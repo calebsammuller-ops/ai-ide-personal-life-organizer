@@ -4,3 +4,8 @@ node_modules/
 .env.local
 .env*.local
 *.log
+tsconfig.tsbuildinfo
+FULL_CODEBASE_DUMP.txt
+KEY_FILES_DUMP.txt
+ios/
+*.tsbuildinfo
