@@ -1,4 +1,4 @@
-import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit'
+import { createSlice, createAsyncThunk, createSelector, PayloadAction } from '@reduxjs/toolkit'
 import type { Habit, HabitCompletion } from '@/types'
 import type { RootState } from '../store'
 
@@ -222,27 +222,36 @@ export const habitsSlice = createSlice({
 
 export const { setSelectedHabit, setFilterCategory } = habitsSlice.actions
 
+// Base selectors
 export const selectAllHabits = (state: RootState) => state.habits.habits
-export const selectActiveHabits = (state: RootState) =>
-  state.habits.habits.filter((h) => h.isActive)
-export const selectHabitById = (id: string) => (state: RootState) =>
-  state.habits.habits.find((h) => h.id === id)
-export const selectHabitCompletions = (habitId: string) => (state: RootState) =>
-  state.habits.completions[habitId] ?? []
+export const selectAllCompletions = (state: RootState) => state.habits.completions
 export const selectSelectedHabit = (state: RootState) => state.habits.selectedHabit
 export const selectHabitsLoading = (state: RootState) => state.habits.isLoading
 
-export const selectAllCompletions = (state: RootState) => state.habits.completions
+// Memoized selectors
+export const selectActiveHabits = createSelector(
+  selectAllHabits,
+  habits => habits.filter(h => h.isActive)
+)
 
-export const selectTodayCompletions = (state: RootState) => {
-  const today = new Date().toISOString().split('T')[0]
-  const completedIds: string[] = []
-  Object.entries(state.habits.completions).forEach(([habitId, completions]) => {
-    if (completions.some((c) => c.completedDate === today)) {
-      completedIds.push(habitId)
-    }
-  })
-  return completedIds
-}
+export const selectHabitById = (id: string) => createSelector(
+  selectAllHabits,
+  habits => habits.find(h => h.id === id)
+)
+
+export const selectHabitCompletions = (habitId: string) => createSelector(
+  selectAllCompletions,
+  completions => completions[habitId] ?? []
+)
+
+export const selectTodayCompletions = createSelector(
+  selectAllCompletions,
+  completions => {
+    const today = new Date().toISOString().split('T')[0]
+    return Object.entries(completions)
+      .filter(([, habitCompletions]) => habitCompletions.some(c => c.completedDate === today))
+      .map(([habitId]) => habitId)
+  }
+)
 
 export default habitsSlice.reducer

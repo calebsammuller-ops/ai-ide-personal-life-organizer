@@ -1,4 +1,4 @@
-import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit'
+import { createSlice, createAsyncThunk, createSelector, PayloadAction } from '@reduxjs/toolkit'
 import type { RootState } from '../store'
 import type {
   Task,
@@ -315,7 +315,7 @@ export const {
   optimisticUpdateTaskStatus,
 } = tasksSlice.actions
 
-// Selectors
+// Base selectors (cheap field access — no memoization needed)
 export const selectAllTasks = (state: RootState) => state.tasks.tasks
 export const selectSelectedTask = (state: RootState) => state.tasks.selectedTask
 export const selectTasksLoading = (state: RootState) => state.tasks.isLoading
@@ -323,68 +323,85 @@ export const selectTasksScheduling = (state: RootState) => state.tasks.isSchedul
 export const selectTasksError = (state: RootState) => state.tasks.error
 export const selectSchedulingSuggestions = (state: RootState) => state.tasks.schedulingSuggestions
 export const selectShowSchedulingModal = (state: RootState) => state.tasks.showSchedulingModal
+const selectStatusFilter = (state: RootState) => state.tasks.statusFilter
+const selectPriorityFilter = (state: RootState) => state.tasks.priorityFilter
+const selectDateFilter = (state: RootState) => state.tasks.dateFilter
 
-export const selectPendingTasks = (state: RootState) =>
-  state.tasks.tasks.filter(t => t.status === 'pending')
+// Memoized selectors — only recompute when their inputs change
+export const selectPendingTasks = createSelector(
+  selectAllTasks,
+  tasks => tasks.filter(t => t.status === 'pending')
+)
 
-export const selectScheduledTasks = (state: RootState) =>
-  state.tasks.tasks.filter(t => t.status === 'scheduled')
+export const selectScheduledTasks = createSelector(
+  selectAllTasks,
+  tasks => tasks.filter(t => t.status === 'scheduled')
+)
 
-export const selectCompletedTasks = (state: RootState) =>
-  state.tasks.tasks.filter(t => t.status === 'completed')
+export const selectCompletedTasks = createSelector(
+  selectAllTasks,
+  tasks => tasks.filter(t => t.status === 'completed')
+)
 
-export const selectTasksByDate = (date: string) => (state: RootState) =>
-  state.tasks.tasks.filter(task => {
-    if (!task.scheduledStart) return false
-    const taskDate = new Date(task.scheduledStart).toISOString().split('T')[0]
-    return taskDate === date
-  })
-
-export const selectTasksByStatus = (status: TaskStatus) => (state: RootState) =>
-  state.tasks.tasks.filter(t => t.status === status)
-
-export const selectOverdueTasks = (state: RootState) => {
-  const now = new Date()
-  return state.tasks.tasks.filter(task => {
-    if (task.status === 'completed' || task.status === 'cancelled') return false
-    if (!task.deadline) return false
-    return new Date(task.deadline) < now
-  })
-}
-
-export const selectTasksDueToday = (state: RootState) => {
-  const today = new Date().toISOString().split('T')[0]
-  return state.tasks.tasks.filter(task => {
-    if (task.status === 'completed' || task.status === 'cancelled') return false
-    if (!task.deadline) return false
-    const deadlineDate = new Date(task.deadline).toISOString().split('T')[0]
-    return deadlineDate === today
-  })
-}
-
-export const selectHighPriorityTasks = (state: RootState) =>
-  state.tasks.tasks.filter(t => t.priority <= 2 && t.status !== 'completed' && t.status !== 'cancelled')
-
-export const selectFilteredTasks = (state: RootState) => {
-  let filtered = state.tasks.tasks
-
-  if (state.tasks.statusFilter !== 'all') {
-    filtered = filtered.filter(t => t.status === state.tasks.statusFilter)
-  }
-
-  if (state.tasks.priorityFilter !== null) {
-    filtered = filtered.filter(t => t.priority === state.tasks.priorityFilter)
-  }
-
-  if (state.tasks.dateFilter) {
-    filtered = filtered.filter(task => {
-      if (!task.scheduledStart) return false
-      const taskDate = new Date(task.scheduledStart).toISOString().split('T')[0]
-      return taskDate === state.tasks.dateFilter
+export const selectOverdueTasks = createSelector(
+  selectAllTasks,
+  tasks => {
+    const now = new Date()
+    return tasks.filter(task => {
+      if (task.status === 'completed' || task.status === 'cancelled') return false
+      if (!task.deadline) return false
+      return new Date(task.deadline) < now
     })
   }
+)
 
-  return filtered
-}
+export const selectTasksDueToday = createSelector(
+  selectAllTasks,
+  tasks => {
+    const today = new Date().toISOString().split('T')[0]
+    return tasks.filter(task => {
+      if (task.status === 'completed' || task.status === 'cancelled') return false
+      if (!task.deadline) return false
+      return new Date(task.deadline).toISOString().split('T')[0] === today
+    })
+  }
+)
+
+export const selectHighPriorityTasks = createSelector(
+  selectAllTasks,
+  tasks => tasks.filter(t => t.priority <= 2 && t.status !== 'completed' && t.status !== 'cancelled')
+)
+
+export const selectFilteredTasks = createSelector(
+  selectAllTasks,
+  selectStatusFilter,
+  selectPriorityFilter,
+  selectDateFilter,
+  (tasks, statusFilter, priorityFilter, dateFilter) => {
+    let filtered = tasks
+    if (statusFilter !== 'all') filtered = filtered.filter(t => t.status === statusFilter)
+    if (priorityFilter !== null) filtered = filtered.filter(t => t.priority === priorityFilter)
+    if (dateFilter) {
+      filtered = filtered.filter(task => {
+        if (!task.scheduledStart) return false
+        return new Date(task.scheduledStart).toISOString().split('T')[0] === dateFilter
+      })
+    }
+    return filtered
+  }
+)
+
+export const selectTasksByDate = (date: string) => createSelector(
+  selectAllTasks,
+  tasks => tasks.filter(task => {
+    if (!task.scheduledStart) return false
+    return new Date(task.scheduledStart).toISOString().split('T')[0] === date
+  })
+)
+
+export const selectTasksByStatus = (status: TaskStatus) => createSelector(
+  selectAllTasks,
+  tasks => tasks.filter(t => t.status === status)
+)
 
 export default tasksSlice.reducer

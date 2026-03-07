@@ -246,7 +246,7 @@ async function handleCreateMeal(
   const mealDate = date ? String(date) : new Date().toISOString().split('T')[0]
   const ingredientList = Array.isArray(ingredients) ? ingredients as string[] : []
 
-  const { data, error } = await (supabase as any)
+  const { data, error } = await supabase
     .from('meal_plans')
     .insert({
       user_id: userId,
@@ -278,7 +278,7 @@ async function handleCreateMeal(
       is_checked: false,
       meal_plan_id: data.id,
     }))
-    await (supabase as any).from('shopping_list_items').insert(shoppingItems)
+    await supabase.from('shopping_list_items').insert(shoppingItems)
   }
 
   const shoppingMsg = ingredientList.length > 0
@@ -1328,7 +1328,7 @@ async function handleCreateHabit(
   const validFrequencies = ['daily', 'weekly', 'monthly']
   const habitFrequency = validFrequencies.includes(freq) ? freq : 'daily'
 
-  const { data, error } = await (supabase.from('habits') as any).insert({
+  const { data, error } = await supabase.from('habits').insert({
     user_id: userId,
     name: name as string,
     description: description as string | undefined,
@@ -1949,7 +1949,7 @@ async function handleAddShoppingItem(
     added_by: 'ai',
   }))
 
-  const { error } = await (supabase as any).from('shopping_list_items').insert(rows)
+  const { error } = await supabase.from('shopping_list_items').insert(rows)
 
   if (error) {
     return { success: false, message: `Failed to add items: ${error.message}` }
@@ -1980,7 +1980,7 @@ async function handleCreateKnowledgeNote(
   let zettelId = base
   for (const s of suffixes) {
     const id = base + s
-    const { data } = await (supabase as any).from('knowledge_notes').select('id').eq('zettel_id', id).maybeSingle()
+    const { data } = await supabase.from('knowledge_notes').select('id').eq('zettel_id', id).maybeSingle()
     if (!data) { zettelId = id; break }
   }
 
@@ -1989,7 +1989,7 @@ async function handleCreateKnowledgeNote(
 
   const tagList = Array.isArray(tags) ? tags : (typeof tags === 'string' ? [tags] : [])
 
-  const { data, error } = await (supabase as any).from('knowledge_notes').insert({
+  const { data, error } = await supabase.from('knowledge_notes').insert({
     zettel_id: zettelId,
     user_id: userId,
     title: String(title).trim(),
@@ -2007,7 +2007,7 @@ async function handleCreateKnowledgeNote(
   }
 
   // Log cognitive event
-  await (supabase as any).from('cognitive_events').insert({
+  await supabase.from('cognitive_events').insert({
     user_id: userId,
     event_type: 'note_created',
     related_note_ids: [data.id],
@@ -2033,14 +2033,14 @@ async function handleLinkKnowledgeNotes(
   }
 
   // Find notes by title (case-insensitive fuzzy match)
-  const { data: sourceNotes } = await (supabase as any)
+  const { data: sourceNotes } = await supabase
     .from('knowledge_notes')
     .select('id, title')
     .eq('user_id', userId)
     .ilike('title', `%${String(sourceTitle).trim()}%`)
     .limit(1)
 
-  const { data: targetNotes } = await (supabase as any)
+  const { data: targetNotes } = await supabase
     .from('knowledge_notes')
     .select('id, title')
     .eq('user_id', userId)
@@ -2057,7 +2057,7 @@ async function handleLinkKnowledgeNotes(
   const validRelationships = ['supports', 'contradicts', 'extends', 'applies_to', 'derived_from', 'related']
   const rel = validRelationships.includes(String(relationship)) ? String(relationship) : 'related'
 
-  const { error } = await (supabase as any).from('knowledge_links').insert({
+  const { error } = await supabase.from('knowledge_links').insert({
     user_id: userId,
     source_note_id: source.id,
     target_note_id: target.id,
@@ -2071,7 +2071,7 @@ async function handleLinkKnowledgeNotes(
   }
 
   // Log cognitive event
-  await (supabase as any).from('cognitive_events').insert({
+  await supabase.from('cognitive_events').insert({
     user_id: userId,
     event_type: 'link_created',
     related_note_ids: [source.id, target.id],

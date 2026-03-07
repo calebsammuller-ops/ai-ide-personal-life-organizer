@@ -13,7 +13,8 @@ export async function POST(request: Request) {
 
     // Allow cron calls with secret, otherwise require auth
     const cronSecret = request.headers.get('x-cron-secret')
-    const isCron = cronSecret && cronSecret === (process.env.CRON_SECRET || '')
+    const expectedSecret = process.env.CRON_SECRET
+    const isCron = !!expectedSecret && cronSecret === expectedSecret
 
     let userId: string
 

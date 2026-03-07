@@ -24,6 +24,7 @@ import {
   handleConnectCommand,
   handleGhostCommand,
 } from '@/lib/assistant/vaultCommands'
+import type { SupabaseClient } from '@supabase/supabase-js'
 import type { AssistantMessage, CalendarEvent, Habit, MealPlan, UserPreferences, LearnedPatterns, UserMemory, GrowthPhase, SystemPersona } from '@/types'
 import { GROWTH_PHASE_CONFIG, SYSTEM_PERSONA_CONFIG } from '@/types'
 
@@ -102,6 +103,9 @@ export async function POST(request: NextRequest) {
   console.log('[Assistant] POST request received')
 
   const supabase = createClient()
+  // db is a base SupabaseClient without the Database generic — used for tables
+  // not yet included in the auto-generated Database type definition.
+  const db = supabase as unknown as SupabaseClient
   const { data: { user } } = await supabase.auth.getUser()
 
   if (!user) {
@@ -136,8 +140,8 @@ export async function POST(request: NextRequest) {
 
   // Create user message
   console.log('[Assistant] Creating user message in database')
-  const { data: userMessage, error: userError } = await (supabase
-    .from('assistant_messages') as any)
+  const { data: userMessage, error: userError } = await db
+    .from('assistant_messages')
     .insert({
       user_id: user.id,
       conversation_id: conversationId,
@@ -195,8 +199,8 @@ Respond in a structured, tactical way. Use markdown with headers and bullet poin
         const cmdText = cmdResponse.content.find(b => b.type === 'text')
         const cmdContent = cmdText?.type === 'text' ? cmdText.text : 'Command failed to generate a response.'
 
-        const { data: assistantMessage, error: assistantError } = await (supabase
-          .from('assistant_messages') as any)
+        const { data: assistantMessage, error: assistantError } = await db
+          .from('assistant_messages')
           .insert({
             user_id: user.id,
             conversation_id: conversationId,
@@ -230,8 +234,8 @@ Respond in a structured, tactical way. Use markdown with headers and bullet poin
   // ─────────────────────────────────────────────────────────────────────────
 
   // Fetch conversation history (last 10 messages for context)
-  const { data: history } = await (supabase
-    .from('assistant_messages') as any)
+  const { data: history } = await db
+    .from('assistant_messages')
     .select('*')
     .eq('conversation_id', conversationId)
     .order('created_at', { ascending: true })
@@ -308,7 +312,7 @@ Respond in a structured, tactical way. Use markdown with headers and bullet poin
       body.pageContext,
       growthResult.phase,
       latestReflection,
-      (body as any).attachment as { base64: string; mimeType: string; name: string } | undefined
+      body.attachment
     )
     console.log('[Assistant] AI response generated successfully')
   } catch (error) {
@@ -375,8 +379,8 @@ Respond in a structured, tactical way. Use markdown with headers and bullet poin
 
   // Save assistant message (only use columns that exist in the database)
   console.log('[Assistant] Saving assistant message to database')
-  const { data: assistantMessage, error: assistantError } = await (supabase
-    .from('assistant_messages') as any)
+  const { data: assistantMessage, error: assistantError } = await db
+    .from('assistant_messages')
     .insert({
       user_id: user.id,
       conversation_id: conversationId,
@@ -393,7 +397,7 @@ Respond in a structured, tactical way. Use markdown with headers and bullet poin
   console.log('[Assistant] Assistant message saved successfully')
 
   // Save conversation exchange to ai_decisions for transparency log
-  ;(supabase.from('ai_decisions') as any)
+  ;db.from('ai_decisions')
     .insert({
       user_id: user.id,
       agent: 'strategist',
@@ -427,6 +431,7 @@ Respond in a structured, tactical way. Use markdown with headers and bullet poin
 }
 
 async function fetchUserContext(userId: string, supabase: ReturnType<typeof createClient>): Promise<UserContext> {
+  const db = supabase as unknown as SupabaseClient
   const today = new Date().toISOString().split('T')[0]
   const todayStart = `${today}T00:00:00`
   const todayEnd = `${today}T23:59:59`
@@ -474,16 +479,16 @@ async function fetchUserContext(userId: string, supabase: ReturnType<typeof crea
       .gte('completed_date', thirtyDaysAgo)
       .order('completed_date', { ascending: false }),
     // Fetch active projects
-    (supabase
-      .from('projects') as any)
+    db
+      .from('projects')
       .select('id, name, status, description')
       .eq('user_id', userId)
       .neq('status', 'completed')
       .order('created_at', { ascending: false })
       .limit(10),
     // Fetch pending tasks (not completed)
-    (supabase
-      .from('tasks') as any)
+    db
+      .from('tasks')
       .select('id, title, priority, deadline, project_id')
       .eq('user_id', userId)
       .eq('completed', false)
@@ -511,7 +516,7 @@ async function fetchUserContext(userId: string, supabase: ReturnType<typeof crea
     userMemories,
     habitStats,
     projects: (projectsResult.data || []) as { id: string; name: string; status: string; description: string | null }[],
-    pendingTasks: ((tasksResult.data || []) as any[]).map(t => ({
+    pendingTasks: (tasksResult.data || []).map((t: { id: string; title: string; priority: string | null; deadline: string | null; project_id: string | null }) => ({
       id: t.id,
       title: t.title,
       priority: t.priority || 'medium',
@@ -524,7 +529,8 @@ async function fetchUserContext(userId: string, supabase: ReturnType<typeof crea
 
 async function fetchKnowledgeContext(userId: string, supabase: ReturnType<typeof createClient>) {
   try {
-    const { data } = await (supabase as any)
+    const db = supabase as unknown as SupabaseClient
+    const { data } = await db
       .from('knowledge_notes')
       .select('zettel_id, title, type, content, tags, confidence, importance')
       .eq('user_id', userId)
@@ -704,7 +710,7 @@ CRITICAL SOURCE VALIDATION RULES:
     : ''
 
   // Build Truth Mode section
-  const truthMode = (userContext.preferences as any).truthMode || 'direct'
+  const truthMode = userContext.preferences.truthMode || 'direct'
   const truthModeSection = (() => {
     switch (truthMode) {
       case 'observational':
@@ -727,7 +733,7 @@ ${phaseConfig.description}
 AI Approach: ${phaseConfig.aiApproach}`
 
   // Build System Persona section
-  const activePersona: SystemPersona = ((userContext.preferences as any).activePersona as SystemPersona) || 'truthful'
+  const activePersona: SystemPersona = userContext.preferences.activePersona || 'truthful'
   const personaConfig = SYSTEM_PERSONA_CONFIG[activePersona]
   const personaSection = `ACTIVE PERSONA: ${personaConfig.label}
 ${personaConfig.promptBehavior}`
@@ -878,9 +884,9 @@ DAILY RHYTHM:
 - Work: ${userContext.preferences.workStartTime || '9:00 AM'} - ${userContext.preferences.workEndTime || '5:00 PM'}
 - Sleep: ${userContext.preferences.sleepTime || '11:00 PM'}
 
-LIFE MODE: ${(userContext.preferences as any).lifeMode || 'normal'}
+LIFE MODE: ${userContext.preferences.lifeMode || 'normal'}
 ${(() => {
-  const mode = (userContext.preferences as any).lifeMode || 'normal'
+  const mode = userContext.preferences.lifeMode || 'normal'
   switch (mode) {
     case 'deep_work': return 'User is in Deep Work mode. Minimize interruptions, keep responses focused and direct. Only suggest actions that support deep concentration.'
     case 'recovery': return 'User is in Recovery mode. Be gentle, reduce expectations. Do not suggest adding new tasks. Encourage rest and self-care.'
@@ -892,9 +898,9 @@ ${(() => {
   }
 })()}
 
-AUTONOMY LEVEL: ${(userContext.preferences as any).autonomyLevel || 3}
+AUTONOMY LEVEL: ${userContext.preferences.autonomyLevel || 3}
 ${(() => {
-  const level = (userContext.preferences as any).autonomyLevel || 3
+  const level = userContext.preferences.autonomyLevel || 3
   switch (level) {
     case 1: return 'Advisory only — suggest actions but never execute. Always ask before doing anything.'
     case 2: return 'Suggest + confirm — propose changes but wait for user approval before executing.'

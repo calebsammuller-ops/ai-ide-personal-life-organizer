@@ -1,4 +1,4 @@
-import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit'
+import { createSlice, createAsyncThunk, createSelector, PayloadAction } from '@reduxjs/toolkit'
 import type { RootState } from '../store'
 import type {
   KnowledgeNote,
@@ -588,8 +588,6 @@ export const {
 export const selectAllNotes = (state: RootState) => state.knowledge.notes
 export const selectAllLinks = (state: RootState) => state.knowledge.links
 export const selectSelectedNoteId = (state: RootState) => state.knowledge.selectedNoteId
-export const selectSelectedNote = (state: RootState) =>
-  state.knowledge.notes.find(n => n.id === state.knowledge.selectedNoteId) || null
 export const selectKnowledgeLoading = (state: RootState) => state.knowledge.isLoading
 export const selectKnowledgeGenerating = (state: RootState) => state.knowledge.isGenerating
 export const selectKnowledgeError = (state: RootState) => state.knowledge.error
@@ -605,8 +603,10 @@ export const selectVelocity = (state: RootState) => state.knowledge.velocity
 export const selectSearchQuery = (state: RootState) => state.knowledge.searchQuery
 export const selectTypeFilter = (state: RootState) => state.knowledge.typeFilter
 
-export const selectNoteLinks = (noteId: string) => (state: RootState) =>
-  state.knowledge.links.filter(l => l.sourceNoteId === noteId || l.targetNoteId === noteId)
+export const selectNoteLinks = (noteId: string) => createSelector(
+  selectAllLinks,
+  links => links.filter(l => l.sourceNoteId === noteId || l.targetNoteId === noteId)
+)
 
 export const selectPredictions = (state: RootState) => state.knowledge.predictions
 export const selectMissions = (state: RootState) => state.knowledge.missions
@@ -614,19 +614,29 @@ export const selectDuplicates = (state: RootState) => state.knowledge.duplicates
 export const selectKnowledgeReport = (state: RootState) => state.knowledge.report
 export const selectIsEvolving = (state: RootState) => state.knowledge.isEvolving
 
-export const selectFilteredNotes = (state: RootState) => {
-  let notes = state.knowledge.notes
-  const { searchQuery, typeFilter } = state.knowledge
-  if (typeFilter && typeFilter !== 'all') notes = notes.filter(n => n.type === typeFilter)
-  if (searchQuery) {
-    const q = searchQuery.toLowerCase()
-    notes = notes.filter(n =>
-      n.title.toLowerCase().includes(q) ||
-      n.content.toLowerCase().includes(q) ||
-      n.tags.some(t => t.toLowerCase().includes(q))
-    )
+export const selectSelectedNote = createSelector(
+  selectAllNotes,
+  selectSelectedNoteId,
+  (notes, selectedId) => notes.find(n => n.id === selectedId) || null
+)
+
+export const selectFilteredNotes = createSelector(
+  selectAllNotes,
+  selectSearchQuery,
+  selectTypeFilter,
+  (notes, searchQuery, typeFilter) => {
+    let filtered = notes
+    if (typeFilter && typeFilter !== 'all') filtered = filtered.filter(n => n.type === typeFilter)
+    if (searchQuery) {
+      const q = searchQuery.toLowerCase()
+      filtered = filtered.filter(n =>
+        n.title.toLowerCase().includes(q) ||
+        n.content.toLowerCase().includes(q) ||
+        n.tags.some(t => t.toLowerCase().includes(q))
+      )
+    }
+    return filtered
   }
-  return notes
-}
+)
 
 export default knowledgeSlice.reducer

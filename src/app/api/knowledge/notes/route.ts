@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { NextRequest, NextResponse } from 'next/server'
 import OpenAI from 'openai'
+import { logError } from '@/lib/logger'
 import type { KnowledgeNote, CreateNoteInput } from '@/types/knowledge'
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
@@ -73,7 +74,10 @@ export async function GET(request: NextRequest) {
   if (tag) query = query.contains('tags', [tag])
 
   const { data, error } = await query
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  if (error) {
+    logError(error, { route: 'GET /api/knowledge/notes', userId: user.id })
+    return NextResponse.json({ error: 'Failed to fetch notes' }, { status: 500 })
+  }
 
   return NextResponse.json({ data: (data || []).map(transformNote) })
 }
@@ -114,7 +118,10 @@ export async function POST(request: NextRequest) {
     .select()
     .single()
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  if (error) {
+    logError(error, { route: 'POST /api/knowledge/notes', userId: user.id })
+    return NextResponse.json({ error: 'Failed to create note' }, { status: 500 })
+  }
 
   // Log cognitive event
   await supabase.from('cognitive_events').insert({

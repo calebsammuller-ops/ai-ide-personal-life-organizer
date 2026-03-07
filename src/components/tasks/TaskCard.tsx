@@ -1,5 +1,6 @@
 'use client'
 
+import { memo } from 'react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -55,7 +56,7 @@ const statusColors: Record<string, string> = {
   deferred: 'bg-purple-100 text-purple-700',
 }
 
-export function TaskCard({
+export const TaskCard = memo(function TaskCard({
   task,
   onComplete,
   onSchedule,
@@ -229,4 +230,4 @@ export function TaskCard({
       </CardContent>
     </Card>
   )
-}
+})

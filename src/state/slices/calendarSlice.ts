@@ -1,4 +1,4 @@
-import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit'
+import { createSlice, createAsyncThunk, createSelector, PayloadAction } from '@reduxjs/toolkit'
 import type { CalendarEvent, Calendar } from '@/types'
 import type { RootState } from '../store'
 import type { ConflictInfo, ResolutionSuggestion } from '@/lib/calendar/conflictDetection'
@@ -244,10 +244,12 @@ export const selectShowConflictModal = (state: RootState) => state.calendar.show
 export const selectPendingEvent = (state: RootState) => state.calendar.pendingEvent
 export const selectIsCheckingConflicts = (state: RootState) => state.calendar.isCheckingConflicts
 
-export const selectEventsByDate = (date: string) => (state: RootState) =>
-  state.calendar.events.filter((event) => {
+export const selectEventsByDate = (date: string) => createSelector(
+  selectAllEvents,
+  events => events.filter(event => {
     const eventDate = new Date(event.startTime as string).toISOString().split('T')[0]
     return eventDate === date
   })
+)
 
 export default calendarSlice.reducer

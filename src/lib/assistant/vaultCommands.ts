@@ -7,6 +7,20 @@
 
 import { createClient } from '@/lib/supabase/server'
 
+/**
+ * Sanitize user-provided args before embedding them in Claude prompts.
+ * Strips newlines, prompt-injection patterns, and limits length.
+ */
+function sanitizeArg(arg: string, maxLength = 200): string {
+  return arg
+    .replace(/[\r\n]+/g, ' ')           // no newlines (cross-prompt injection)
+    .replace(/---+/g, '')                // no markdown separators
+    .replace(/system\s*:/gi, '')         // no "system:" prefix injection
+    .replace(/\[INST\]|\[\/INST\]/gi, '') // no instruction tags
+    .trim()
+    .slice(0, maxLength)
+}
+
 export interface VaultCommand {
   name: string
   trigger: string          // what the user types e.g. "/today"
@@ -415,6 +429,7 @@ export async function handleTraceCommand(
     }
   }
 
+  topic = sanitizeArg(topic)
   const searchTerm = topic.toLowerCase()
 
   const [thoughts, tasks, calendar] = await Promise.all([
@@ -512,6 +527,7 @@ export async function handleConnectCommand(
   supabase: SupabaseClient,
   args: string
 ): Promise<CommandContext> {
+  args = sanitizeArg(args)
   // Parse "topic A and topic B" or just "topic A topic B"
   const parts = args.toLowerCase().split(/\s+and\s+|\s*,\s*/)
   const topicA = parts[0]?.trim()
@@ -580,6 +596,8 @@ export async function handleGhostCommand(
       systemInstruction: 'Tell the user they need to provide a question: /ghost [question]. Example: /ghost what do I think about AI?',
     }
   }
+
+  question = sanitizeArg(question)
 
   const [thoughts, habits, tasks] = await Promise.all([
     fetchThoughts(userId, supabase, 60),

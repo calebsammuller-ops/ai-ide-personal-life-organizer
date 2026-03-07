@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo } from 'react'
+import { useMemo, memo } from 'react'
 import { cn } from '@/lib/utils'
 import { Flame, TrendingUp, CheckCircle2, Calendar } from 'lucide-react'
 import type { HabitCompletion } from '@/types'
@@ -22,7 +22,7 @@ function intensityClass(count: number, max: number): string {
   return 'bg-purple-400 hover:bg-purple-300 shadow-[0_0_6px_rgba(168,85,247,0.5)]'
 }
 
-export function HabitHeatmap({ completions, habitCount }: HabitHeatmapProps) {
+export const HabitHeatmap = memo(function HabitHeatmap({ completions, habitCount }: HabitHeatmapProps) {
   const { weeks, stats } = useMemo(() => {
     // Build date → count map from all completions
     const dateMap: Record<string, number> = {}
@@ -177,4 +177,4 @@ export function HabitHeatmap({ completions, habitCount }: HabitHeatmapProps) {
       </div>
     </div>
   )
-}
+})
