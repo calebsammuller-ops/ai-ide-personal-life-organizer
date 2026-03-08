@@ -1,7 +1,7 @@
 'use client'
 
-import { useEffect } from 'react'
-import { Brain, RefreshCw, Lightbulb, Network, Sparkles } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { Brain, RefreshCw, Lightbulb, Network, Sparkles, Share2 } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -12,8 +12,22 @@ import {
   selectAllNotes, selectAllLinks, selectBriefing, selectKnowledgeGenerating,
   selectPredictions,
 } from '@/state/slices/knowledgeSlice'
+import { fetchCognitiveMirror } from '@/state/slices/cognitiveMirrorSlice'
+import { fetchStrategy } from '@/state/slices/strategySlice'
+import { fetchTrajectory } from '@/state/slices/trajectorySlice'
 import { cn } from '@/lib/utils'
 import Link from 'next/link'
+import { CognitiveMirrorCard } from './CognitiveMirrorCard'
+import { StrategyEngineCard } from './StrategyEngineCard'
+import { LifeTrajectoryCard } from './LifeTrajectoryCard'
+import { ShareableInsightCard } from './ShareableInsightCard'
+import { WhatIfSimulator } from './WhatIfSimulator'
+
+interface SharingNote {
+  title: string
+  content: string
+  tags: string[]
+}
 
 export function InsightsDashboard() {
   const dispatch = useAppDispatch()
@@ -22,11 +36,15 @@ export function InsightsDashboard() {
   const briefing = useAppSelector(selectBriefing)
   const isGenerating = useAppSelector(selectKnowledgeGenerating)
   const predictions = useAppSelector(selectPredictions)
+  const [sharingNote, setSharingNote] = useState<SharingNote | null>(null)
 
   useEffect(() => {
     dispatch(fetchNotes() as any)
     dispatch(fetchBriefing() as any)
     dispatch(fetchPredictions() as any)
+    dispatch(fetchCognitiveMirror() as any)
+    dispatch(fetchStrategy() as any)
+    dispatch(fetchTrajectory() as any)
   }, [dispatch])
 
   const insightNotes = notes.filter(n => n.tags?.includes('ai-insight'))
@@ -49,6 +67,15 @@ export function InsightsDashboard() {
         </Button>
       </div>
 
+      {/* Cognitive Mirror */}
+      <CognitiveMirrorCard />
+
+      {/* Strategy Engine */}
+      <StrategyEngineCard />
+
+      {/* Life Trajectory */}
+      <LifeTrajectoryCard />
+
       {/* Knowledge Briefing */}
       {briefing && (
         <Card>
@@ -65,10 +92,17 @@ export function InsightsDashboard() {
             {briefing.insights?.map((insight: { title: string; content: string }, i: number) => (
               <div key={i} className="flex items-start gap-2 p-3 bg-amber-500/5 border border-amber-500/20 rounded-lg">
                 <Sparkles className="h-4 w-4 text-amber-500 shrink-0 mt-0.5" />
-                <div>
+                <div className="flex-1 min-w-0">
                   <p className="font-medium text-sm text-amber-600">{insight.title}</p>
                   <p className="text-sm text-muted-foreground mt-1">{insight.content}</p>
                 </div>
+                <button
+                  onClick={() => setSharingNote({ title: insight.title, content: insight.content, tags: [] })}
+                  className="shrink-0 text-muted-foreground hover:text-foreground transition-colors"
+                  title="Share this insight"
+                >
+                  <Share2 className="h-3.5 w-3.5" />
+                </button>
               </div>
             ))}
           </CardContent>
@@ -125,15 +159,22 @@ export function InsightsDashboard() {
           <CardContent>
             <div className="space-y-2">
               {insightNotes.slice(0, 5).map(note => (
-                <Link key={note.id} href={`/knowledge?noteId=${note.id}`}>
-                  <div className="p-3 border border-border/50 rounded-lg hover:border-primary/30 hover:bg-primary/5 transition-colors">
+                <div key={note.id} className="flex items-start gap-2 p-3 border border-border/50 rounded-lg hover:border-primary/30 hover:bg-primary/5 transition-colors group">
+                  <Link href={`/knowledge?noteId=${note.id}`} className="flex-1 min-w-0">
                     <p className="font-medium text-sm">{note.title}</p>
                     <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{note.content}</p>
                     <p className="text-[10px] text-muted-foreground/50 mt-1">
                       {new Date(note.createdAt).toLocaleDateString()}
                     </p>
-                  </div>
-                </Link>
+                  </Link>
+                  <button
+                    onClick={() => setSharingNote({ title: note.title, content: note.content, tags: note.tags || [] })}
+                    className="shrink-0 text-muted-foreground hover:text-foreground opacity-0 group-hover:opacity-100 transition-all"
+                    title="Share this insight"
+                  >
+                    <Share2 className="h-3.5 w-3.5" />
+                  </button>
+                </div>
               ))}
               {insightNotes.length > 5 && (
                 <Link href="/knowledge" className="text-sm text-primary hover:underline block text-center pt-1">
@@ -144,6 +185,9 @@ export function InsightsDashboard() {
           </CardContent>
         </Card>
       )}
+
+      {/* What If Simulator */}
+      <WhatIfSimulator />
 
       {/* Empty state */}
       {!briefing && predictions.length === 0 && insightNotes.length === 0 && (
@@ -165,6 +209,15 @@ export function InsightsDashboard() {
             </div>
           </CardContent>
         </Card>
+      )}
+      {/* Shareable Insight Card Modal */}
+      {sharingNote && (
+        <ShareableInsightCard
+          title={sharingNote.title}
+          content={sharingNote.content}
+          tags={sharingNote.tags}
+          onClose={() => setSharingNote(null)}
+        />
       )}
     </div>
   )

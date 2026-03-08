@@ -146,3 +146,83 @@ export interface KnowledgeChatMessage {
   content: string
   relatedNotes?: { id: string; title: string; zettelId?: string }[]
 }
+
+// ── Wave 2: Intelligence Features ──────────────────────────────────────────
+
+// Cognitive Mirror
+export interface CognitiveMirrorPattern {
+  label: string
+  description: string
+  score: number
+  valence: 'strength' | 'weakness' | 'neutral'
+}
+export interface CognitiveMirrorResult {
+  patterns: CognitiveMirrorPattern[]
+  dominantStyle: string
+  observation: string
+  strengthSummary: string
+  blindSpot: string
+  recommendation: string
+  thinkingBiases: string[]
+  learningStyle: string
+  focusScore: number
+}
+
+// Strategy Engine
+export interface StrategyStep {
+  priority: number
+  action: string
+  rationale: string
+  relatedNotes: string[]
+  timeEstimate: string
+  impactScore: number
+  effortScore: number
+  confidence: number
+}
+export interface StrategyResult {
+  strategicFocus: string
+  steps: StrategyStep[]
+  momentumArea: string
+  underexploredArea: string
+  weeklyChallenge: string
+}
+
+// Life Trajectory
+export interface TrendSeries {
+  tag: string
+  weeks: { week: string; count: number }[]
+  momentum: number
+}
+export interface TrajectoryProjection {
+  threeMonths: string
+  twelveMonths: string
+}
+export interface TrajectoryNarrative {
+  trajectory: string
+  headline: string
+  reasoning: string
+  possibleFutures: string[]
+  projection: TrajectoryProjection
+}
+export interface TrajectoryResult {
+  trends: TrendSeries[]
+  risingTags: string[]
+  stableTags: string[]
+  narrative: TrajectoryNarrative | null
+}
+
+// What If Simulation
+export interface SimulatedOutcome {
+  label: string
+  probability: string
+  description: string
+  keyActions: string[]
+  risks: string[]
+  sourceNotes: string[]
+}
+export interface WhatIfSimulation {
+  scenario: string
+  outcomes: SimulatedOutcome[]
+  recommendation: string
+  notesToReview: string[]
+}

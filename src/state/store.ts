@@ -8,6 +8,9 @@ import consentReducer from './slices/consentSlice'
 import searchReducer from './slices/searchSlice'
 import knowledgeReducer from './slices/knowledgeSlice'
 import intelligenceScoreReducer from './slices/intelligenceScoreSlice'
+import cognitiveMirrorReducer from './slices/cognitiveMirrorSlice'
+import strategyReducer from './slices/strategySlice'
+import trajectoryReducer from './slices/trajectorySlice'
 
 export const store = configureStore({
   reducer: {
@@ -20,6 +23,9 @@ export const store = configureStore({
     search: searchReducer,
     knowledge: knowledgeReducer,
     intelligenceScore: intelligenceScoreReducer,
+    cognitiveMirror: cognitiveMirrorReducer,
+    strategy: strategyReducer,
+    trajectory: trajectoryReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
