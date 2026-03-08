@@ -39,10 +39,10 @@ interface AssistantState {
 }
 
 const defaultSuggestedActions: SuggestedAction[] = [
-  { label: 'Schedule event', action: 'schedule_event', icon: 'calendar' },
-  { label: 'Log habit', action: 'log_habit', icon: 'check' },
-  { label: 'Plan meals', action: 'plan_meals', icon: 'utensils' },
-  { label: 'Capture thought', action: 'capture_thought', icon: 'lightbulb' },
+  { label: 'Analyze my thinking', action: 'analyze_thinking', icon: 'brain' },
+  { label: 'What should I focus on?', action: 'strategy', icon: 'target' },
+  { label: 'Capture an idea', action: 'capture_idea', icon: 'lightbulb' },
+  { label: 'Challenge my assumptions', action: 'challenge', icon: 'zap' },
 ]
 
 const initialState: AssistantState = {

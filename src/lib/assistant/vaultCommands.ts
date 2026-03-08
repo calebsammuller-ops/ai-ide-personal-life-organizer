@@ -31,30 +31,30 @@ export interface VaultCommand {
 
 export const VAULT_COMMANDS: VaultCommand[] = [
   {
-    name: 'Morning Brief',
+    name: 'Knowledge Brief',
     trigger: '/today',
-    description: 'Pulls your calendar, tasks, habits & recent thoughts into a prioritised day plan',
+    description: 'Pulls your recent notes, connections & insights into a focused thinking brief',
     usage: '/today',
     icon: '🌅',
   },
   {
-    name: 'End of Day',
+    name: 'Reflect',
     trigger: '/end-day',
-    description: "Reviews what got done, what's outstanding, and extracts 3 action items for tomorrow",
+    description: 'Reviews your recent ideas and surfaces the 3 most important threads to develop next',
     usage: '/end-day',
     icon: '🌙',
   },
   {
     name: 'Emerge',
     trigger: '/emerge',
-    description: "Scans your thoughts, tasks & habits for patterns you haven't consciously noticed",
+    description: "Scans your knowledge graph for patterns and connections you haven't consciously noticed",
     usage: '/emerge',
     icon: '🔮',
   },
   {
-    name: 'Drift',
+    name: 'Focus Check',
     trigger: '/drift',
-    description: 'Compares your stated intentions against actual behaviour over the last 30 days',
+    description: 'Compares your stated focus areas against the ideas you have actually been capturing',
     usage: '/drift',
     icon: '📊',
   },

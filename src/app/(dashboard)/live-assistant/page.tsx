@@ -88,7 +88,7 @@ function AILoadingOverlay() {
         <div className="absolute bottom-0 left-0 w-3 h-3 border-b border-l border-primary/50" />
         <div className="absolute bottom-0 right-0 w-3 h-3 border-b border-r border-primary/50" />
 
-        <p className="text-[10px] text-primary/60 uppercase tracking-widest font-mono">STRATEGIST v2</p>
+        <p className="text-[10px] text-primary/60 uppercase tracking-widest font-mono">THINKING PARTNER</p>
 
         <div className="w-48 h-px bg-primary/10 overflow-hidden relative">
           <motion.div
@@ -127,7 +127,7 @@ export default function LiveAssistantPage() {
   const attachmentPreviewsRef = useRef<Map<string, string>>(new Map())
 
   useRegisterPageContext({
-    pageTitle: 'Strategist',
+    pageTitle: 'Thinking Partner',
   })
 
   useEffect(() => {
@@ -331,8 +331,8 @@ export default function LiveAssistantPage() {
                   size="sm"
                 />
                 <div>
-                  <h2 className="text-xs font-mono font-bold tracking-widest uppercase">STRATEGIST</h2>
-                  <p className="text-[10px] text-muted-foreground uppercase tracking-wide font-mono">TACTICAL AI</p>
+                  <h2 className="text-xs font-mono font-bold tracking-widest uppercase">THINKING PARTNER</h2>
+                  <p className="text-[10px] text-muted-foreground uppercase tracking-wide font-mono">KNOWLEDGE AI</p>
                 </div>
               </div>
               <div className="flex items-center gap-1.5">
@@ -467,7 +467,7 @@ export default function LiveAssistantPage() {
                     transition={{ delay: 0.3 }}
                     className="text-xs text-muted-foreground font-mono mb-4 max-w-xs mt-4 leading-relaxed"
                   >
-                    STRATEGIST ONLINE. Ready to help you manage schedule, habits, meals, and more. Issue a command to begin.
+                    THINKING PARTNER ONLINE. Ask me anything about your ideas, get your strategy, simulate scenarios, or use slash commands to explore your knowledge graph.
                   </motion.p>
                   <motion.div
                     initial={{ opacity: 0, y: 10 }}
@@ -712,12 +712,12 @@ export default function LiveAssistantPage() {
                 </Button>
 
                 <Input
-                  placeholder="ISSUE COMMAND..."
+                  placeholder="Ask anything, or type / for commands..."
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   onKeyDown={handleKeyDown}
                   disabled={isTyping}
-                  className="flex-1 h-8 text-xs font-mono rounded-sm bg-muted/50 border-border/50 placeholder:text-muted-foreground/40 placeholder:uppercase placeholder:tracking-wider placeholder:text-[10px]"
+                  className="flex-1 h-8 text-xs font-mono rounded-sm bg-muted/50 border-border/50 placeholder:text-muted-foreground/40 placeholder:tracking-wider placeholder:text-[10px]"
                 />
 
                 <Button
