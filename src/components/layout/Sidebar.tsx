@@ -3,80 +3,43 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import {
-  Calendar,
-  CheckSquare,
-  UtensilsCrossed,
+  Brain,
   Lightbulb,
   MessageCircle,
-  Home,
   Settings,
   ChevronLeft,
   ChevronRight,
-  Brain,
-  ListTodo,
-  FolderKanban,
-  Timer,
-  FileText,
-  Zap,
-  Calculator,
-  BarChart3,
-  ScrollText,
-  Flame,
-  ShoppingCart,
   Network,
-  Search,
+  Sparkles,
   Clock,
+  Search,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { useAppSelector, useAppDispatch } from '@/state/hooks'
-import { selectIsSidebarCollapsed, toggleSidebar, selectIsWinterArcMode, toggleWinterArcMode } from '@/state/slices/uiSlice'
+import { selectIsSidebarCollapsed, toggleSidebar } from '@/state/slices/uiSlice'
 
 const navSections = [
   {
-    label: 'Core',
+    label: 'Ideas',
     items: [
-      { href: '/dashboard',  icon: Home,          label: 'Command Center' },
-      { href: '/calendar',   icon: Calendar,      label: 'Calendar' },
-      { href: '/tasks',      icon: ListTodo,      label: 'Missions' },
-      { href: '/projects',   icon: FolderKanban,  label: 'Projects' },
-      { href: '/habits',     icon: CheckSquare,   label: 'Protocols' },
+      { href: '/knowledge',          icon: Brain,     label: 'All Ideas' },
+      { href: '/knowledge/ideas',    icon: Lightbulb, label: 'Expand Ideas' },
+      { href: '/knowledge/research', icon: Search,    label: 'Research' },
+      { href: '/knowledge/timeline', icon: Clock,     label: 'Timeline' },
     ],
   },
   {
-    label: 'Productivity',
+    label: 'Graph',
     items: [
-      { href: '/time-tracking', icon: Timer,    label: 'Time Tracking' },
-      { href: '/docs',          icon: FileText, label: 'Docs' },
-      { href: '/automations',   icon: Zap,      label: 'Automations' },
+      { href: '/knowledge/graph', icon: Network, label: 'Knowledge Graph' },
     ],
   },
   {
-    label: 'Tools',
+    label: 'Insights',
     items: [
-      { href: '/math',                 icon: Calculator,      label: 'Study Assistant' },
-      { href: '/meal-planning',        icon: UtensilsCrossed, label: 'Meals' },
-      { href: '/shopping-list',        icon: ShoppingCart,    label: 'Shopping' },
-      { href: '/thought-organization', icon: Lightbulb,       label: 'Thoughts' },
-    ],
-  },
-  {
-    label: 'Second Brain',
-    items: [
-      { href: '/knowledge',          icon: Brain,    label: 'Knowledge' },
-      { href: '/knowledge/graph',    icon: Network,  label: 'Graph' },
-      { href: '/knowledge/ideas',    icon: Lightbulb, label: 'Ideas' },
-      { href: '/knowledge/research', icon: Search,   label: 'Research' },
-      { href: '/knowledge/timeline', icon: Clock,    label: 'Timeline' },
-    ],
-  },
-  {
-    label: 'AI & Intel',
-    items: [
-      { href: '/live-assistant', icon: MessageCircle, label: 'Strategist' },
-      { href: '/ai-decisions',   icon: ScrollText,    label: 'AI Decisions' },
-      { href: '/progress',       icon: BarChart3,     label: 'Progress' },
-      { href: '/insights',       icon: Brain,         label: 'Insights' },
+      { href: '/insights',         icon: Sparkles,      label: 'AI Insights' },
+      { href: '/live-assistant',   icon: MessageCircle, label: 'Thinking Partner' },
     ],
   },
 ]
@@ -85,7 +48,6 @@ export function Sidebar() {
   const pathname = usePathname()
   const dispatch = useAppDispatch()
   const isCollapsed = useAppSelector(selectIsSidebarCollapsed)
-  const isWinterArcMode = useAppSelector(selectIsWinterArcMode)
 
   return (
     <aside
@@ -97,12 +59,12 @@ export function Sidebar() {
       {/* Logo / Header */}
       <div className="flex h-12 items-center justify-between border-b border-border/50 px-3">
         {!isCollapsed && (
-          <Link href="/dashboard" className="flex items-center gap-2">
+          <Link href="/knowledge" className="flex items-center gap-2">
             <div className="h-7 w-7 bg-primary/90 flex items-center justify-center flex-shrink-0">
-              <span className="text-white font-bold text-[10px] font-mono tracking-widest">LO</span>
+              <Brain className="h-4 w-4 text-white" />
             </div>
             <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-foreground/70">
-              Life Organizer
+              Thinking Partner
             </span>
           </Link>
         )}
@@ -132,7 +94,7 @@ export function Sidebar() {
             {isCollapsed && <div className="h-px bg-border/30 mx-2 my-1" />}
             <div className="space-y-0.5">
               {section.items.map((item) => {
-                const isActive = pathname === item.href || (item.href !== '/dashboard' && pathname.startsWith(item.href))
+                const isActive = pathname === item.href || (item.href !== '/knowledge' && pathname.startsWith(item.href))
                 return (
                   <Link
                     key={item.href}
@@ -160,7 +122,7 @@ export function Sidebar() {
       </nav>
 
       {/* Footer */}
-      <div className="border-t border-border/50 p-2 space-y-0.5">
+      <div className="border-t border-border/50 p-2">
         <Link
           href="/settings"
           className={cn(
@@ -176,26 +138,6 @@ export function Sidebar() {
           <Settings className="h-4 w-4 shrink-0" />
           {!isCollapsed && <span className="text-xs font-mono">Settings</span>}
         </Link>
-
-        <button
-          onClick={() => dispatch(toggleWinterArcMode())}
-          className={cn(
-            'w-full flex items-center gap-2.5 px-3 py-1.5 transition-colors',
-            !isCollapsed && 'border-l-2',
-            isWinterArcMode
-              ? 'border-primary bg-primary/10 text-primary'
-              : 'border-transparent text-muted-foreground hover:text-primary hover:bg-primary/5 hover:border-primary/25',
-            isCollapsed && 'justify-center px-2'
-          )}
-          title={isCollapsed ? 'Winter Arc Mode' : undefined}
-        >
-          <Flame className="h-4 w-4 shrink-0" />
-          {!isCollapsed && (
-            <span className="text-[10px] font-mono font-bold uppercase tracking-widest">
-              {isWinterArcMode ? '❄ LOCKED IN' : '❄ WINTER ARC'}
-            </span>
-          )}
-        </button>
       </div>
     </aside>
   )

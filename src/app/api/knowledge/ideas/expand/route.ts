@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { sendMessage } from '@/lib/ai/anthropicClient'
 import { withAuth, withApiHandler } from '@/lib/api/middleware'
+import { buildIdeaExpandPrompt } from '@/lib/ai/prompts/knowledge'
+import { recordEvolution } from '@/lib/evolution/ideaEvolutionEngine'
 import type { User } from '@supabase/supabase-js'
 
 export const POST = withApiHandler(withAuth(async (request: Request, user: User) => {
@@ -23,28 +25,7 @@ export const POST = withApiHandler(withAuth(async (request: Request, user: User)
     .map(n => `- [${n.type}] "${n.title}" (tags: ${(n.tags || []).join(', ')})`)
     .join('\n')
 
-  const prompt = `You are an AI business strategist and innovation architect.
-
-The user has the following knowledge background:
-${noteSummary || 'No notes yet.'}
-${context ? `\nAdditional context: ${context}` : ''}
-
-The user wants to expand this seed idea into a full structured breakdown:
-"${seedIdea}"
-
-Return ONLY valid JSON:
-{
-  "title": "refined catchy name for the idea",
-  "oneLiner": "one sentence elevator pitch",
-  "market": "target market, estimated size, and opportunity",
-  "features": ["core feature 1", "core feature 2", "core feature 3", "core feature 4"],
-  "businessModel": "how it makes money (revenue streams, pricing model)",
-  "competitors": ["competitor or analog 1", "competitor or analog 2", "competitor or analog 3"],
-  "uniqueAdvantage": "what unique angle makes this hard to replicate (tie to user's knowledge if relevant)",
-  "nextSteps": ["immediate action 1", "immediate action 2", "immediate action 3"],
-  "risks": ["key risk 1", "key risk 2"],
-  "noteContent": "a well-written permanent knowledge note summarizing this expanded idea (2-3 paragraphs)"
-}`
+  const prompt = buildIdeaExpandPrompt(seedIdea, noteSummary, context)
 
   const result = await sendMessage({
     model: 'claude-opus-4-6',
@@ -90,6 +71,19 @@ Return ONLY valid JSON:
       related_note_ids: savedNoteId ? [savedNoteId] : [],
       description: `Expanded idea: "${expansion.title || seedIdea}"`,
     })
+
+    // Record evolution: the saved note is an expansion of the seed idea
+    // Use savedNoteId as both source and derived since it's a new note from scratch
+    if (savedNoteId) {
+      recordEvolution(
+        supabase,
+        user.id,
+        savedNoteId,
+        savedNoteId,
+        'expansion',
+        `AI expanded seed idea "${seedIdea}" into "${expansion.title || seedIdea}"`
+      )
+    }
   }
 
   return NextResponse.json({ data: expansion, savedNoteId })

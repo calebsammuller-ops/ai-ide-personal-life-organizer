@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
-import Anthropic from '@anthropic-ai/sdk'
-
-const anthropic = new Anthropic()
+import { sendMessage } from '@/lib/ai/anthropicClient'
+import { buildEvolutionInsightPrompt, buildEvolutionPredictionPrompt, buildNoteCompressionPrompt } from '@/lib/ai/prompts/knowledge'
+import { generateInsightNotes } from '@/lib/knowledge/insightEngine'
 
 // This endpoint runs the full knowledge graph evolution cycle.
 // Called by: nightly cron, or manually by user.
@@ -84,29 +84,21 @@ async function evolveForUser(supabase: ReturnType<typeof import('@/lib/supabase/
   const titleToId: Record<string, string> = {}
   for (const n of notes) { titleToId[n.title] = n.id }
 
+  // Map notes to NoteContext shape for prompt builders
+  const notesForPrompt = notes.map(n => ({ ...n, zettelId: n.zettel_id }))
+
   // Step 1: Generate new insights
   try {
-    const insightPrompt = `Analyze this Zettelkasten knowledge graph for user ${userId}.
+    const insightPrompt = buildEvolutionInsightPrompt(notesForPrompt, userId)
 
-Notes (${notes.length}):
-${notes.slice(0, 30).map(n => `[${n.zettel_id || n.id.slice(0,8)}] [${n.type}] "${n.title}" - ${n.content?.slice(0, 80)}`).join('\n')}
-
-Generate 2-3 NEW synthesis notes that reveal non-obvious connections, plus 3-5 new links.
-Focus on cross-cluster insights that aren't already obvious.
-
-Return JSON:
-{
-  "newNotes": [{"title": string, "type": "permanent"|"hub", "content": string, "tags": string[], "confidence": 0.7-0.9}],
-  "newLinks": [{"sourceTitle": string, "targetTitle": string, "relationship": "supports"|"extends"|"derived_from"|"related"}]
-}`
-
-    const insightResponse = await anthropic.messages.create({
+    const insightResult = await sendMessage({
       model: 'claude-opus-4-6',
-      max_tokens: 2000,
+      maxTokens: 2000,
       messages: [{ role: 'user', content: insightPrompt }],
+      userId,
     })
 
-    const insightText = insightResponse.content[0].type === 'text' ? insightResponse.content[0].text : ''
+    const insightText = insightResult.success && insightResult.data ? insightResult.data.content : ''
     const insightJson = insightText.match(/\{[\s\S]*\}/)
 
     if (insightJson) {
@@ -167,26 +159,18 @@ Return JSON:
         tagMap[tag].push(note.title)
       }
     }
-    const clusters = Object.entries(tagMap).filter(([, ns]) => ns.length >= 2).slice(0, 12)
+    const clusterNames = Object.entries(tagMap).filter(([, ns]) => ns.length >= 2).slice(0, 12).map(([t]) => t)
 
-    const predPrompt = `Knowledge graph has ${notes.length} notes across clusters: ${clusters.map(([t]) => t).join(', ')}.
+    const predPrompt = buildEvolutionPredictionPrompt(notesForPrompt, clusterNames)
 
-Top notes: ${notes.slice(0, 15).map(n => `"${n.title}"`).join(', ')}
-
-Generate 4-5 specific predictions. Return JSON:
-{
-  "predictions": [
-    {"prediction_type": "missing_link"|"knowledge_gap"|"emerging_cluster"|"idea_opportunity"|"next_topic", "description": string, "related_note_titles": string[], "confidence": number}
-  ]
-}`
-
-    const predResponse = await anthropic.messages.create({
+    const predResult = await sendMessage({
       model: 'claude-opus-4-6',
-      max_tokens: 1000,
+      maxTokens: 1000,
       messages: [{ role: 'user', content: predPrompt }],
+      userId,
     })
 
-    const predText = predResponse.content[0].type === 'text' ? predResponse.content[0].text : ''
+    const predText = predResult.success && predResult.data ? predResult.data.content : ''
     const predJson = predText.match(/\{[\s\S]*\}/)
 
     if (predJson) {
@@ -221,20 +205,16 @@ Generate 4-5 specific predictions. Return JSON:
 
     if (dormant && dormant.length >= 10) {
       // Compress dormant fleeting notes into a hub summary
-      const summaryPrompt = `Compress these ${dormant.length} old fleeting notes into a single hub summary note.
+      const summaryPrompt = buildNoteCompressionPrompt(dormant.map(n => ({ title: n.title, content: n.content || '' })))
 
-Notes:
-${dormant.map(n => `- "${n.title}": ${n.content?.slice(0, 100)}`).join('\n')}
-
-Return JSON: {"title": string, "content": string, "tags": string[]}`
-
-      const compressResponse = await anthropic.messages.create({
+      const compressResult = await sendMessage({
         model: 'claude-opus-4-6',
-        max_tokens: 500,
+        maxTokens: 500,
         messages: [{ role: 'user', content: summaryPrompt }],
+        userId,
       })
 
-      const compressText = compressResponse.content[0].type === 'text' ? compressResponse.content[0].text : ''
+      const compressText = compressResult.success && compressResult.data ? compressResult.data.content : ''
       const compressJson = compressText.match(/\{[\s\S]*\}/)
 
       if (compressJson) {
@@ -262,6 +242,23 @@ Return JSON: {"title": string, "content": string, "tags": string[]}`
         notesCompressed = dormant.length
       }
     }
+  } catch { /* non-blocking */ }
+
+  // Step 4: Autonomous insight engine — detect clusters and synthesize insight notes
+  try {
+    const linkList = [...existingLinks || []].map(l => ({
+      sourceNoteId: l.source_note_id,
+      targetNoteId: l.target_note_id,
+    }))
+    const noteList = (notes || []).map(n => ({
+      id: n.id,
+      title: n.title,
+      content: n.content || '',
+      tags: n.tags || [],
+      type: n.type,
+    }))
+    const { created } = await generateInsightNotes(supabase, userId, noteList, linkList)
+    insightsCreated += created
   } catch { /* non-blocking */ }
 
   return { insightsCreated, linksCreated, predictionsGenerated, notesCompressed }

@@ -8,8 +8,9 @@ import {
 } from '@/state/slices/knowledgeSlice'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
-import { Network, ZoomIn, ZoomOut, RotateCcw, Brain, ChevronLeft, Sparkles, Filter } from 'lucide-react'
+import { Network, ZoomIn, ZoomOut, RotateCcw, Brain, ChevronLeft, Sparkles, BarChart2 } from 'lucide-react'
 import type { NoteType } from '@/types/knowledge'
+import type { GraphMetrics } from '@/lib/knowledge/graphAnalytics'
 
 const TYPE_COLORS_HEX: Record<NoteType, string> = {
   fleeting: '#94a3b8',    // slate
@@ -170,10 +171,16 @@ export default function KnowledgeGraphPage() {
   const [simulationRunning, setSimulationRunning] = useState(true)
   const [typeFilter, setTypeFilter] = useState<string>('all')
   const [tooltip, setTooltip] = useState<{ x: number; y: number; node: GraphNode } | null>(null)
+  const [graphMetrics, setGraphMetrics] = useState<GraphMetrics | null>(null)
+  const [showMetrics, setShowMetrics] = useState(false)
 
   useEffect(() => {
     dispatch(fetchNotes())
     dispatch(fetchLinks())
+    fetch('/api/knowledge/graph-analytics')
+      .then(r => r.json())
+      .then(d => { if (d.metrics) setGraphMetrics(d.metrics) })
+      .catch(() => {})
   }, [dispatch])
 
   useEffect(() => {
@@ -305,6 +312,14 @@ export default function KnowledgeGraphPage() {
             <Sparkles className="h-3.5 w-3.5 mr-1" />
             {isGenerating ? 'Analyzing...' : 'Analyze'}
           </Button>
+          <Button
+            variant="ghost" size="sm"
+            className={`h-7 text-[10px] font-mono hover:bg-primary/10 ${showMetrics ? 'text-primary' : 'text-muted-foreground'}`}
+            onClick={() => setShowMetrics(s => !s)}
+          >
+            <BarChart2 className="h-3.5 w-3.5 mr-1" />
+            Metrics
+          </Button>
         </div>
       </div>
 
@@ -345,6 +360,45 @@ export default function KnowledgeGraphPage() {
                 <p className="text-[8px] text-muted-foreground/60">{c.notes.length} notes</p>
               </div>
             ))}
+          </div>
+        </div>
+      )}
+
+      {/* Graph Metrics panel */}
+      {showMetrics && graphMetrics && (
+        <div className="absolute top-16 left-4 z-10 w-52 bg-background/90 border border-border/50 rounded p-3 backdrop-blur-sm">
+          <p className="text-[9px] font-mono font-bold uppercase text-muted-foreground/50 mb-2">Graph Metrics</p>
+          <div className="space-y-1.5 text-[10px] font-mono">
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">Orphan notes</span>
+              <span className="text-amber-400">{graphMetrics.orphanCount}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">Clusters</span>
+              <span className="text-primary">{graphMetrics.clusterCount}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">Avg connections</span>
+              <span className="text-foreground">{graphMetrics.avgConnections.toFixed(1)}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">Hub nodes</span>
+              <span className="text-orange-400">{graphMetrics.hubNodes.length}</span>
+            </div>
+            {graphMetrics.mostLinkedNote && (
+              <div className="mt-1.5 pt-1.5 border-t border-border/30">
+                <p className="text-muted-foreground/60 text-[8px] uppercase mb-0.5">Most linked</p>
+                <p className="text-foreground truncate">{graphMetrics.mostLinkedNote.title}</p>
+              </div>
+            )}
+            {graphMetrics.hubNodes.length > 0 && (
+              <div className="mt-1.5 pt-1.5 border-t border-border/30">
+                <p className="text-muted-foreground/60 text-[8px] uppercase mb-1">Hub nodes (≥3 links)</p>
+                {graphMetrics.hubNodes.slice(0, 3).map(n => (
+                  <p key={n.id} className="text-orange-400 truncate text-[9px]">{n.title}</p>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       )}

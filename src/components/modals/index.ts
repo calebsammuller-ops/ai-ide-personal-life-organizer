@@ -1,6 +1,1 @@
 export { ModalManager } from './ModalManager'
-export { CreateEventModal } from './CreateEventModal'
-export { CreateHabitModal } from './CreateHabitModal'
-export { CreateMealModal } from './CreateMealModal'
-export { ViewMealModal } from './ViewMealModal'
-export { ShoppingListModal } from './ShoppingListModal'

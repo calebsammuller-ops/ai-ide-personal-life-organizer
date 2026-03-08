@@ -1,53 +1,8 @@
 import { createClient } from '@/lib/supabase/server'
 import { NextRequest, NextResponse } from 'next/server'
-import OpenAI from 'openai'
 import { logError } from '@/lib/logger'
-import type { KnowledgeNote, CreateNoteInput } from '@/types/knowledge'
-
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
-
-function transformNote(n: Record<string, unknown>): KnowledgeNote {
-  return {
-    id: n.id as string,
-    zettelId: n.zettel_id as string | undefined,
-    userId: n.user_id as string,
-    title: n.title as string,
-    type: n.type as KnowledgeNote['type'],
-    content: n.content as string,
-    tags: (n.tags as string[]) || [],
-    confidence: (n.confidence as number) ?? 0.8,
-    importance: (n.importance as number) ?? 0.5,
-    source: n.source as KnowledgeNote['source'],
-    sourceUrl: n.source_url as string | undefined,
-    isArchived: n.is_archived as boolean,
-    metadata: (n.metadata as Record<string, unknown>) || {},
-    createdAt: n.created_at as string,
-    updatedAt: n.updated_at as string,
-  }
-}
-
-async function generateZettelId(supabase: ReturnType<typeof createClient>): Promise<string> {
-  const base = new Date().toISOString().replace(/[-:T]/g, '').slice(0, 12)
-  const suffixes = ['', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']
-  for (const s of suffixes) {
-    const id = base + s
-    const { data } = await supabase.from('knowledge_notes').select('id').eq('zettel_id', id).maybeSingle()
-    if (!data) return id
-  }
-  return base + Date.now().toString().slice(-4)
-}
-
-async function generateEmbedding(text: string): Promise<number[] | null> {
-  try {
-    const response = await openai.embeddings.create({
-      model: 'text-embedding-3-small',
-      input: text.slice(0, 8000),
-    })
-    return response.data[0].embedding
-  } catch {
-    return null
-  }
-}
+import { createKnowledgeNote, transformNote } from '@/lib/knowledge/service'
+import type { CreateNoteInput } from '@/types/knowledge'
 
 export async function GET(request: NextRequest) {
   const supabase = createClient()
@@ -88,48 +43,15 @@ export async function POST(request: NextRequest) {
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const body: CreateNoteInput = await request.json()
-  if (!body.title?.trim()) return NextResponse.json({ error: 'Title is required' }, { status: 400 })
 
-  const zettelId = await generateZettelId(supabase)
-
-  // Generate embedding for semantic auto-linking
-  const embeddingText = `${body.title} ${body.content || ''} ${(body.tags || []).join(' ')}`
-  const embedding = await generateEmbedding(embeddingText)
-
-  const insertData: Record<string, unknown> = {
-    zettel_id: zettelId,
-    user_id: user.id,
-    title: body.title.trim(),
-    type: body.type || 'permanent',
-    content: body.content || '',
-    tags: body.tags || [],
-    confidence: body.confidence ?? 0.8,
-    importance: body.importance ?? 0.5,
-    source: body.source || 'user',
-    source_url: body.sourceUrl,
-    is_archived: false,
-  }
-
-  if (embedding) insertData.embedding = JSON.stringify(embedding)
-
-  const { data, error } = await supabase
-    .from('knowledge_notes')
-    .insert(insertData)
-    .select()
-    .single()
-
-  if (error) {
+  try {
+    const note = await createKnowledgeNote(supabase as any, user.id, body)
+    return NextResponse.json({ data: note }, { status: 201 })
+  } catch (error) {
+    if (error instanceof Error && error.message === 'Title is required') {
+      return NextResponse.json({ error: 'Title is required' }, { status: 400 })
+    }
     logError(error, { route: 'POST /api/knowledge/notes', userId: user.id })
     return NextResponse.json({ error: 'Failed to create note' }, { status: 500 })
   }
-
-  // Log cognitive event
-  await supabase.from('cognitive_events').insert({
-    user_id: user.id,
-    event_type: 'note_created',
-    related_note_ids: [data.id],
-    description: `Created ${body.type || 'permanent'} note: "${body.title.trim()}"`,
-  })
-
-  return NextResponse.json({ data: transformNote(data) }, { status: 201 })
 }

@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { sendMessage } from '@/lib/ai/anthropicClient'
 import { withAuth, withApiHandler } from '@/lib/api/middleware'
+import { buildRAGChatSystemPrompt } from '@/lib/ai/prompts/knowledge'
 import type { User } from '@supabase/supabase-js'
 
 export const POST = withApiHandler(withAuth(async (request: Request, user: User) => {
@@ -56,25 +57,8 @@ export const POST = withApiHandler(withAuth(async (request: Request, user: User)
     })
   }
 
-  const notesContext = notes
-    .map(n => `[${n.zettel_id || n.id.slice(0, 8)}] [${n.type}] "${n.title}"\nTags: ${(n.tags || []).join(', ')}\n${n.content.slice(0, 300)}${n.content.length > 300 ? '...' : ''}`)
-    .join('\n\n---\n\n')
-
-  const systemPrompt = `You are a personal knowledge assistant with access to the user's Zettelkasten second brain.
-
-Your job is to answer questions by searching through the user's notes and synthesizing insights.
-
-Rules:
-1. ONLY use information from the provided notes — never hallucinate
-2. Always cite specific notes using [zettel_id] "Note Title" format
-3. If a note is directly relevant, quote or paraphrase from it
-4. If asked to list notes, return them clearly
-5. If the answer isn't in the notes, say so honestly and suggest what note to create
-6. Be concise but thorough
-
-Available knowledge notes (${notes.length} total):
-
-${notesContext}`
+  const notesForPrompt = notes.map(n => ({ ...n, zettelId: n.zettel_id }))
+  const systemPrompt = buildRAGChatSystemPrompt(notesForPrompt)
 
   const messages = [
     ...history.slice(-6).map((m: { role: string; content: string }) => ({

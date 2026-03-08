@@ -33,12 +33,6 @@ import {
   fetchConversations,
   fetchMessages,
 } from '@/state/slices/assistantSlice'
-import { fetchTasks } from '@/state/slices/tasksSlice'
-import { fetchProjects } from '@/state/slices/projectsSlice'
-import { fetchHabits } from '@/state/slices/habitsSlice'
-import { fetchEvents } from '@/state/slices/calendarSlice'
-import { fetchWeekMeals, fetchShoppingList } from '@/state/slices/mealPlanningSlice'
-import { fetchThoughts } from '@/state/slices/thoughtsSlice'
 import { cn } from '@/lib/utils'
 import { useRegisterPageContext } from '@/hooks/useRegisterPageContext'
 
@@ -156,33 +150,13 @@ export default function LiveAssistantPage() {
   }, [])
 
   useEffect(() => {
-    if (lastActionResult?.success && lastExecutedIntent) {
-      // Refresh the relevant Redux data so the UI reflects what the AI just did
-      const taskIntents = ['create_tasks', 'schedule_task', 'schedule_plan', 'complete_task', 'reschedule_task']
-      const projectIntents = ['create_project']
-      const habitIntents = ['create_habit', 'update_habit', 'complete_habit']
-      const calendarIntents = ['schedule_event', 'cancel_event', 'create_focus_time', 'schedule_plan']
-      const mealIntents = ['create_meal', 'log_food']
-      const shoppingIntents = ['add_shopping_item', 'create_meal']
-      const thoughtIntents = ['capture_thought']
-
-      const today = new Date().toISOString().split('T')[0]
-      const weekEnd = new Date(Date.now() + 7 * 86400000).toISOString().split('T')[0]
-      if (taskIntents.includes(lastExecutedIntent)) dispatch(fetchTasks() as any)
-      if (projectIntents.includes(lastExecutedIntent)) dispatch(fetchProjects() as any)
-      if (habitIntents.includes(lastExecutedIntent)) dispatch(fetchHabits() as any)
-      if (calendarIntents.includes(lastExecutedIntent)) dispatch(fetchEvents({ start: today, end: weekEnd }) as any)
-      if (mealIntents.includes(lastExecutedIntent)) dispatch(fetchWeekMeals(today) as any)
-      if (shoppingIntents.includes(lastExecutedIntent)) dispatch(fetchShoppingList(undefined as any) as any)
-      if (thoughtIntents.includes(lastExecutedIntent)) dispatch(fetchThoughts() as any)
-    }
     if (lastActionResult) {
       const timer = setTimeout(() => {
         dispatch(clearLastActionResult())
       }, 5000)
       return () => clearTimeout(timer)
     }
-  }, [lastActionResult, lastExecutedIntent, dispatch])
+  }, [lastActionResult, dispatch])
 
   useEffect(() => {
     if (error) {

@@ -11,6 +11,10 @@ import {
   selectKnowledgeLoading, selectKnowledgeGenerating, selectKnowledgeError,
   selectLastInsightSummary, selectLastSocratic, selectNoteLinks,
 } from '@/state/slices/knowledgeSlice'
+import {
+  fetchIntelligenceScore,
+  selectIntelligenceScore, selectScoreBreakdown, selectWeekGrowthPct,
+} from '@/state/slices/intelligenceScoreSlice'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import {
@@ -238,6 +242,9 @@ export default function KnowledgePage() {
   const insightSummary = useAppSelector(selectLastInsightSummary)
   const noteLinks = useAppSelector(selectNoteLinks(selectedNoteId || ''))
   const error = useAppSelector(selectKnowledgeError)
+  const intelligenceScore = useAppSelector(selectIntelligenceScore)
+  const scoreBreakdown = useAppSelector(selectScoreBreakdown)
+  const weekGrowthPct = useAppSelector(selectWeekGrowthPct)
 
   const [searchInput, setSearchInput] = useState('')
   const [typeFilter, setTypeFilterLocal] = useState('all')
@@ -269,12 +276,25 @@ export default function KnowledgePage() {
   const [chatInput, setChatInput] = useState('')
   const [isChatLoading, setIsChatLoading] = useState(false)
 
+  // Idea evolution timeline
+  const [evolutionTimeline, setEvolutionTimeline] = useState<{ id: string; evolutionType: string; summary: string; createdAt: string }[]>([])
+
   const saveTimeout = useRef<NodeJS.Timeout | null>(null)
 
   useEffect(() => {
     dispatch(fetchNotes())
     dispatch(fetchLinks())
+    dispatch(fetchIntelligenceScore())
   }, [dispatch])
+
+  useEffect(() => {
+    if (!selectedNoteId) return
+    setEvolutionTimeline([])
+    fetch(`/api/knowledge/notes/${selectedNoteId}/evolution`)
+      .then(r => r.json())
+      .then(d => { if (d.timeline) setEvolutionTimeline(d.timeline) })
+      .catch(() => {})
+  }, [selectedNoteId])
 
   useEffect(() => {
     if (selectedNote) {
@@ -543,6 +563,39 @@ export default function KnowledgePage() {
             />
           ))}
         </div>
+
+        {/* Intelligence Score widget */}
+        {intelligenceScore > 0 && (
+          <div className="p-3 border-t border-border/30 bg-primary/5">
+            <div className="flex items-center justify-between mb-1">
+              <span className="text-[9px] font-mono font-bold uppercase tracking-widest text-muted-foreground/50">Intelligence Score</span>
+              {weekGrowthPct !== null && (
+                <span className={`text-[9px] font-mono font-bold ${weekGrowthPct >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
+                  {weekGrowthPct >= 0 ? '+' : ''}{weekGrowthPct}% this week
+                </span>
+              )}
+            </div>
+            <p className="text-2xl font-mono font-bold text-primary leading-none mb-1.5">{intelligenceScore}</p>
+            <div className="grid grid-cols-4 gap-1 text-center">
+              <div>
+                <p className="text-[10px] font-mono font-bold text-foreground/80">{scoreBreakdown.notes}</p>
+                <p className="text-[8px] font-mono text-muted-foreground/40">notes</p>
+              </div>
+              <div>
+                <p className="text-[10px] font-mono font-bold text-blue-400">{scoreBreakdown.links}</p>
+                <p className="text-[8px] font-mono text-muted-foreground/40">links</p>
+              </div>
+              <div>
+                <p className="text-[10px] font-mono font-bold text-amber-400">{scoreBreakdown.insights}</p>
+                <p className="text-[8px] font-mono text-muted-foreground/40">insights</p>
+              </div>
+              <div>
+                <p className="text-[10px] font-mono font-bold text-purple-400">{scoreBreakdown.evolutions}</p>
+                <p className="text-[8px] font-mono text-muted-foreground/40">evols</p>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Stats footer */}
         <div className="p-2 border-t border-border/30 flex items-center justify-between">
@@ -865,6 +918,31 @@ export default function KnowledgePage() {
             </>
           )}
         </div>
+
+        {/* Evolution Timeline */}
+        {evolutionTimeline.length > 0 && (
+          <div className="p-3 border-t border-border/30">
+            <p className="text-[9px] font-mono font-bold uppercase tracking-widest text-muted-foreground/50 mb-2">Idea Evolution</p>
+            <div className="relative pl-3 space-y-2">
+              <div className="absolute left-0 top-0 bottom-0 w-px bg-border/40" />
+              {evolutionTimeline.map((ev) => (
+                <div key={ev.id} className="relative">
+                  <div className={`absolute -left-[15px] top-1 h-2 w-2 rounded-full border ${
+                    ev.evolutionType === 'expansion' ? 'border-purple-400 bg-purple-500/30' :
+                    ev.evolutionType === 'connection' ? 'border-blue-400 bg-blue-500/30' :
+                    'border-amber-400 bg-amber-500/30'
+                  }`} />
+                  <p className={`text-[8px] font-mono font-bold uppercase mb-0.5 ${
+                    ev.evolutionType === 'expansion' ? 'text-purple-400' :
+                    ev.evolutionType === 'connection' ? 'text-blue-400' :
+                    'text-amber-400'
+                  }`}>{ev.evolutionType}</p>
+                  <p className="text-[9px] text-muted-foreground/60 leading-tight">{ev.summary}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Graph link */}
         <div className="p-3 border-t border-border/50">

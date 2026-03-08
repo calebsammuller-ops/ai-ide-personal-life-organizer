@@ -5,7 +5,6 @@ import { ModalManager } from '@/components/modals'
 import { SearchModal } from '@/components/modals/SearchModal'
 import { ConsentGate } from '@/components/consent/ConsentGate'
 import { Toaster } from '@/components/ui/toaster'
-import { ReminderBanner } from '@/components/common/ReminderBanner'
 import { DashboardClientLayout } from '@/components/layout/DashboardClientLayout'
 import { AIContextProvider } from '@/providers/AIContextProvider'
 import { MotionProvider } from '@/providers/MotionProvider'
@@ -27,7 +26,6 @@ export default function DashboardLayout({
               <Sidebar />
               <div className="flex flex-1 flex-col">
                 <Header />
-                <ReminderBanner />
                 {children}
                 <BottomNav />
               </div>
