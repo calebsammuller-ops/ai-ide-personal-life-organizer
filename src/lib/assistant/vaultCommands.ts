@@ -86,6 +86,20 @@ export const VAULT_COMMANDS: VaultCommand[] = [
     usage: '/ghost [question]',
     icon: '👻',
   },
+  {
+    name: 'Decide',
+    trigger: '/decide',
+    description: 'AI decision matrix grounded in your knowledge graph — pros, cons, risks, recommendation',
+    usage: '/decide [question or decision]',
+    icon: '⚖️',
+  },
+  {
+    name: 'Weekly Review',
+    trigger: '/review',
+    description: 'Your weekly knowledge review — themes, momentum, focus, and a question to sit with',
+    usage: '/review',
+    icon: '📅',
+  },
 ]
 
 export function detectCommand(content: string): { command: VaultCommand; args: string } | null {
@@ -581,6 +595,125 @@ Using the references above:
 4. **Next Step** — one concrete action to start building this bridge
 
 This should feel like a creative breakthrough, not just information retrieval.`,
+  }
+}
+
+export async function handleDecideCommand(
+  userId: string,
+  supabase: SupabaseClient,
+  question: string
+): Promise<CommandContext> {
+  if (!question) {
+    return {
+      commandName: '/decide',
+      dataContext: '',
+      systemInstruction: 'Tell the user they need to provide a decision question: /decide [question]. Example: /decide Should I launch as B2B or B2C?',
+    }
+  }
+
+  question = sanitizeArg(question)
+
+  const { data: notes } = await supabase
+    .from('knowledge_notes')
+    .select('title, content, tags')
+    .eq('user_id', userId)
+    .eq('is_archived', false)
+    .order('created_at', { ascending: false })
+    .limit(20)
+
+  const noteList = (notes || [])
+    .map(n => `- "${n.title}": ${(n.content || '').slice(0, 150)}`)
+    .join('\n')
+
+  const dataContext = `
+DECISION QUESTION: "${question}"
+
+USER'S KNOWLEDGE GRAPH (20 most recent notes):
+${noteList || '(no notes yet)'}
+`.trim()
+
+  return {
+    commandName: '/decide',
+    dataContext,
+    systemInstruction: `The user ran /decide — build a decision matrix for their question.
+
+Decision: "${question}"
+
+Using their knowledge graph above:
+1. Identify 2–4 distinct options (generate them if not explicit)
+2. For each option: 2-3 pros, 2-3 cons, risk level (low/medium/high), which of their notes support it
+3. Give a clear recommendation
+4. Name 2 key factors they should weigh
+5. Name 1 blind spot they're likely missing
+6. One concrete next step in the next 48 hours
+
+Format response clearly with headers per option. End with the recommendation and next step.
+Be direct. Say what you actually think is the right call.`,
+  }
+}
+
+export async function handleReviewCommand(
+  userId: string,
+  supabase: SupabaseClient
+): Promise<CommandContext> {
+  const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString()
+
+  const [notesRes, linksRes] = await Promise.all([
+    supabase
+      .from('knowledge_notes')
+      .select('title, tags, created_at')
+      .eq('user_id', userId)
+      .eq('is_archived', false)
+      .gte('created_at', sevenDaysAgo)
+      .order('created_at', { ascending: false }),
+    supabase
+      .from('knowledge_links')
+      .select('id', { count: 'exact', head: true })
+      .eq('user_id', userId)
+      .gte('created_at', sevenDaysAgo),
+  ])
+
+  const notes = notesRes.data || []
+  const linkCount = linksRes.count || 0
+
+  const tagCounts: Record<string, number> = {}
+  for (const n of notes) {
+    for (const tag of (n.tags || [])) {
+      if (tag !== 'ai-insight') tagCounts[tag] = (tagCounts[tag] || 0) + 1
+    }
+  }
+
+  const topTags = Object.entries(tagCounts)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 8)
+    .map(([tag, count]) => `#${tag} (${count})`)
+    .join(', ')
+
+  const recentTitles = notes.slice(0, 10).map(n => `"${n.title}"`).join(', ')
+
+  const dataContext = `
+WEEKLY KNOWLEDGE REVIEW — LAST 7 DAYS
+
+Notes added: ${notes.length}
+New connections made: ${linkCount}
+Top tags: ${topTags || 'none'}
+Recent note titles: ${recentTitles || 'none'}
+`.trim()
+
+  return {
+    commandName: '/review',
+    dataContext,
+    systemInstruction: `The user ran /review — generate their weekly knowledge review.
+
+Using the data above:
+1. **Themes** — what 2-3 themes dominated their thinking this week?
+2. **Deepest Insight** — the most substantive observation from the week's work
+3. **Momentum** — what are they building toward? (start with "You're building toward...")
+4. **Next Week Focus** — one clear, specific area to focus on
+5. **Question to Sit With** — one Socratic question they should genuinely think about
+
+If they had a light week (few notes), acknowledge it honestly and still give a useful reflection.
+Keep it direct, personal, and substantive — not generic.`,
   }
 }
 

@@ -23,6 +23,8 @@ import {
   handleIdeasCommand,
   handleConnectCommand,
   handleGhostCommand,
+  handleDecideCommand,
+  handleReviewCommand,
 } from '@/lib/assistant/vaultCommands'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { AssistantMessage, CalendarEvent, Habit, MealPlan, UserPreferences, LearnedPatterns, UserMemory, GrowthPhase, SystemPersona } from '@/types'
@@ -174,6 +176,8 @@ export async function POST(request: NextRequest) {
         case '/ideas':    cmdCtx = await handleIdeasCommand(user.id, supabase); break
         case '/connect':  cmdCtx = await handleConnectCommand(user.id, supabase, vaultCmd.args); break
         case '/ghost':    cmdCtx = await handleGhostCommand(user.id, supabase, vaultCmd.args); break
+        case '/decide':   cmdCtx = await handleDecideCommand(user.id, supabase, vaultCmd.args); break
+        case '/review':   cmdCtx = await handleReviewCommand(user.id, supabase); break
         default: cmdCtx = null
       }
 

@@ -11,6 +11,7 @@ import intelligenceScoreReducer from './slices/intelligenceScoreSlice'
 import cognitiveMirrorReducer from './slices/cognitiveMirrorSlice'
 import strategyReducer from './slices/strategySlice'
 import trajectoryReducer from './slices/trajectorySlice'
+import weeklyReviewReducer from './slices/weeklyReviewSlice'
 
 export const store = configureStore({
   reducer: {
@@ -26,6 +27,7 @@ export const store = configureStore({
     cognitiveMirror: cognitiveMirrorReducer,
     strategy: strategyReducer,
     trajectory: trajectoryReducer,
+    weeklyReview: weeklyReviewReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

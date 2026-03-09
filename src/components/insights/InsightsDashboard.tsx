@@ -15,6 +15,7 @@ import {
 import { fetchCognitiveMirror } from '@/state/slices/cognitiveMirrorSlice'
 import { fetchStrategy } from '@/state/slices/strategySlice'
 import { fetchTrajectory } from '@/state/slices/trajectorySlice'
+import { fetchWeeklyReview } from '@/state/slices/weeklyReviewSlice'
 import { cn } from '@/lib/utils'
 import Link from 'next/link'
 import { CognitiveMirrorCard } from './CognitiveMirrorCard'
@@ -22,6 +23,8 @@ import { StrategyEngineCard } from './StrategyEngineCard'
 import { LifeTrajectoryCard } from './LifeTrajectoryCard'
 import { ShareableInsightCard } from './ShareableInsightCard'
 import { WhatIfSimulator } from './WhatIfSimulator'
+import { WeeklyReviewCard } from './WeeklyReviewCard'
+import { DecisionEngineCard } from './DecisionEngineCard'
 
 interface SharingNote {
   title: string
@@ -45,6 +48,7 @@ export function InsightsDashboard() {
     dispatch(fetchCognitiveMirror() as any)
     dispatch(fetchStrategy() as any)
     dispatch(fetchTrajectory() as any)
+    dispatch(fetchWeeklyReview() as any)
   }, [dispatch])
 
   const insightNotes = notes.filter(n => n.tags?.includes('ai-insight'))
@@ -75,6 +79,12 @@ export function InsightsDashboard() {
 
       {/* Life Trajectory */}
       <LifeTrajectoryCard />
+
+      {/* Weekly Review */}
+      <WeeklyReviewCard />
+
+      {/* Decision Engine */}
+      <DecisionEngineCard />
 
       {/* Knowledge Briefing */}
       {briefing && (

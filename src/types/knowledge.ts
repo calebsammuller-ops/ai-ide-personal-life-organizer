@@ -226,3 +226,34 @@ export interface WhatIfSimulation {
   recommendation: string
   notesToReview: string[]
 }
+
+// ── Wave 3: Decision Engine + Weekly Review ─────────────────────────────────
+
+// Decision Engine
+export interface DecisionOption {
+  option: string
+  pros: string[]
+  cons: string[]
+  riskLevel: 'low' | 'medium' | 'high'
+  alignsWithNotes: string[]
+}
+export interface DecisionResult {
+  question: string
+  options: DecisionOption[]
+  recommendation: string
+  keyFactors: string[]
+  blindSpots: string[]
+  nextStep: string
+}
+
+// Weekly Review
+export interface WeeklyReviewResult {
+  period: string
+  noteCount: number
+  topThemes: string[]
+  deepestInsight: string
+  momentum: string
+  notableConnections: string[]
+  nextWeekFocus: string
+  questionToSitWith: string
+}

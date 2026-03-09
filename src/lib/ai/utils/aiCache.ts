@@ -1,11 +1,12 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 
-export type CacheType = 'cognitive_mirror' | 'strategy' | 'trajectory'
+export type CacheType = 'cognitive_mirror' | 'strategy' | 'trajectory' | 'weekly_review'
 
 const TTL_HOURS: Record<CacheType, number> = {
   cognitive_mirror: 24,
   strategy: 12,
   trajectory: 24,
+  weekly_review: 168,
 }
 
 export async function getCached<T>(
