@@ -11,20 +11,13 @@ import { setSearchOpen, openModal } from '@/state/slices/uiSlice'
 
 const pageTitles: Record<string, string> = {
   '/dashboard':            'COMMAND CENTER',
-  '/calendar':             'CALENDAR',
-  '/habits':               'PROTOCOLS',
-  '/tasks':                'MISSIONS',
-  '/projects':             'PROJECTS',
-  '/time-tracking':        'TIME TRACKING',
-  '/live-assistant':       'STRATEGIST',
-  '/meal-planning':        'NUTRITION',
-  '/thought-organization': 'MIND MAP',
-  '/math':                 'STUDY ASSISTANT',
-  '/docs':                 'DOCS',
-  '/automations':          'AUTOMATIONS',
-  '/progress':             'PROGRESS',
+  '/live-assistant':       'THINKING PARTNER',
+  '/knowledge':            'CAPTURE',
+  '/knowledge/ideas':      'EXPAND IDEAS',
+  '/knowledge/research':   'RESEARCH',
+  '/knowledge/timeline':   'TIMELINE',
+  '/knowledge/graph':      'KNOWLEDGE MAP',
   '/insights':             'INTEL',
-  '/ai-decisions':         'AI DECISIONS',
   '/settings':             'SETTINGS',
 }
 
@@ -47,7 +40,7 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-40 safe-top">
-      <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/20 to-transparent" />
+      <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/50 to-transparent" />
 
       <div className="bg-background/90 backdrop-blur-xl">
         <div className="flex h-12 items-center justify-between px-4">

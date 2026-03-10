@@ -1,25 +1,29 @@
 import type { Metadata, Viewport } from 'next'
-import { Inter } from 'next/font/google'
+import { JetBrains_Mono } from 'next/font/google'
 import './globals.css'
 import { Providers } from '@/components/providers'
 
-const inter = Inter({ subsets: ['latin'] })
+const mono = JetBrains_Mono({
+  subsets: ['latin'],
+  variable: '--font-mono',
+  weight: ['300', '400', '500', '700'],
+})
 
 export const metadata: Metadata = {
-  title: 'Life Organizer',
-  description: 'AI-powered personal life organizer for managing your daily life, tasks, habits, and schedules.',
+  title: 'Thinking Partner',
+  description: 'AI-powered knowledge graph and thinking partner.',
   manifest: '/manifest.json',
   appleWebApp: {
     capable: true,
     statusBarStyle: 'default',
-    title: 'Life Organizer',
+    title: 'Thinking Partner',
   },
 }
 
 export const viewport: Viewport = {
   themeColor: [
-    { media: '(prefers-color-scheme: light)', color: '#ffffff' },
-    { media: '(prefers-color-scheme: dark)', color: '#0f172a' },
+    { media: '(prefers-color-scheme: light)', color: '#080706' },
+    { media: '(prefers-color-scheme: dark)', color: '#080706' },
   ],
   width: 'device-width',
   initialScale: 1,
@@ -33,8 +37,8 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body className={inter.className}>
+    <html lang="en" className={`${mono.variable} dark`} suppressHydrationWarning>
+      <body className={mono.className}>
         <Providers>{children}</Providers>
       </body>
     </html>

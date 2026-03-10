@@ -60,31 +60,31 @@
     --glow-blue: 220 100% 60%;
   }
 
-  /* Dark Mode - Winter Arc / Lock-In Orange + Black */
+  /* Dark Mode - Cognitive Command Center / Warm Near-Black */
   .dark {
-    /* Pure black backgrounds */
-    --background: 0 0% 4%;
-    --foreground: 0 0% 95%;
+    /* Warm near-black backgrounds */
+    --background: 15 8% 3%;
+    --foreground: 0 0% 90%;
 
-    /* Carbon black card */
-    --card: 0 0% 7%;
-    --card-foreground: 0 0% 95%;
+    /* Warm carbon card */
+    --card: 15 6% 6%;
+    --card-foreground: 0 0% 90%;
 
     /* Popover */
-    --popover: 0 0% 9%;
-    --popover-foreground: 0 0% 95%;
+    --popover: 15 5% 8%;
+    --popover-foreground: 0 0% 90%;
 
     /* Primary - Burnt Orange #FF5A1F */
     --primary: 17 100% 56%;
     --primary-foreground: 0 0% 100%;
 
-    /* Secondary - dark surface */
-    --secondary: 0 0% 11%;
-    --secondary-foreground: 0 0% 85%;
+    /* Secondary - dark warm surface */
+    --secondary: 15 5% 10%;
+    --secondary-foreground: 0 0% 78%;
 
     /* Muted */
-    --muted: 0 0% 10%;
-    --muted-foreground: 0 0% 45%;
+    --muted: 15 4% 9%;
+    --muted-foreground: 0 0% 36%;
 
     /* Accent - slightly brighter orange */
     --accent: 22 100% 52%;
@@ -103,8 +103,8 @@
     --warning-foreground: 0 0% 100%;
 
     /* Borders and inputs */
-    --border: 0 0% 17%;
-    --input: 0 0% 13%;
+    --border: 15 6% 13%;
+    --input: 15 5% 11%;
     --ring: 17 100% 56%;
 
     /* Radius: sharp 4px max */
@@ -241,6 +241,64 @@
   .float {
     animation: float 3s ease-in-out infinite;
   }
+
+  /* Body: subtle orange vignette (top-left warm glow) */
+  body {
+    background-image:
+      radial-gradient(ellipse 80% 40% at 0% 0%, hsl(17 100% 56% / 0.045) 0%, transparent 60%),
+      radial-gradient(ellipse 50% 25% at 100% 100%, hsl(17 100% 40% / 0.025) 0%, transparent 50%);
+  }
+
+  /* Orange left-bar glow for active nav items */
+  .nav-active-glow {
+    box-shadow: inset 2px 0 0 hsl(var(--primary)), 0 0 20px hsl(var(--primary) / 0.10);
+  }
+
+  /* Typography system */
+  .text-headline {
+    font-size: 1.25rem;
+    font-weight: 700;
+    line-height: 1.4;
+  }
+  .text-section-label {
+    font-size: 0.6875rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+  }
+  .text-body {
+    font-size: 0.8125rem;
+    line-height: 1.5;
+  }
+  .text-meta {
+    font-size: 0.6875rem;
+    line-height: 1.4;
+  }
+
+  /* Spacing system */
+  .section-gap { margin-bottom: 2rem; }
+  .component-gap { margin-bottom: 1rem; }
+  .element-gap { margin-bottom: 0.5rem; }
+
+  /* Curiosity trigger pulse */
+  .curiosity-pulse {
+    animation: curiosity-pulse 3s ease-in-out infinite;
+  }
+
+  /* Fade-in-up for page content */
+  .fade-in-up {
+    animation: fade-in-up 0.25s ease-out both;
+  }
+}
+
+@keyframes curiosity-pulse {
+  0%, 100% { border-color: hsl(var(--primary) / 0.25); }
+  50% { border-color: hsl(var(--primary) / 0.6); box-shadow: 0 0 12px hsl(var(--primary) / 0.15); }
+}
+
+@keyframes fade-in-up {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
 /* Animations */

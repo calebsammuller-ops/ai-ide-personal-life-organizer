@@ -21,25 +21,36 @@ import { selectIsSidebarCollapsed, toggleSidebar } from '@/state/slices/uiSlice'
 
 const navSections = [
   {
-    label: 'Ideas',
+    label: 'COMMAND',
     items: [
-      { href: '/knowledge',          icon: Brain,     label: 'All Ideas' },
-      { href: '/knowledge/ideas',    icon: Lightbulb, label: 'Expand Ideas' },
+      { href: '/dashboard',      icon: Brain,          label: 'Command Center' },
+      { href: '/live-assistant', icon: MessageCircle,  label: 'Thinking Partner' },
+    ],
+  },
+  {
+    label: 'CAPTURE',
+    items: [
+      { href: '/knowledge',          icon: Lightbulb, label: 'Ideas' },
       { href: '/knowledge/research', icon: Search,    label: 'Research' },
-      { href: '/knowledge/timeline', icon: Clock,     label: 'Timeline' },
     ],
   },
   {
-    label: 'Graph',
+    label: 'DEVELOP',
     items: [
-      { href: '/knowledge/graph', icon: Network, label: 'Knowledge Graph' },
+      { href: '/knowledge/ideas', icon: Sparkles, label: 'Expand Ideas' },
     ],
   },
   {
-    label: 'Insights',
+    label: 'KNOWLEDGE',
     items: [
-      { href: '/insights',         icon: Sparkles,      label: 'AI Insights' },
-      { href: '/live-assistant',   icon: MessageCircle, label: 'Thinking Partner' },
+      { href: '/knowledge/graph',    icon: Network, label: 'Knowledge Map' },
+      { href: '/knowledge/timeline', icon: Clock,   label: 'Timeline' },
+    ],
+  },
+  {
+    label: 'INTELLIGENCE',
+    items: [
+      { href: '/insights', icon: Brain, label: 'AI Insights' },
     ],
   },
 ]
@@ -52,18 +63,19 @@ export function Sidebar() {
   return (
     <aside
       className={cn(
-        'hidden md:flex flex-col bg-background h-screen sticky top-0 transition-all duration-300 border-r border-border/50',
+        'hidden md:flex flex-col h-screen sticky top-0 transition-all duration-300 border-r border-border/50',
+        'bg-[hsl(15_8%_2%)]',
         isCollapsed ? 'w-14' : 'w-60'
       )}
     >
       {/* Logo / Header */}
       <div className="flex h-12 items-center justify-between border-b border-border/50 px-3">
         {!isCollapsed && (
-          <Link href="/knowledge" className="flex items-center gap-2">
+          <Link href="/dashboard" className="flex items-center gap-2">
             <div className="h-7 w-7 bg-primary/90 flex items-center justify-center flex-shrink-0">
               <Brain className="h-4 w-4 text-white" />
             </div>
-            <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-foreground/70">
+            <span className="text-[9px] font-mono font-bold uppercase tracking-[0.25em] text-primary/65">
               Thinking Partner
             </span>
           </Link>
@@ -87,26 +99,27 @@ export function Sidebar() {
         {navSections.map((section) => (
           <div key={section.label}>
             {!isCollapsed && (
-              <p className="px-3 py-1 text-[9px] font-mono font-bold uppercase tracking-widest text-muted-foreground/35">
+              <p className="px-3 py-1 text-[9px] font-mono font-bold uppercase tracking-[0.22em] text-muted-foreground/22">
                 {section.label}
               </p>
             )}
-            {isCollapsed && <div className="h-px bg-border/30 mx-2 my-1" />}
+            {isCollapsed && <div className="h-px bg-primary/10 mx-2 my-1" />}
             <div className="space-y-0.5">
-              {section.items.map((item) => {
+              {section.items.map((item, index) => {
                 const isActive = pathname === item.href || (item.href !== '/knowledge' && pathname.startsWith(item.href))
                 return (
                   <Link
                     key={item.href}
                     href={item.href}
                     className={cn(
-                      'flex items-center gap-2.5 px-3 py-1.5 transition-colors',
+                      'fade-in-up flex items-center gap-2.5 px-3 py-1.5 transition-colors',
                       !isCollapsed && 'border-l-2',
                       isActive
-                        ? 'border-primary bg-primary/5 text-primary'
-                        : 'border-transparent text-muted-foreground hover:bg-primary/5 hover:text-foreground hover:border-primary/25',
+                        ? 'nav-active-glow border-primary bg-primary/[0.06] text-primary'
+                        : 'border-transparent text-muted-foreground hover:bg-primary/[0.04] hover:text-foreground hover:border-primary/35',
                       isCollapsed && 'justify-center px-2'
                     )}
+                    style={{ animationDelay: `${index * 30}ms` }}
                     title={isCollapsed ? item.label : undefined}
                   >
                     <item.icon className="h-4 w-4 shrink-0" />
@@ -129,8 +142,8 @@ export function Sidebar() {
             'flex items-center gap-2.5 px-3 py-1.5 transition-colors',
             !isCollapsed && 'border-l-2',
             pathname.startsWith('/settings')
-              ? 'border-primary bg-primary/5 text-primary'
-              : 'border-transparent text-muted-foreground hover:bg-primary/5 hover:text-foreground hover:border-primary/25',
+              ? 'nav-active-glow border-primary bg-primary/[0.06] text-primary'
+              : 'border-transparent text-muted-foreground hover:bg-primary/[0.04] hover:text-foreground hover:border-primary/35',
             isCollapsed && 'justify-center px-2'
           )}
           title={isCollapsed ? 'Settings' : undefined}

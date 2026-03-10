@@ -1,8 +1,8 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo } from 'react'
 import { motion } from 'framer-motion'
-import { Brain, Sparkles, RefreshCw, Network, Zap, X, ArrowRight, MessageCircle } from 'lucide-react'
+import { Brain, Sparkles, RefreshCw, Network, Zap, X, ArrowRight, MessageCircle, Lightbulb, Link2 } from 'lucide-react'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { SeismicWave } from '@/components/ui/SeismicWave'
@@ -44,10 +44,30 @@ export default function DashboardPage() {
   }, [dispatch])
 
   const stats = [
-    { label: 'IDEAS', value: knowledgeNotes.length, href: '/knowledge' },
+    { label: 'IDEAS CAPTURED', value: knowledgeNotes.filter(n => !n.tags?.includes('ai-insight')).length, href: '/knowledge' },
     { label: 'CONNECTIONS', value: knowledgeLinks.length, href: '/knowledge/graph' },
-    { label: 'AI INSIGHTS', value: predictions.length, href: '/insights' },
+    { label: 'INSIGHTS GENERATED', value: knowledgeNotes.filter(n => n.tags?.includes('ai-insight')).length, href: '/insights' },
+    { label: 'CONCEPTS DEVELOPED', value: predictions.length, href: '/insights' },
   ]
+
+  // TODAY'S FOCUS: top 3 non-ai-insight notes by importance desc
+  const todaysFocus = useMemo(() => {
+    return knowledgeNotes
+      .filter(n => !n.tags?.includes('ai-insight'))
+      .sort((a, b) => (b.importance ?? 0) - (a.importance ?? 0))
+      .slice(0, 3)
+  }, [knowledgeNotes])
+
+  // CURIOSITY TRIGGER: find an orphan note (no links) updated most recently
+  const orphanNote = useMemo(() => {
+    if (knowledgeNotes.length < 5) return null
+    const linkedIds = new Set(
+      knowledgeLinks.flatMap(l => [l.sourceNoteId, l.targetNoteId])
+    )
+    return knowledgeNotes
+      .filter(n => !n.tags?.includes('ai-insight') && !linkedIds.has(n.id))
+      .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime())[0] || null
+  }, [knowledgeNotes, knowledgeLinks])
 
   return (
     <main className="flex flex-col h-[calc(100vh-3rem)] md:h-[calc(100vh-0px)] p-3 md:p-4 pb-16 md:pb-4 overflow-y-auto gap-3">
@@ -56,7 +76,7 @@ export default function DashboardPage() {
       <div className="flex-shrink-0 flex items-center justify-between mb-1">
         <div className="flex items-center gap-2">
           <div className="w-0.5 h-5 bg-primary" />
-          <h2 className="text-xs font-mono font-bold uppercase tracking-widest text-primary">THINKING PARTNER</h2>
+          <h2 className="text-xs font-mono font-bold uppercase tracking-widest text-primary">COMMAND CENTER</h2>
         </div>
         <div className="flex items-center gap-1.5">
           <motion.div
@@ -70,12 +90,12 @@ export default function DashboardPage() {
 
       <SeismicWave height={40} className="opacity-50 flex-shrink-0" />
 
-      {/* Stats */}
-      <div className="flex-shrink-0 grid grid-cols-3 gap-2">
+      {/* Stats strip */}
+      <div className="flex-shrink-0 grid grid-cols-4 gap-2">
         {stats.map((stat) => (
           <Link key={stat.label} href={stat.href}>
             <div className="border border-border/50 bg-card p-2 hover:border-primary/30 hover:bg-primary/5 transition-colors">
-              <p className="text-[8px] font-mono uppercase tracking-widest text-muted-foreground/60 mb-1">{stat.label}</p>
+              <p className="text-[8px] font-mono uppercase tracking-widest text-muted-foreground/60 mb-1 leading-tight">{stat.label}</p>
               <p className="text-lg font-mono font-bold text-primary leading-none">{stat.value}</p>
             </div>
           </Link>
@@ -101,12 +121,12 @@ export default function DashboardPage() {
         </Link>
       </div>
 
-      {/* Knowledge Brain Briefing */}
+      {/* AI OBSERVATIONS */}
       <Card className="rounded-sm border-primary/20 bg-primary/5">
         <CardHeader className="flex flex-row items-center justify-between py-2 px-3 border-b border-primary/20">
           <div className="flex items-center gap-2">
             <Brain className="h-3.5 w-3.5 text-primary" />
-            <p className="text-[10px] font-mono font-bold uppercase tracking-widest text-primary/80">KNOWLEDGE BRIEFING</p>
+            <p className="text-[10px] font-mono font-bold uppercase tracking-widest text-primary/80">AI OBSERVATIONS</p>
             <span className="text-[9px] font-mono text-muted-foreground/40">{knowledgeNotes.length} ideas · {knowledgeLinks.length} links</span>
           </div>
           <div className="flex gap-1">
@@ -134,7 +154,7 @@ export default function DashboardPage() {
               )}
               {briefing.insights?.slice(0, 2).map((insight: { title: string; content: string }, i: number) => (
                 <div key={i} className="flex items-start gap-2 p-1.5 bg-amber-500/5 border border-amber-500/20 rounded">
-                  <Sparkles className="h-3 w-3 text-amber-400 shrink-0 mt-0.5" />
+                  <span className="text-[10px] font-mono font-bold text-amber-500/60 shrink-0 mt-0.5">{String(i + 1).padStart(2, '0')}</span>
                   <div>
                     <p className="text-[10px] font-mono font-bold text-amber-400">{insight.title}</p>
                     <p className="text-[9px] text-muted-foreground/70">{insight.content?.slice(0, 120)}</p>
@@ -180,6 +200,43 @@ export default function DashboardPage() {
           )}
         </CardContent>
       </Card>
+
+      {/* CURIOSITY TRIGGER */}
+      {orphanNote && (
+        <Link href={`/knowledge?noteId=${orphanNote.id}`}>
+          <div className="curiosity-pulse border border-primary/25 bg-primary/[0.03] rounded-sm px-3 py-2 flex items-center gap-2 hover:bg-primary/[0.06] transition-colors">
+            <Link2 className="h-3 w-3 text-primary/60 shrink-0" />
+            <p className="text-[10px] font-mono text-muted-foreground/70 flex-1">
+              <span className="text-primary/70">This idea is waiting to connect:</span> {orphanNote.title}
+            </p>
+            <ArrowRight className="h-3 w-3 text-primary/40 shrink-0" />
+          </div>
+        </Link>
+      )}
+
+      {/* TODAY'S FOCUS */}
+      <div>
+        <div className="flex items-center gap-2 mb-2">
+          <div className="w-0.5 h-4 bg-primary" />
+          <p className="text-[10px] font-mono font-bold uppercase tracking-widest text-primary/80">TODAY'S FOCUS</p>
+        </div>
+        {todaysFocus.length === 0 ? (
+          <p className="text-[10px] font-mono text-muted-foreground/40 px-3">Add ideas to build your focus list.</p>
+        ) : (
+          <div className="space-y-1.5">
+            {todaysFocus.map((note) => (
+              <Link key={note.id} href={`/knowledge?noteId=${note.id}`}>
+                <div className="flex items-center gap-2 border border-border/50 bg-card px-3 py-2 hover:border-primary/30 hover:bg-primary/5 transition-colors group">
+                  <Lightbulb className="h-3 w-3 text-muted-foreground/40 shrink-0 group-hover:text-primary/60 transition-colors" />
+                  <p className="text-xs font-mono text-foreground/80 flex-1 truncate">{note.title}</p>
+                  <span className="text-[9px] font-mono text-muted-foreground/40 uppercase shrink-0">{note.type}</span>
+                  <ArrowRight className="h-3 w-3 text-muted-foreground/20 group-hover:text-primary/40 shrink-0 transition-colors" />
+                </div>
+              </Link>
+            ))}
+          </div>
+        )}
+      </div>
 
       {/* AI Predictions */}
       {(predictions.length > 0 || knowledgeNotes.length >= 3) && (

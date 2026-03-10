@@ -8,7 +8,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
   return (
     <ReduxProvider>
       <SupabaseProvider>
-        <ThemeProvider defaultTheme="system" storageKey="life-organizer-theme">
+        <ThemeProvider forcedTheme="dark" storageKey="life-organizer-theme">
           {children}
         </ThemeProvider>
       </SupabaseProvider>
