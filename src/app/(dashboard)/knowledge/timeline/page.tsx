@@ -86,6 +86,18 @@ export default function TimelinePage() {
   const report = useAppSelector(selectKnowledgeReport)
 
   const [showReport, setShowReport] = useState(false)
+  const [filterType, setFilterType] = useState('ALL')
+
+  const EVENT_FILTER_TYPES: Record<string, string[]> = {
+    NOTES: ['note_created', 'note_updated'],
+    LINKS: ['link_created'],
+    INSIGHTS: ['insight_generated', 'idea_generated'],
+    RESEARCH: ['research_added', 'knowledge_gap_detected'],
+  }
+
+  const filteredEvents = filterType === 'ALL'
+    ? events
+    : events.filter(e => EVENT_FILTER_TYPES[filterType]?.includes((e as { eventType: string }).eventType))
 
   useEffect(() => {
     dispatch(fetchTimeline())
@@ -97,7 +109,7 @@ export default function TimelinePage() {
     setShowReport(true)
   }
 
-  const groupedEvents = groupEventsByDate(events as { createdAt: string; [key: string]: unknown }[])
+  const groupedEvents = groupEventsByDate(filteredEvents as { createdAt: string; [key: string]: unknown }[])
 
   const eventTypeCount = events.reduce((acc, e) => {
     acc[e.eventType] = (acc[e.eventType] || 0) + 1
@@ -153,8 +165,8 @@ export default function TimelinePage() {
                 <AreaChart data={velocity} margin={{ top: 5, right: 10, left: -30, bottom: 0 }}>
                   <defs>
                     <linearGradient id="velocityGrad" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.3} />
-                      <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0} />
+                      <stop offset="5%" stopColor="hsl(17, 100%, 56%)" stopOpacity={0.3} />
+                      <stop offset="95%" stopColor="hsl(17, 100%, 56%)" stopOpacity={0} />
                     </linearGradient>
                   </defs>
                   <XAxis dataKey="date" tick={{ fontSize: 8, fontFamily: 'monospace', fill: 'hsl(var(--muted-foreground))' }} tickFormatter={d => d.slice(5)} />
@@ -164,12 +176,30 @@ export default function TimelinePage() {
                     labelFormatter={d => `Date: ${d}`}
                     formatter={(v: number) => [`${v} notes`, 'Created']}
                   />
-                  <Area type="monotone" dataKey="count" stroke="hsl(var(--primary))" fill="url(#velocityGrad)" strokeWidth={1.5} dot={false} />
+                  <Area type="monotone" dataKey="count" stroke="hsl(17, 100%, 56%)" fill="url(#velocityGrad)" strokeWidth={1.5} dot={false} />
                 </AreaChart>
               </ResponsiveContainer>
             </div>
           </div>
         )}
+
+        {/* Event Filter Pills */}
+        <div className="px-4 pt-3 pb-0 flex gap-1.5 flex-wrap">
+          {['ALL', 'NOTES', 'LINKS', 'INSIGHTS', 'RESEARCH'].map(f => (
+            <button
+              key={f}
+              onClick={() => setFilterType(f)}
+              className={cn(
+                'text-[9px] font-mono uppercase tracking-wider px-2 py-0.5 border rounded-sm transition-colors',
+                filterType === f
+                  ? 'border-primary/50 text-primary bg-primary/10'
+                  : 'border-border/40 text-muted-foreground/40 hover:border-primary/25 hover:text-muted-foreground/60'
+              )}
+            >
+              {f}
+            </button>
+          ))}
+        </div>
 
         {/* Events */}
         <div className="p-4 space-y-6 max-w-3xl">

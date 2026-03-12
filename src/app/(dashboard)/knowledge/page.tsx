@@ -21,11 +21,19 @@ import {
   Brain, Link2, Unlink, Plus, Search, Sparkles, Lightbulb,
   Network, HelpCircle, X, Save, Eye, EyeOff, Zap, ChevronDown,
   Tag, AlertCircle, GitBranch, Trash2, Archive, RotateCcw,
-  CheckSquare, FolderOpen, MessageSquare, Send,
+  CheckSquare, FolderOpen, MessageSquare, Send, LayoutGrid, List,
 } from 'lucide-react'
 import type { NoteType, RelationshipType, KnowledgeNote, KnowledgeChatMessage } from '@/types/knowledge'
 
 const NOTE_TYPES: NoteType[] = ['fleeting', 'permanent', 'concept', 'experience', 'project', 'hub', 'reference']
+
+const PIPELINE_STAGES = [
+  { type: 'fleeting'  as NoteType, label: 'CAPTURED',   color: 'text-muted-foreground/60',  border: 'border-slate-500/30' },
+  { type: 'reference' as NoteType, label: 'RESEARCH',   color: 'text-blue-400',              border: 'border-blue-500/30' },
+  { type: 'permanent' as NoteType, label: 'DEVELOPING', color: 'text-amber-400',             border: 'border-amber-500/30' },
+  { type: 'concept'   as NoteType, label: 'CONCEPT',    color: 'text-purple-400',            border: 'border-purple-500/30' },
+  { type: 'project'   as NoteType, label: 'PROJECT',    color: 'text-green-400',             border: 'border-green-500/30' },
+]
 const RELATIONSHIP_TYPES: RelationshipType[] = ['supports', 'contradicts', 'extends', 'applies_to', 'derived_from', 'related']
 
 const TYPE_COLORS: Record<NoteType, string> = {
@@ -270,6 +278,10 @@ export default function KnowledgePage() {
   // Note→Task/Project toast
   const [conversionToast, setConversionToast] = useState<string | null>(null)
 
+  // View mode: list or pipeline kanban
+  const [viewMode, setViewMode] = useState<'list' | 'pipeline'>('list')
+  const [draggedNoteId, setDraggedNoteId] = useState<string | null>(null)
+
   // Knowledge chat
   const [showChat, setShowChat] = useState(false)
   const [chatHistory, setChatHistory] = useState<KnowledgeChatMessage[]>([])
@@ -441,6 +453,14 @@ export default function KnowledgePage() {
     }
   }
 
+  const handlePipelineDrop = async (targetType: NoteType) => {
+    if (!draggedNoteId || draggedNoteId === null) return
+    const note = allNotes.find(n => n.id === draggedNoteId)
+    if (!note || note.type === targetType) { setDraggedNoteId(null); return }
+    await dispatch(updateNote({ id: draggedNoteId, updates: { type: targetType } }))
+    setDraggedNoteId(null)
+  }
+
   const handleLink = async (targetId: string, relationship: RelationshipType) => {
     if (!selectedNoteId) return
     await dispatch(createLink({ sourceNoteId: selectedNoteId, targetNoteId: targetId, relationship }))
@@ -493,6 +513,81 @@ export default function KnowledgePage() {
 
   const getLinkedNote = (id: string) => allNotes.find(n => n.id === id)
 
+  // ── PIPELINE VIEW ──────────────────────────────────────────────────────────
+  if (viewMode === 'pipeline') {
+    return (
+      <div className="h-screen flex flex-col overflow-hidden bg-background">
+        {/* Pipeline header */}
+        <div className="flex items-center justify-between px-4 py-2.5 border-b border-border/50 flex-shrink-0">
+          <div className="flex items-center gap-2">
+            <div className="w-0.5 h-4 bg-primary" />
+            <span className="text-xs font-mono font-bold uppercase tracking-widest">IDEA PIPELINE</span>
+            <span className="text-[9px] font-mono text-muted-foreground/40">{allNotes.filter(n => PIPELINE_STAGES.some(s => s.type === n.type)).length} ideas</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <Button variant="ghost" size="sm" className="h-6 px-2 text-[10px] font-mono text-muted-foreground hover:text-primary" onClick={handleNewNote}>
+              <Plus className="h-3 w-3 mr-1" /> New Idea
+            </Button>
+            <Button variant="ghost" size="icon" className="h-6 w-6 text-primary" onClick={() => setViewMode('list')} title="Switch to List">
+              <List className="h-3.5 w-3.5" />
+            </Button>
+          </div>
+        </div>
+
+        {/* Kanban columns */}
+        <div className="flex-1 flex gap-3 p-4 overflow-x-auto overflow-y-hidden">
+          {PIPELINE_STAGES.map(stage => {
+            const stageNotes = allNotes.filter(n => n.type === stage.type)
+            return (
+              <div
+                key={stage.type}
+                className={cn('flex-shrink-0 w-52 flex flex-col border rounded-sm bg-card/40', stage.border)}
+                onDragOver={e => e.preventDefault()}
+                onDrop={() => handlePipelineDrop(stage.type)}
+              >
+                {/* Column header */}
+                <div className="flex items-center justify-between px-2.5 py-2 border-b border-border/30">
+                  <p className={`text-[9px] font-mono font-bold uppercase tracking-widest ${stage.color}`}>{stage.label}</p>
+                  <span className="text-[9px] font-mono text-muted-foreground/25">{stageNotes.length}</span>
+                </div>
+                {/* Cards */}
+                <div className="flex-1 overflow-y-auto p-1.5 space-y-1.5 min-h-0">
+                  {stageNotes.map(note => (
+                    <div
+                      key={note.id}
+                      draggable
+                      onDragStart={() => setDraggedNoteId(note.id)}
+                      onClick={() => { setViewMode('list'); dispatch(setSelectedNoteId(note.id)) }}
+                      className="border border-border/40 bg-background/80 p-2.5 cursor-grab hover:border-primary/30 hover:bg-primary/5 rounded-sm transition-colors group"
+                    >
+                      <p className="text-xs font-mono font-bold leading-tight line-clamp-2">{note.title}</p>
+                      {note.zettelId && (
+                        <p className="text-[8px] font-mono text-muted-foreground/30 mt-0.5">{note.zettelId}</p>
+                      )}
+                      {note.tags.length > 0 && (
+                        <div className="flex gap-1 mt-1.5 flex-wrap">
+                          {note.tags.slice(0, 2).map(t => (
+                            <span key={t} className="text-[8px] bg-muted/40 px-1 rounded text-muted-foreground/50">#{t}</span>
+                          ))}
+                        </div>
+                      )}
+                      <div className="mt-2 h-px bg-border/30 overflow-hidden">
+                        <div className="h-px bg-primary/50" style={{ width: `${(note.importance ?? 5) * 10}%` }} />
+                      </div>
+                    </div>
+                  ))}
+                  {stageNotes.length === 0 && (
+                    <p className="text-[9px] font-mono text-muted-foreground/20 text-center py-6">drop ideas here</p>
+                  )}
+                </div>
+              </div>
+            )
+          })}
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="h-screen flex overflow-hidden bg-background">
       {/* LEFT PANEL — Note List */}
@@ -505,6 +600,14 @@ export default function KnowledgePage() {
               <span className="text-xs font-mono font-bold uppercase tracking-widest text-foreground">Second Brain</span>
             </div>
             <div className="flex gap-1">
+              <Button
+                variant="ghost" size="icon"
+                className={cn('h-6 w-6 transition-colors', viewMode === 'pipeline' ? 'text-primary' : 'text-muted-foreground hover:text-primary')}
+                onClick={() => setViewMode(v => v === 'list' ? 'pipeline' : 'list')}
+                title={viewMode === 'list' ? 'Switch to Pipeline' : 'Switch to List'}
+              >
+                {viewMode === 'list' ? <LayoutGrid className="h-3.5 w-3.5" /> : <List className="h-3.5 w-3.5" />}
+              </Button>
               <Button variant="ghost" size="icon" className="h-6 w-6 text-muted-foreground hover:text-primary" onClick={handleNewNote}>
                 <Plus className="h-3.5 w-3.5" />
               </Button>

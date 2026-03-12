@@ -104,6 +104,13 @@ function AILoadingOverlay() {
   )
 }
 
+const SESSION_TEMPLATES = [
+  { id: 'explore',  title: 'Explore an Idea',   steps: ['Define the idea', 'Find assumptions', 'Connect to knowledge', 'Next action'], prompt: "Let's explore an idea together. Start by telling me the idea in one sentence." },
+  { id: 'strategy', title: 'Build a Strategy',  steps: ['Define opportunity', 'Assess risks', 'Identify resources', 'Create plan'], prompt: "Let's build a strategy. What opportunity or goal are you working on?" },
+  { id: 'decide',   title: 'Make a Decision',   steps: ['Define decision', 'Map options', 'Weigh trade-offs', 'Commit to next step'], prompt: "Let's make a decision together. Describe the choice you're facing." },
+  { id: 'research', title: 'Research a Topic',  steps: ['What I know', 'Key questions', 'Sources to explore', 'Synthesize'], prompt: "Let's research a topic systematically. What topic are you exploring?" },
+]
+
 export default function LiveAssistantPage() {
   const dispatch = useAppDispatch()
   const messages = useAppSelector(selectMessages)
@@ -122,9 +129,12 @@ export default function LiveAssistantPage() {
     name: string
     previewUrl: string
   } | null>(null)
+  const [activeSession, setActiveSession] = useState<typeof SESSION_TEMPLATES[0] | null>(null)
+  const [currentStep, setCurrentStep] = useState(0)
   const scrollRef = useRef<HTMLDivElement>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const attachmentPreviewsRef = useRef<Map<string, string>>(new Map())
+  const prevIsTypingRef = useRef(false)
 
   useRegisterPageContext({
     pageTitle: 'Thinking Partner',
@@ -166,6 +176,13 @@ export default function LiveAssistantPage() {
       return () => clearTimeout(timer)
     }
   }, [error, dispatch])
+
+  useEffect(() => {
+    if (prevIsTypingRef.current && !isTyping && activeSession) {
+      setCurrentStep(prev => Math.min(prev + 1, activeSession.steps.length - 1))
+    }
+    prevIsTypingRef.current = isTyping
+  }, [isTyping, activeSession])
 
   const fileToBase64 = useCallback((file: File): Promise<string> => {
     return new Promise((resolve, reject) => {
@@ -292,6 +309,17 @@ export default function LiveAssistantPage() {
 
   const handleNewConversation = () => {
     dispatch(startNewConversation())
+    setActiveSession(null)
+    setCurrentStep(0)
+  }
+
+  const startSession = (template: typeof SESSION_TEMPLATES[0]) => {
+    setActiveSession(template)
+    setCurrentStep(0)
+    dispatch(sendMessage({
+      conversationId: conversationId ?? undefined,
+      content: template.prompt,
+    }))
   }
 
   return (
@@ -453,6 +481,22 @@ export default function LiveAssistantPage() {
               )}
             </AnimatePresence>
 
+            {/* Session Progress Bar */}
+            {activeSession && (
+              <div className="flex-shrink-0 flex items-center gap-2 px-4 py-2 border-b border-border/30 bg-card/30">
+                <span className="text-[9px] font-mono text-primary/60 uppercase tracking-widest shrink-0">{activeSession.title}</span>
+                <div className="flex items-center gap-1 flex-1">
+                  {activeSession.steps.map((_, i) => (
+                    <div key={i} className={cn('h-1 flex-1 rounded-sm transition-colors', i <= currentStep ? 'bg-primary/70' : 'bg-border/50')} />
+                  ))}
+                </div>
+                <span className="text-[9px] font-mono text-muted-foreground/40 shrink-0">{activeSession.steps[currentStep]}</span>
+                <button onClick={() => { setActiveSession(null); setCurrentStep(0) }} className="ml-1 shrink-0">
+                  <XIcon className="h-3 w-3 text-muted-foreground/30 hover:text-muted-foreground transition-colors" />
+                </button>
+              </div>
+            )}
+
             <ScrollArea className="flex-1 p-3" ref={scrollRef}>
               {messages.length === 0 ? (
                 <motion.div
@@ -492,6 +536,26 @@ export default function LiveAssistantPage() {
                         </Button>
                       </motion.div>
                     ))}
+                  </motion.div>
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.9 }}
+                    className="w-full mt-5 px-2"
+                  >
+                    <p className="text-[9px] font-mono text-muted-foreground/35 uppercase tracking-widest mb-2 text-center">GUIDED SESSIONS</p>
+                    <div className="grid grid-cols-2 gap-2">
+                      {SESSION_TEMPLATES.map(t => (
+                        <button
+                          key={t.id}
+                          onClick={() => startSession(t)}
+                          className="text-left border border-border/50 p-2.5 hover:border-primary/40 hover:bg-primary/5 rounded-sm transition-colors"
+                        >
+                          <p className="text-xs font-mono font-bold">{t.title}</p>
+                          <p className="text-[9px] font-mono text-muted-foreground/40 mt-0.5">{t.steps.length} steps</p>
+                        </button>
+                      ))}
+                    </div>
                   </motion.div>
                 </motion.div>
               ) : (
