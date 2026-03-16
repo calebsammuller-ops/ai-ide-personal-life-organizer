@@ -9,8 +9,8 @@ import {
 } from '@/state/slices/knowledgeSlice'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
-import { Lightbulb, Search, ChevronLeft, Brain, AlertCircle, ExternalLink, Zap, Save, ChevronDown, ChevronUp } from 'lucide-react'
-import type { IdeaExpansion } from '@/types/knowledge'
+import { Lightbulb, Search, ChevronLeft, Brain, AlertCircle, ExternalLink, Zap, Save, ChevronDown, ChevronUp, Atom, RefreshCw } from 'lucide-react'
+import type { IdeaExpansion, KnowledgeCollision } from '@/types/knowledge'
 
 const EFFORT_COLORS = { low: 'text-emerald-400', medium: 'text-amber-400', high: 'text-red-400' }
 const IMPACT_COLORS = { low: 'text-gray-400', medium: 'text-blue-400', high: 'text-purple-400' }
@@ -30,7 +30,10 @@ export default function IdeasPage() {
   const isGenerating = useAppSelector(selectKnowledgeGenerating)
   const error = useAppSelector(selectKnowledgeError)
 
-  const [activeTab, setActiveTab] = useState<'ideas' | 'gaps' | 'expand'>('ideas')
+  const [activeTab, setActiveTab] = useState<'ideas' | 'gaps' | 'expand' | 'collide'>('ideas')
+  const [collision, setCollision] = useState<KnowledgeCollision | null>(null)
+  const [colliding, setColliding] = useState(false)
+  const [collideError, setCollideError] = useState<string | null>(null)
   const [seedIdea, setSeedIdea] = useState('')
   const [expansion, setExpansion] = useState<IdeaExpansion | null>(null)
   const [isExpanding, setIsExpanding] = useState(false)
@@ -78,6 +81,21 @@ export default function IdeasPage() {
     if (data.savedNoteId) setSavedNoteId(data.savedNoteId)
   }
 
+  const handleCollide = async () => {
+    setColliding(true)
+    setCollideError(null)
+    try {
+      const res = await fetch('/api/knowledge/collide', { method: 'POST' })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Collision failed')
+      setCollision(data.data)
+    } catch (e) {
+      setCollideError(e instanceof Error ? e.message : 'Failed to generate collision')
+    } finally {
+      setColliding(false)
+    }
+  }
+
   const toggleSection = (key: string) => setExpandedSections(s => ({ ...s, [key]: !s[key] }))
 
   const PRIORITY_COLORS = { critical: 'text-red-400 border-red-500 bg-red-500/10', high: 'text-orange-400 border-orange-500 bg-orange-500/10', medium: 'text-blue-400 border-blue-500 bg-blue-500/10' }
@@ -107,6 +125,12 @@ export default function IdeasPage() {
               Detect Gaps
             </Button>
           )}
+          {activeTab === 'collide' && collision && (
+            <Button onClick={handleCollide} disabled={colliding} size="sm" variant="outline" className="font-mono text-xs border-orange-500/50 text-orange-400 hover:bg-orange-500/10">
+              <RefreshCw className={cn('h-3.5 w-3.5 mr-1.5', colliding && 'animate-spin')} />
+              {colliding ? 'Colliding...' : 'New Collision'}
+            </Button>
+          )}
         </div>
       </div>
 
@@ -120,6 +144,10 @@ export default function IdeasPage() {
         </button>
         <button onClick={() => setActiveTab('expand')} className={cn('px-4 py-2 text-xs font-mono font-bold uppercase transition-colors', activeTab === 'expand' ? 'border-b-2 border-cyan-400 text-cyan-400' : 'text-muted-foreground hover:text-foreground')}>
           Expand Idea
+        </button>
+        <button onClick={() => setActiveTab('collide')} className={cn('px-4 py-2 text-xs font-mono font-bold uppercase transition-colors flex items-center gap-1.5', activeTab === 'collide' ? 'border-b-2 border-orange-400 text-orange-400' : 'text-muted-foreground hover:text-foreground')}>
+          <Atom className="h-3 w-3" />
+          Collide
         </button>
       </div>
 
@@ -376,6 +404,107 @@ export default function IdeasPage() {
               </div>
             )}
           </>
+        )}
+        {activeTab === 'collide' && (
+          <div className="max-w-3xl">
+            {collideError && (
+              <div className="flex items-center gap-2 p-3 bg-red-900/20 border border-red-500/30 rounded mb-4 text-red-400 text-xs font-mono">
+                <AlertCircle className="h-4 w-4 shrink-0" />
+                {collideError}
+              </div>
+            )}
+
+            {!collision && !colliding && (
+              <div className="flex flex-col items-center justify-center h-64">
+                <Atom className="h-16 w-16 text-muted-foreground/10 mb-4" />
+                <p className="text-sm font-mono text-muted-foreground/40 mb-1">Idea Collision Engine</p>
+                <p className="text-xs font-mono text-muted-foreground/30 mb-4 text-center max-w-xs">
+                  {notes.length < 6
+                    ? `Add at least 6 ideas to enable collision detection (${notes.length}/6)`
+                    : 'Collides two unrelated knowledge clusters to generate a breakthrough concept'}
+                </p>
+                <Button
+                  onClick={handleCollide}
+                  disabled={colliding || notes.length < 6}
+                  size="sm"
+                  className="font-mono text-xs bg-orange-600 hover:bg-orange-700 text-white"
+                >
+                  <Atom className="h-3.5 w-3.5 mr-1.5" />
+                  Collide Ideas
+                </Button>
+              </div>
+            )}
+
+            {colliding && (
+              <div className="flex items-center gap-3 p-4 bg-orange-500/5 border border-orange-500/20 rounded">
+                <div className="h-4 w-4 border-2 border-orange-500/30 border-t-orange-500 animate-spin rounded-full shrink-0" />
+                <p className="text-xs font-mono text-orange-400/80">Scanning knowledge clusters for hidden connections...</p>
+              </div>
+            )}
+
+            {collision && !colliding && (
+              <div className="space-y-4">
+                {/* Cluster badges */}
+                <div className="flex items-center gap-3 flex-wrap">
+                  <span className="text-[9px] font-mono font-bold uppercase px-2 py-1 border border-blue-500/40 bg-blue-500/10 text-blue-400 rounded-sm">
+                    {collision.clusterA.theme}
+                  </span>
+                  <span className="text-base">⚡</span>
+                  <span className="text-[9px] font-mono font-bold uppercase px-2 py-1 border border-purple-500/40 bg-purple-500/10 text-purple-400 rounded-sm">
+                    {collision.clusterB.theme}
+                  </span>
+                </div>
+
+                {/* Collision result card */}
+                <div className="p-4 bg-orange-500/5 border border-orange-500/30 rounded">
+                  <div className="flex items-start gap-2 mb-3">
+                    <Zap className="h-4 w-4 text-orange-400 shrink-0 mt-0.5" />
+                    <div>
+                      <h3 className="text-sm font-mono font-bold text-foreground">{collision.collision.title}</h3>
+                      <p className="text-xs text-muted-foreground/70 mt-1 leading-relaxed">{collision.collision.concept}</p>
+                    </div>
+                  </div>
+
+                  {collision.collision.applications.length > 0 && (
+                    <div className="mb-3 p-2.5 bg-background/40 border border-border/40 rounded-sm">
+                      <p className="text-[9px] font-mono font-bold uppercase text-muted-foreground/40 mb-1.5">Applications</p>
+                      <ul className="space-y-1">
+                        {collision.collision.applications.map((app, i) => (
+                          <li key={i} className="flex items-start gap-1.5 text-xs text-foreground/80">
+                            <span className="text-orange-400 mt-0.5 shrink-0">•</span>{app}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+
+                  <div className="mb-3 p-2.5 bg-background/40 border border-border/40 rounded-sm">
+                    <p className="text-[9px] font-mono font-bold uppercase text-muted-foreground/40 mb-1">Tech Approach</p>
+                    <p className="text-xs text-foreground/80">{collision.collision.techApproach}</p>
+                  </div>
+
+                  <div className="p-2.5 bg-emerald-500/5 border border-emerald-500/20 rounded-sm">
+                    <p className="text-[9px] font-mono font-bold uppercase text-emerald-400/60 mb-1">First Step</p>
+                    <p className="text-xs text-foreground/80">{collision.collision.firstStep}</p>
+                  </div>
+                </div>
+
+                {/* Source notes */}
+                <div className="grid grid-cols-2 gap-3">
+                  {[collision.clusterA, collision.clusterB].map((cluster, ci) => (
+                    <div key={ci} className="p-2.5 border border-border/40 bg-background/30 rounded-sm">
+                      <p className={cn('text-[9px] font-mono font-bold uppercase mb-1.5', ci === 0 ? 'text-blue-400/60' : 'text-purple-400/60')}>{cluster.theme}</p>
+                      <div className="flex flex-wrap gap-1">
+                        {cluster.notes.slice(0, 4).map((n, i) => (
+                          <span key={i} className="text-[8px] font-mono bg-muted/30 px-1 py-0.5 rounded text-muted-foreground/60">{n}</span>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
         )}
       </div>
     </div>

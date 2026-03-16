@@ -257,3 +257,16 @@ export interface WeeklyReviewResult {
   nextWeekFocus: string
   questionToSitWith: string
 }
+
+// Idea Collision Engine
+export interface KnowledgeCollision {
+  clusterA: { theme: string; notes: string[] }
+  clusterB: { theme: string; notes: string[] }
+  collision: {
+    title: string
+    concept: string
+    applications: string[]
+    techApproach: string
+    firstStep: string
+  }
+}

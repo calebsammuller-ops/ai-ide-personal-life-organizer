@@ -15,6 +15,8 @@ import {
   selectAllNotes, selectAllLinks, selectBriefing, selectBriefingAge, selectKnowledgeGenerating,
   selectPredictions,
 } from '@/state/slices/knowledgeSlice'
+import { fetchCognitiveMirror, selectCognitiveMirrorData } from '@/state/slices/cognitiveMirrorSlice'
+import { fetchTrajectory, selectTrajectoryData } from '@/state/slices/trajectorySlice'
 import Link from 'next/link'
 import { cn } from '@/lib/utils'
 
@@ -27,6 +29,8 @@ export default function DashboardPage() {
   const briefingAge = useAppSelector(selectBriefingAge)
   const isBriefingGenerating = useAppSelector(selectKnowledgeGenerating)
   const predictions = useAppSelector(selectPredictions)
+  const cognitiveData = useAppSelector(selectCognitiveMirrorData)
+  const trajectoryData = useAppSelector(selectTrajectoryData)
 
   useRegisterPageContext({
     pageTitle: 'Home',
@@ -41,6 +45,8 @@ export default function DashboardPage() {
     dispatch(fetchNotes() as any)
     dispatch(fetchBriefing() as any)
     dispatch(fetchPredictions() as any)
+    dispatch(fetchCognitiveMirror() as any)
+    dispatch(fetchTrajectory() as any)
   }, [dispatch])
 
   const stats = [
@@ -200,6 +206,54 @@ export default function DashboardPage() {
           )}
         </CardContent>
       </Card>
+
+      {/* COGNITIVE PROFILE */}
+      {cognitiveData && (
+        <Card className="rounded-sm border-border/50">
+          <CardHeader className="flex flex-row items-center justify-between py-2 px-3 border-b border-border/50">
+            <div className="flex items-center gap-2">
+              <Brain className="h-3.5 w-3.5 text-primary" />
+              <p className="text-[10px] font-mono font-bold uppercase tracking-widest text-primary/80">COGNITIVE PROFILE</p>
+            </div>
+            <Link href="/insights">
+              <span className="text-[9px] font-mono text-muted-foreground/40 hover:text-primary transition-colors">Full analysis →</span>
+            </Link>
+          </CardHeader>
+          <CardContent className="p-3 space-y-2">
+            <div className="flex items-center gap-2">
+              <span className="px-2 py-0.5 rounded-sm text-[10px] font-mono font-bold bg-primary/10 text-primary border border-primary/30">
+                {cognitiveData.dominantStyle}
+              </span>
+              <span className="text-[10px] font-mono text-muted-foreground/50">{cognitiveData.learningStyle} Learner</span>
+              <span className="ml-auto text-[9px] font-mono text-muted-foreground/30">
+                Focus: {Math.round(cognitiveData.focusScore * 100)}%
+              </span>
+            </div>
+            <div className="h-1 bg-muted overflow-hidden">
+              <div className="h-full bg-primary transition-all" style={{ width: `${cognitiveData.focusScore * 100}%` }} />
+            </div>
+            <div className="space-y-1">
+              {cognitiveData.patterns.slice(0, 2).map((p, i) => (
+                <div key={i} className="flex items-center gap-2">
+                  <span className="text-[9px] font-mono text-foreground/60 flex-1 truncate">{p.label}</span>
+                  <div className="w-16 h-1 bg-muted overflow-hidden">
+                    <div
+                      className={cn('h-full transition-all', p.valence === 'strength' ? 'bg-primary/70' : p.valence === 'weakness' ? 'bg-destructive/60' : 'bg-muted-foreground/40')}
+                      style={{ width: `${p.score * 100}%` }}
+                    />
+                  </div>
+                  <span className="text-[8px] font-mono text-muted-foreground/30 w-6 text-right">{Math.round(p.score * 100)}%</span>
+                </div>
+              ))}
+            </div>
+            {trajectoryData?.narrative?.headline && (
+              <p className="text-[9px] font-mono text-muted-foreground/50 italic border-t border-border/30 pt-1.5">
+                {trajectoryData.narrative.headline}
+              </p>
+            )}
+          </CardContent>
+        </Card>
+      )}
 
       {/* CURIOSITY TRIGGER */}
       {orphanNote && (

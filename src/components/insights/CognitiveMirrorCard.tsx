@@ -15,16 +15,16 @@ import {
 import { cn } from '@/lib/utils'
 
 const STYLE_COLORS: Record<string, string> = {
-  Explorer: 'bg-blue-500/15 text-blue-400 border border-blue-500/30',
-  Builder: 'bg-green-500/15 text-green-400 border border-green-500/30',
+  Explorer: 'bg-primary/10 text-primary border border-primary/30',
+  Builder: 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30',
   Connector: 'bg-purple-500/15 text-purple-400 border border-purple-500/30',
   Synthesizer: 'bg-amber-500/15 text-amber-400 border border-amber-500/30',
 }
 
 const VALENCE_COLORS: Record<string, string> = {
-  strength: 'bg-green-500',
-  weakness: 'bg-red-500',
-  neutral: 'bg-blue-500',
+  strength: 'bg-primary/70',
+  weakness: 'bg-destructive/60',
+  neutral: 'bg-muted-foreground/40',
 }
 
 export function CognitiveMirrorCard() {
@@ -44,77 +44,74 @@ export function CognitiveMirrorCard() {
     : null
 
   return (
-    <Card>
-      <CardHeader className="pb-3">
-        <div className="flex items-center justify-between">
-          <CardTitle className="flex items-center gap-2 text-base">
-            <Brain className="h-4 w-4 text-blue-500" />
-            Cognitive Mirror
-          </CardTitle>
-          <div className="flex items-center gap-2">
-            {cached && relativeTime && (
-              <span className="flex items-center gap-1 text-[10px] text-muted-foreground">
-                <Clock className="h-3 w-3" />
-                Analyzed {relativeTime}
-              </span>
-            )}
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => dispatch(fetchCognitiveMirror() as any)}
-              disabled={loading}
-            >
-              <RefreshCw className={cn('h-3 w-3 mr-1', loading && 'animate-spin')} />
-              {loading ? 'Analyzing...' : data ? 'Re-analyze' : 'Analyze My Thinking'}
-            </Button>
-          </div>
-        </div>
+    <Card className="rounded-sm border-primary/20">
+      <CardHeader className="flex flex-row items-center justify-between py-2 px-3 border-b border-primary/20">
+        <CardTitle className="flex items-center gap-2">
+          <Brain className="h-3.5 w-3.5 text-primary" />
+          <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-primary/80">COGNITIVE MIRROR</span>
+          {cached && relativeTime && (
+            <span className="flex items-center gap-1 text-[9px] font-mono text-muted-foreground/30">
+              <Clock className="h-2.5 w-2.5" />
+              {relativeTime}
+            </span>
+          )}
+        </CardTitle>
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => dispatch(fetchCognitiveMirror() as any)}
+          disabled={loading}
+          className="h-6 px-2 text-[10px] font-mono text-primary/60 hover:bg-primary/10 hover:text-primary"
+        >
+          <RefreshCw className={cn('h-3 w-3 mr-1', loading && 'animate-spin')} />
+          {loading ? '...' : data ? 'Re-analyze' : 'Analyze'}
+        </Button>
       </CardHeader>
 
       {data && (
-        <CardContent className="space-y-4">
+        <CardContent className="p-3 space-y-3">
           {/* Dominant Style */}
-          <div className="flex items-center gap-3">
-            <span className={cn('px-3 py-1 rounded-full text-sm font-semibold', STYLE_COLORS[data.dominantStyle] || STYLE_COLORS['Explorer'])}>
+          <div className="flex items-center gap-2">
+            <span className={cn('px-2 py-0.5 rounded-sm text-[10px] font-mono font-bold', STYLE_COLORS[data.dominantStyle] || STYLE_COLORS['Explorer'])}>
               {data.dominantStyle}
             </span>
-            <span className="text-sm text-muted-foreground">{data.learningStyle} Learner</span>
+            <span className="text-[10px] font-mono text-muted-foreground/50">{data.learningStyle} Learner</span>
           </div>
 
           {/* Focus Score */}
           <div>
-            <div className="flex justify-between text-xs text-muted-foreground mb-1">
-              <span>Focus Score</span>
+            <div className="flex justify-between text-[9px] font-mono text-muted-foreground/50 mb-1">
+              <span>FOCUS SCORE</span>
               <span>{Math.round(data.focusScore * 100)}%</span>
             </div>
-            <div className="h-2 bg-muted rounded-full overflow-hidden">
+            <div className="h-1.5 bg-muted overflow-hidden">
               <div
-                className="h-full bg-blue-500 rounded-full transition-all"
+                className="h-full bg-primary transition-all"
                 style={{ width: `${data.focusScore * 100}%` }}
               />
             </div>
-            <div className="flex justify-between text-[10px] text-muted-foreground/60 mt-0.5">
+            <div className="flex justify-between text-[8px] font-mono text-muted-foreground/30 mt-0.5">
               <span>Broad</span>
-              <span>Deep Focus</span>
+              <span>Deep</span>
             </div>
           </div>
 
           {/* Patterns */}
           {data.patterns.length > 0 && (
-            <div className="space-y-2">
+            <div className="space-y-1.5">
               {data.patterns.map((p, i) => (
                 <div key={i}>
-                  <div className="flex justify-between text-xs mb-0.5">
-                    <span className="font-medium">{p.label}</span>
-                    <span className="text-muted-foreground">{Math.round(p.score * 100)}%</span>
+                  <div className="flex justify-between text-[9px] font-mono mb-0.5">
+                    <span className="text-foreground/70">{p.label}</span>
+                    <span className="text-muted-foreground/40">{Math.round(p.score * 100)}%</span>
                   </div>
-                  <div className="h-1.5 bg-muted rounded-full overflow-hidden">
+                  <div className="h-1 bg-muted overflow-hidden">
                     <div
-                      className={cn('h-full rounded-full', VALENCE_COLORS[p.valence])}
+                      className={cn('h-full transition-all', VALENCE_COLORS[p.valence])}
                       style={{ width: `${p.score * 100}%` }}
                     />
                   </div>
-                  <p className="text-[11px] text-muted-foreground mt-0.5">{p.description}</p>
+                  <p className="text-[9px] font-mono text-muted-foreground/40 mt-0.5">{p.description}</p>
                 </div>
               ))}
             </div>
@@ -123,10 +120,10 @@ export function CognitiveMirrorCard() {
           {/* Thinking Biases */}
           {data.thinkingBiases.length > 0 && (
             <div>
-              <p className="text-xs font-medium mb-1.5">Thinking Biases</p>
-              <div className="flex flex-wrap gap-1.5">
+              <p className="text-[9px] font-mono font-bold uppercase tracking-wider text-muted-foreground/40 mb-1">Thinking Biases</p>
+              <div className="flex flex-wrap gap-1">
                 {data.thinkingBiases.map((bias, i) => (
-                  <span key={i} className="px-2 py-0.5 text-[10px] rounded-full bg-red-500/10 text-red-400 border border-red-500/20">
+                  <span key={i} className="px-1.5 py-0.5 text-[8px] font-mono rounded-sm bg-destructive/10 text-destructive/70 border border-destructive/20">
                     {bias}
                   </span>
                 ))}
@@ -135,26 +132,26 @@ export function CognitiveMirrorCard() {
           )}
 
           {/* Observation */}
-          <p className="text-sm text-muted-foreground italic">{data.observation}</p>
+          <p className="text-[10px] font-mono text-muted-foreground/60 italic leading-relaxed">{data.observation}</p>
 
           {/* Blind spot + recommendation */}
-          <div className="space-y-2">
-            <div className="p-3 border border-orange-500/20 bg-orange-500/5 rounded-lg">
-              <p className="text-xs font-semibold text-orange-500 mb-0.5">Blind Spot</p>
-              <p className="text-sm">{data.blindSpot}</p>
+          <div className="space-y-1.5">
+            <div className="p-2 border border-amber-500/20 bg-amber-500/5 rounded-sm">
+              <p className="text-[9px] font-mono font-bold uppercase text-amber-500/60 mb-0.5">Blind Spot</p>
+              <p className="text-[10px] font-mono text-foreground/70">{data.blindSpot}</p>
             </div>
-            <div className="p-3 border border-primary/20 bg-primary/5 rounded-lg">
-              <p className="text-xs font-semibold text-primary mb-0.5">Recommendation</p>
-              <p className="text-sm">{data.recommendation}</p>
+            <div className="p-2 border border-primary/20 bg-primary/5 rounded-sm">
+              <p className="text-[9px] font-mono font-bold uppercase text-primary/60 mb-0.5">Recommendation</p>
+              <p className="text-[10px] font-mono text-foreground/70">{data.recommendation}</p>
             </div>
           </div>
         </CardContent>
       )}
 
       {!data && !loading && (
-        <CardContent>
-          <p className="text-sm text-muted-foreground text-center py-4">
-            Click "Analyze My Thinking" to reveal your cognitive patterns.
+        <CardContent className="p-3">
+          <p className="text-[10px] font-mono text-muted-foreground/40 text-center py-4">
+            Click "Analyze" to reveal your cognitive patterns.
           </p>
         </CardContent>
       )}
