@@ -12,6 +12,7 @@ import cognitiveMirrorReducer from './slices/cognitiveMirrorSlice'
 import strategyReducer from './slices/strategySlice'
 import trajectoryReducer from './slices/trajectorySlice'
 import weeklyReviewReducer from './slices/weeklyReviewSlice'
+import rightPanelReducer from './slices/rightPanelSlice'
 
 export const store = configureStore({
   reducer: {
@@ -28,6 +29,7 @@ export const store = configureStore({
     strategy: strategyReducer,
     trajectory: trajectoryReducer,
     weeklyReview: weeklyReviewReducer,
+    rightPanel: rightPanelReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

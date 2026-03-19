@@ -18,6 +18,8 @@ interface UIState {
   theme: 'light' | 'dark' | 'system'
   isSidebarCollapsed: boolean
   isWinterArcMode: boolean
+  isRightPanelOpen: boolean
+  isRightPanelPinned: boolean
 }
 
 const initialState: UIState = {
@@ -30,6 +32,8 @@ const initialState: UIState = {
   theme: 'system',
   isSidebarCollapsed: false,
   isWinterArcMode: false,
+  isRightPanelOpen: true,
+  isRightPanelPinned: false,
 }
 
 export const uiSlice = createSlice({
@@ -78,6 +82,12 @@ export const uiSlice = createSlice({
     toggleWinterArcMode: (state) => {
       state.isWinterArcMode = !state.isWinterArcMode
     },
+    toggleRightPanel: (state) => {
+      state.isRightPanelOpen = !state.isRightPanelOpen
+    },
+    toggleRightPanelPin: (state) => {
+      state.isRightPanelPinned = !state.isRightPanelPinned
+    },
   },
 })
 
@@ -93,6 +103,8 @@ export const {
   setTheme,
   toggleSidebar,
   toggleWinterArcMode,
+  toggleRightPanel,
+  toggleRightPanelPin,
 } = uiSlice.actions
 
 export const selectActiveModal = (state: RootState) => state.ui.activeModal
@@ -104,5 +116,7 @@ export const selectSearchQuery = (state: RootState) => state.ui.searchQuery
 export const selectTheme = (state: RootState) => state.ui.theme
 export const selectIsSidebarCollapsed = (state: RootState) => state.ui.isSidebarCollapsed
 export const selectIsWinterArcMode = (state: RootState) => state.ui.isWinterArcMode
+export const selectIsRightPanelOpen = (state: RootState) => state.ui.isRightPanelOpen
+export const selectIsRightPanelPinned = (state: RootState) => state.ui.isRightPanelPinned
 
 export default uiSlice.reducer

@@ -10,6 +10,7 @@ import { AIContextProvider } from '@/providers/AIContextProvider'
 import { MotionProvider } from '@/providers/MotionProvider'
 import { FloatingAssistant } from '@/components/floating-assistant/FloatingAssistant'
 import { GlitchBackground } from '@/components/layout/GlitchBackground'
+import { RightPanel } from '@/components/layout/RightPanel'
 
 export default function DashboardLayout({
   children,
@@ -24,11 +25,12 @@ export default function DashboardLayout({
             <div className="flex min-h-screen">
               <GlitchBackground />
               <Sidebar />
-              <div className="flex flex-1 flex-col">
+              <div className="flex flex-1 flex-col min-w-0">
                 <Header />
                 {children}
                 <BottomNav />
               </div>
+              <RightPanel />
               <ModalManager />
               <SearchModal />
               <ConsentGate><span /></ConsentGate>
