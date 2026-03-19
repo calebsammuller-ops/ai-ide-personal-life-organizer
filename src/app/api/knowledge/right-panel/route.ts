@@ -5,19 +5,16 @@ import { sendMessage } from '@/lib/ai/anthropicClient'
 import { parseAIJSON } from '@/lib/ai/utils/parseAIJSON'
 import type { User } from '@supabase/supabase-js'
 
-const CONTEXT_HINTS: Record<string, string> = {
-  ideas: 'The user is currently browsing their ideas. Prioritize actions around expanding or connecting ideas.',
-  graph: 'The user is viewing their knowledge graph. Emphasize connections and structural patterns.',
-  insights: 'The user is on the intelligence hub. Focus on meta-level patterns in their thinking.',
-  general: '',
-}
-
 const FALLBACK = {
   insight: 'Add more notes to unlock personalized intelligence.',
+  whyThisMatters: null,
+  pattern: null,
   connections: [],
-  nextAction: { text: 'Capture your first idea to get started', type: 'expand' as const },
+  nextActions: [{ text: 'Capture your first idea to get started', type: 'expand', priority: 'low', targetId: '' }],
   priority: 'low' as const,
   confidence: 0,
+  confidenceReason: null,
+  patternShift: null,
 }
 
 export const POST = withApiHandler(withAuth(async (request: Request, user: User) => {
@@ -41,47 +38,71 @@ export const POST = withApiHandler(withAuth(async (request: Request, user: User)
     return NextResponse.json(FALLBACK)
   }
 
+  // Fetch recent AI insight notes as previous insights context
+  const { data: aiInsights } = await supabase
+    .from('knowledge_notes')
+    .select('title, content')
+    .eq('user_id', user.id)
+    .eq('type', 'ai-insight')
+    .order('created_at', { ascending: false })
+    .limit(3)
+
+  const previousInsights = aiInsights && aiInsights.length > 0
+    ? (aiInsights as { title: string; content: string }[])
+        .map(n => `- ${n.title}: ${(n.content || '').slice(0, 80)}`)
+        .join('\n')
+    : 'None'
+
   const summaries = allNotes
     .map((n, i) => `${i + 1}. [${n.type}] "${n.title}" tags:[${(n.tags || []).join(', ')}] — ${(n.content || '').slice(0, 120)}`)
     .join('\n')
 
-  const contextHint = CONTEXT_HINTS[context] || ''
+  const prompt = `You are an advanced intelligence system acting as a cognitive partner.
 
-  const prompt = `You are an intelligence system analyzing a user's thinking patterns.
+You analyze a user's knowledge base to detect thinking patterns, identify meaningful connections, guide decision-making, and recommend high-value actions.
 
-User's most recent notes:
+USER NOTES:
 ${summaries}
-${contextHint ? `\nContext: ${contextHint}` : ''}
 
-Your job:
-1. Detect the strongest pattern in their ideas
-2. Identify 1-2 meaningful, non-obvious connections between notes
-3. Recommend ONE high-value next action
+PAGE CONTEXT: ${context}
 
-Return JSON only, no other text:
+PREVIOUS AI INSIGHTS:
+${previousInsights}
+
+YOUR TASK:
+1. Identify the strongest thinking pattern
+2. Explain why it matters psychologically or strategically
+3. Detect 1-2 non-obvious connections between notes
+4. Suggest 1-3 prioritized next actions
+5. Detect any pattern shift compared to previous insights
+
+RETURN JSON ONLY, no other text:
 {
-  "insight": "specific observation about their current thinking direction",
+  "insight": "specific observation about thinking direction",
+  "whyThisMatters": "why this pattern is important psychologically or strategically",
+  "pattern": "repeated behavior or emerging theme",
   "connections": [
-    { "noteA": "exact note title", "noteB": "exact note title", "reason": "why these connect non-obviously", "strength": 0.0-1.0 }
+    { "noteA": "exact note title", "noteB": "exact note title", "reason": "non-obvious bridge", "strength": 0.0 }
   ],
-  "nextAction": {
-    "text": "concrete action they should take now",
-    "type": "expand | research | connect",
-    "targetId": "note title if applicable, else empty string"
-  },
+  "nextActions": [
+    { "text": "concrete actionable step", "type": "expand | research | connect", "priority": "high | medium | low", "targetId": "note title or empty string" }
+  ],
   "priority": "low | medium | high",
-  "confidence": 0.0-1.0
+  "confidence": 0.0,
+  "confidenceReason": "why this confidence level",
+  "patternShift": "how thinking has changed vs previous insights, or null"
 }
 
-Rules:
-- insight must reference their actual ideas, not be generic
-- connections must be non-obvious bridges between different domains
-- nextAction must be immediately actionable, not vague
-- all text fields must be ≤ 15 words`
+RULES:
+- Be specific, reference actual note titles and content
+- Keep each field under 15 words
+- Connections must be non-obvious bridges between different domains
+- Actions must be immediately actionable
+- patternShift is null if no previous insights or no shift detected`
 
   const result = await sendMessage({
     model: 'claude-haiku-4-5-20251001',
-    maxTokens: 500,
+    maxTokens: 700,
     messages: [{ role: 'user', content: prompt }],
     userId: user.id,
   })
@@ -94,9 +115,13 @@ Rules:
 
   return NextResponse.json({
     insight: parsed.insight || FALLBACK.insight,
+    whyThisMatters: parsed.whyThisMatters || null,
+    pattern: parsed.pattern || null,
     connections: Array.isArray(parsed.connections) ? parsed.connections.slice(0, 2) : [],
-    nextAction: parsed.nextAction || FALLBACK.nextAction,
+    nextActions: Array.isArray(parsed.nextActions) ? parsed.nextActions.slice(0, 3) : FALLBACK.nextActions,
     priority: parsed.priority || 'low',
     confidence: typeof parsed.confidence === 'number' ? parsed.confidence : 0,
+    confidenceReason: parsed.confidenceReason || null,
+    patternShift: parsed.patternShift || null,
   })
 }))
