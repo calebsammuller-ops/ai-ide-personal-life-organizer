@@ -8,6 +8,10 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { useAppSelector, useAppDispatch } from '@/state/hooks'
 import { selectUser } from '@/state/slices/authSlice'
 import { setSearchOpen, openModal } from '@/state/slices/uiSlice'
+import { selectCognitiveState } from '@/state/slices/cognitiveStateSlice'
+import { selectMomentumScore, selectMomentumTrend, selectMomentumStreak } from '@/state/slices/momentumSlice'
+import { selectCurrentNextMove } from '@/state/slices/nextMoveSlice'
+import { cn } from '@/lib/utils'
 
 const pageTitles: Record<string, string> = {
   '/dashboard':            'COMMAND CENTER',
@@ -25,6 +29,11 @@ export function Header() {
   const pathname = usePathname()
   const dispatch = useAppDispatch()
   const user = useAppSelector(selectUser)
+  const cognitiveState = useAppSelector(selectCognitiveState)
+  const momentumScore = useAppSelector(selectMomentumScore)
+  const momentumTrend = useAppSelector(selectMomentumTrend)
+  const streak = useAppSelector(selectMomentumStreak)
+  const currentNextMove = useAppSelector(selectCurrentNextMove)
 
   const getTitle = () => {
     for (const [path, title] of Object.entries(pageTitles)) {
@@ -49,6 +58,33 @@ export function Header() {
             <h1 className="text-xs font-bold tracking-widest uppercase text-foreground font-mono">
               {getTitle()}
             </h1>
+          </div>
+
+          {/* Cognitive status indicators — desktop only */}
+          <div className="hidden md:flex items-center gap-2 flex-1 px-4 overflow-hidden">
+            <span className={cn(
+              'text-[8px] font-mono uppercase tracking-widest border rounded-sm px-1.5 py-px shrink-0',
+              cognitiveState === 'drifting' ? 'border-destructive/40 text-destructive/60' :
+              cognitiveState === 'executing' ? 'border-green-500/30 text-green-500/60' :
+              cognitiveState === 'overwhelmed' ? 'border-amber-500/30 text-amber-500/60' :
+              'border-primary/25 text-primary/50'
+            )}>{cognitiveState}</span>
+
+            <span className="text-[8px] font-mono text-muted-foreground/30 shrink-0">
+              {momentumScore} {momentumTrend === 'up' ? '↑' : momentumTrend === 'down' ? '↓' : '→'}
+            </span>
+
+            {currentNextMove && (
+              <span className="text-[8px] font-mono text-primary/40 truncate max-w-[120px]">
+                → {currentNextMove.text}
+              </span>
+            )}
+
+            {streak > 0 && (
+              <span className="text-[8px] font-mono text-muted-foreground/20 shrink-0">
+                consistency: {streak}d
+              </span>
+            )}
           </div>
 
           <div className="flex items-center gap-1">

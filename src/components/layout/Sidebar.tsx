@@ -17,7 +17,8 @@ import {
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { useAppSelector, useAppDispatch } from '@/state/hooks'
-import { selectIsSidebarCollapsed, toggleSidebar } from '@/state/slices/uiSlice'
+import { selectIsSidebarCollapsed, toggleSidebar, openModal } from '@/state/slices/uiSlice'
+import { selectLockInActive, deactivateLockIn } from '@/state/slices/lockInSlice'
 
 const navSections = [
   {
@@ -59,6 +60,7 @@ export function Sidebar() {
   const pathname = usePathname()
   const dispatch = useAppDispatch()
   const isCollapsed = useAppSelector(selectIsSidebarCollapsed)
+  const lockInActive = useAppSelector(selectLockInActive)
 
   return (
     <aside
@@ -135,7 +137,7 @@ export function Sidebar() {
       </nav>
 
       {/* Footer */}
-      <div className="border-t border-border/50 p-2">
+      <div className="border-t border-border/50 p-2 space-y-0.5">
         <Link
           href="/settings"
           className={cn(
@@ -151,6 +153,23 @@ export function Sidebar() {
           <Settings className="h-4 w-4 shrink-0" />
           {!isCollapsed && <span className="text-xs font-mono">Settings</span>}
         </Link>
+        {!isCollapsed && (
+          lockInActive ? (
+            <button
+              onClick={() => dispatch(deactivateLockIn())}
+              className="w-full flex items-center gap-2.5 px-3 py-1.5 border-l-2 border-destructive/40 text-destructive/60 hover:text-destructive/80 text-[9px] font-mono transition-colors"
+            >
+              EXIT LOCK-IN
+            </button>
+          ) : (
+            <button
+              onClick={() => dispatch(openModal({ modalName: 'lockIn' }))}
+              className="w-full flex items-center gap-2.5 px-3 py-1.5 border-l-2 border-transparent text-primary/40 hover:text-primary/70 text-[9px] font-mono transition-colors"
+            >
+              LOCK-IN MODE
+            </button>
+          )
+        )}
       </div>
     </aside>
   )

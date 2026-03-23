@@ -11,6 +11,8 @@ import { MotionProvider } from '@/providers/MotionProvider'
 import { FloatingAssistant } from '@/components/floating-assistant/FloatingAssistant'
 import { GlitchBackground } from '@/components/layout/GlitchBackground'
 import { RightPanel } from '@/components/layout/RightPanel'
+import { LockInBanner } from '@/components/lock-in/LockInBanner'
+import { MicroReward } from '@/components/ui/MicroReward'
 
 export default function DashboardLayout({
   children,
@@ -27,6 +29,7 @@ export default function DashboardLayout({
               <Sidebar />
               <div className="flex flex-1 flex-col min-w-0">
                 <Header />
+                <LockInBanner />
                 {children}
                 <BottomNav />
               </div>
@@ -36,6 +39,7 @@ export default function DashboardLayout({
               <ConsentGate><span /></ConsentGate>
             </div>
             <FloatingAssistant />
+            <MicroReward />
           </AIContextProvider>
         </MotionProvider>
       </DashboardClientLayout>

@@ -13,6 +13,14 @@ export interface RightPanelNextAction {
   type: 'expand' | 'research' | 'connect'
   priority: 'high' | 'medium' | 'low'
   targetId?: string
+  actionType?: 'write' | 'connect' | 'build' | 'decide' | 'expand'
+  estimatedMinutes?: number
+  difficulty?: 'low' | 'medium' | 'high'
+}
+
+interface VariableInsight {
+  type: 'contradiction' | 'pattern' | 'prediction'
+  text: string
 }
 
 interface RightPanelState {
@@ -25,6 +33,7 @@ interface RightPanelState {
   confidence: number
   confidenceReason: string | null
   patternShift: string | null
+  variableInsight: VariableInsight | null
   loading: boolean
   generatedAt: string | null
 }
@@ -39,6 +48,7 @@ const initialState: RightPanelState = {
   confidence: 0,
   confidenceReason: null,
   patternShift: null,
+  variableInsight: null,
   loading: false,
   generatedAt: null,
 }
@@ -47,7 +57,23 @@ const CACHE_DURATION_MS = 5 * 60 * 1000
 
 export const fetchRightPanel = createAsyncThunk(
   'rightPanel/fetch',
-  async ({ force = false, context = 'general' }: { force?: boolean; context?: string } = {}, { getState }) => {
+  async (
+    args: {
+      force?: boolean
+      context?: string
+      lockInFocus?: string
+      missedCount?: number
+      ignoredCount?: number
+      cognitiveState?: string
+      predictedState?: string
+      bestActionTypes?: string[]
+      worstActionTypes?: string[]
+      respondsToPressure?: boolean
+      committedIdentity?: string
+    } = {},
+    { getState }
+  ) => {
+    const { force = false, context = 'general', ...extra } = args
     const state = getState() as RootState
     const { generatedAt } = state.rightPanel
     if (!force && generatedAt) {
@@ -59,7 +85,7 @@ export const fetchRightPanel = createAsyncThunk(
     const res = await fetch('/api/knowledge/right-panel', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ context }),
+      body: JSON.stringify({ context, ...extra }),
     })
     if (!res.ok) throw new Error('Failed to fetch right panel')
     return res.json()
@@ -88,6 +114,7 @@ const rightPanelSlice = createSlice({
         state.confidence = typeof p.confidence === 'number' ? p.confidence : 0
         state.confidenceReason = p.confidenceReason ?? null
         state.patternShift = p.patternShift ?? null
+        state.variableInsight = p.variableInsight ?? null
         state.generatedAt = new Date().toISOString()
       })
       .addCase(fetchRightPanel.rejected, (state) => {
@@ -107,5 +134,6 @@ export const selectRightPanelPriority = (state: RootState) => state.rightPanel.p
 export const selectRightPanelConfidence = (state: RootState) => state.rightPanel.confidence
 export const selectRightPanelConfidenceReason = (state: RootState) => state.rightPanel.confidenceReason
 export const selectRightPanelPatternShift = (state: RootState) => state.rightPanel.patternShift
+export const selectRightPanelVariableInsight = (state: RootState) => state.rightPanel.variableInsight
 export const selectRightPanelLoading = (state: RootState) => state.rightPanel.loading
 export const selectRightPanelGeneratedAt = (state: RootState) => state.rightPanel.generatedAt

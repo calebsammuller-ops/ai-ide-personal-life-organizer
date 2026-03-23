@@ -10,35 +10,44 @@ const FALLBACK = {
   whyThisMatters: null,
   pattern: null,
   connections: [],
-  nextActions: [{ text: 'Capture your first idea to get started', type: 'expand', priority: 'low', targetId: '' }],
+  nextActions: [{ text: 'Capture your first idea to get started', type: 'expand', priority: 'low', targetId: '', actionType: 'expand', estimatedMinutes: 5, difficulty: 'low' }],
   priority: 'low' as const,
   confidence: 0,
   confidenceReason: null,
   patternShift: null,
+  variableInsight: null,
 }
 
 export const POST = withApiHandler(withAuth(async (request: Request, user: User) => {
   const body = await request.json().catch(() => ({}))
   const context: string = body.context || 'general'
+  const lockInFocus: string | undefined = body.lockInFocus
+  const missedCount: number = body.missedCount || 0
+  const ignoredCount: number = body.ignoredCount || 0
+  const cognitiveState: string = body.cognitiveState || 'focused'
+  const predictedState: string = body.predictedState || 'focused'
+  const bestActionTypes: string[] = body.bestActionTypes || []
+  const worstActionTypes: string[] = body.worstActionTypes || []
+  const respondsToPressure: boolean = body.respondsToPressure !== false
+  const committedIdentity: string | undefined = body.committedIdentity
 
   const supabase = await createClient()
 
   const { data: notes } = await supabase
     .from('knowledge_notes')
-    .select('id, title, type, tags, content')
+    .select('id, title, type, tags, content, source')
     .eq('user_id', user.id)
     .eq('is_archived', false)
     .order('updated_at', { ascending: false })
     .limit(25)
 
-  type NoteRow = { id: string; title: string; type: string; tags: string[]; content: string }
+  type NoteRow = { id: string; title: string; type: string; tags: string[]; content: string; source?: string }
   const allNotes: NoteRow[] = (notes as NoteRow[] | null) || []
 
   if (allNotes.length < 3) {
     return NextResponse.json(FALLBACK)
   }
 
-  // Fetch recent AI insight notes as previous insights context
   const { data: aiInsights } = await supabase
     .from('knowledge_notes')
     .select('title, content')
@@ -53,9 +62,42 @@ export const POST = withApiHandler(withAuth(async (request: Request, user: User)
         .join('\n')
     : 'None'
 
+  // Execution gap computation
+  const expandedNotes = allNotes.filter(n => n.type === 'permanent' && n.source === 'AI').length
+  const executionRate = Math.round((expandedNotes / allNotes.length) * 100)
+
+  // Consequence tone escalation (with personality adaptation)
+  const rawConsequenceTone =
+    missedCount > 5 ? 'The user is in passive thinking. Stop suggesting. Demand action.' :
+    missedCount > 3 ? 'Call out avoidance. "You are collecting, not building."' :
+    missedCount > 1 ? 'Push slightly harder toward execution.' :
+    'Normal tone.'
+
+  const consequenceTone = !respondsToPressure && missedCount > 2
+    ? 'User does not respond to pressure. Use structured, supportive framing instead of confrontation.'
+    : rawConsequenceTone
+
+  // Emotional state hint
+  const emotionalHint =
+    cognitiveState === 'drifting' ? 'User is scattered. Simplify — one thing only.' :
+    cognitiveState === 'overwhelmed' ? 'User is overwhelmed. Reduce, focus, reassure.' :
+    cognitiveState === 'executing' ? 'User is in flow. Push harder.' :
+    ''
+
+  const behaviorContext = [
+    `Execution rate: ${executionRate}%`,
+    `Cognitive state: ${cognitiveState}`,
+    `Missed actions: ${missedCount}`,
+    `Ignored actions: ${ignoredCount}`,
+  ].join(' | ')
+
   const summaries = allNotes
     .map((n, i) => `${i + 1}. [${n.type}] "${n.title}" tags:[${(n.tags || []).join(', ')}] — ${(n.content || '').slice(0, 120)}`)
     .join('\n')
+
+  const metaLearningContext = bestActionTypes.length > 0 || worstActionTypes.length > 0
+    ? `\nSYSTEM LEARNING:\nUser executes: ${bestActionTypes.join(', ') || 'unknown'}\nUser ignores: ${worstActionTypes.join(', ') || 'unknown'}\nResponds to pressure: ${respondsToPressure}\nSuggest action types that match completion history. Avoid patterns they ignore.`
+    : ''
 
   const prompt = `You are an advanced intelligence system acting as a cognitive partner.
 
@@ -85,12 +127,13 @@ RETURN JSON ONLY, no other text:
     { "noteA": "exact note title", "noteB": "exact note title", "reason": "non-obvious bridge", "strength": 0.0 }
   ],
   "nextActions": [
-    { "text": "concrete actionable step", "type": "expand | research | connect", "priority": "high | medium | low", "targetId": "note title or empty string" }
+    { "text": "concrete actionable step", "type": "expand | research | connect", "priority": "high | medium | low", "targetId": "note title or empty string", "actionType": "write|connect|build|decide|expand", "estimatedMinutes": 10, "difficulty": "low|medium|high" }
   ],
   "priority": "low | medium | high",
   "confidence": 0.0,
   "confidenceReason": "why this confidence level",
-  "patternShift": "how thinking has changed vs previous insights, or null"
+  "patternShift": "how thinking has changed vs previous insights, or null",
+  "variableInsight": null
 }
 
 RULES:
@@ -98,11 +141,20 @@ RULES:
 - Keep each field under 15 words
 - Connections must be non-obvious bridges between different domains
 - Actions must be immediately actionable
-- patternShift is null if no previous insights or no shift detected`
+- patternShift is null if no previous insights or no shift detected
+- variableInsight: occasionally (not always) surface one of: a surprising contradiction, a hidden pattern the user missed, or a prediction. Format: { "type": "contradiction|pattern|prediction", "text": "..." } — or null if not surfacing one this time
+
+BEHAVIOR CONTEXT: ${behaviorContext}
+TONE DIRECTIVE: ${consequenceTone}
+${emotionalHint ? `EMOTIONAL STATE: ${emotionalHint}` : ''}
+${lockInFocus ? `LOCK-IN ACTIVE: enforce "${lockInFocus}" strictly.` : ''}
+${committedIdentity ? `USER COMMITTED IDENTITY: ${committedIdentity}. Enforce accordingly.` : ''}
+PREDICTION: If user continues pattern, next state: ${predictedState}. Adjust urgency accordingly.
+${metaLearningContext}`
 
   const result = await sendMessage({
     model: 'claude-haiku-4-5-20251001',
-    maxTokens: 700,
+    maxTokens: 800,
     messages: [{ role: 'user', content: prompt }],
     userId: user.id,
   })
@@ -123,5 +175,6 @@ RULES:
     confidence: typeof parsed.confidence === 'number' ? parsed.confidence : 0,
     confidenceReason: parsed.confidenceReason || null,
     patternShift: parsed.patternShift || null,
+    variableInsight: parsed.variableInsight || null,
   })
 }))

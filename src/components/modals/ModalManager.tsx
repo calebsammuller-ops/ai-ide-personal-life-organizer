@@ -1,16 +1,13 @@
 'use client'
 
-import { useAppSelector, useAppDispatch } from '@/state/hooks'
-import { selectActiveModal, closeModal } from '@/state/slices/uiSlice'
+import { useAppSelector } from '@/state/hooks'
+import { selectActiveModal } from '@/state/slices/uiSlice'
+import { LockInModal } from '@/components/lock-in/LockInModal'
 
 export function ModalManager() {
-  const dispatch = useAppDispatch()
   const activeModal = useAppSelector(selectActiveModal)
 
-  const handleClose = () => {
-    dispatch(closeModal())
-  }
+  if (activeModal === 'lockIn') return <LockInModal />
 
-  // Placeholder — add new modals here as the Thinking Partner features grow
   return null
 }

@@ -13,6 +13,14 @@ import strategyReducer from './slices/strategySlice'
 import trajectoryReducer from './slices/trajectorySlice'
 import weeklyReviewReducer from './slices/weeklyReviewSlice'
 import rightPanelReducer from './slices/rightPanelSlice'
+import lockInReducer from './slices/lockInSlice'
+import nextMoveReducer from './slices/nextMoveSlice'
+import momentumReducer from './slices/momentumSlice'
+import cognitiveStateReducer from './slices/cognitiveStateSlice'
+import identityReducer from './slices/identitySlice'
+import cognitiveMemoryReducer from './slices/cognitiveMemorySlice'
+import selfCompetitionReducer from './slices/selfCompetitionSlice'
+import metaLearningReducer from './slices/metaLearningSlice'
 
 export const store = configureStore({
   reducer: {
@@ -30,6 +38,14 @@ export const store = configureStore({
     trajectory: trajectoryReducer,
     weeklyReview: weeklyReviewReducer,
     rightPanel: rightPanelReducer,
+    lockIn: lockInReducer,
+    nextMove: nextMoveReducer,
+    momentum: momentumReducer,
+    cognitiveState: cognitiveStateReducer,
+    identity: identityReducer,
+    cognitiveMemory: cognitiveMemoryReducer,
+    selfCompetition: selfCompetitionReducer,
+    metaLearning: metaLearningReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

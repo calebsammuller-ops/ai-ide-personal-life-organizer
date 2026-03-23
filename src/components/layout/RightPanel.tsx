@@ -21,9 +21,31 @@ import {
   selectRightPanelConfidence,
   selectRightPanelConfidenceReason,
   selectRightPanelPatternShift,
+  selectRightPanelVariableInsight,
   selectRightPanelLoading,
   type RightPanelNextAction,
 } from '@/state/slices/rightPanelSlice'
+import {
+  selectCurrentNextMove,
+  selectMissedCount,
+  selectIgnoredCount,
+  setNextMove,
+  completeNextMove,
+  dismissNextMove,
+} from '@/state/slices/nextMoveSlice'
+import { selectLockInActive, selectLockInFocus, selectLockInDriftCount } from '@/state/slices/lockInSlice'
+import { selectCognitiveState, selectPredictedNextState } from '@/state/slices/cognitiveStateSlice'
+import {
+  selectBestActionTypes,
+  selectWorstActionTypes,
+  selectRespondsToPressure,
+  recordCompletion,
+  recordIgnored,
+} from '@/state/slices/metaLearningSlice'
+import { selectCommittedIdentity } from '@/state/slices/identitySlice'
+import { increaseMomentum } from '@/state/slices/momentumSlice'
+import { triggerMicroReward } from '@/components/ui/MicroReward'
+import { DailyClosurePrompt } from '@/components/dashboard/DailyClosurePrompt'
 import { useAutoRefresh } from '@/hooks/useAutoRefresh'
 import { cn } from '@/lib/utils'
 
@@ -34,14 +56,21 @@ function getContext(pathname: string): string {
   return 'general'
 }
 
-function getActionRoute(action: RightPanelNextAction): string {
-  if (action.type === 'connect') return '/knowledge/graph'
-  if (action.type === 'expand' || action.type === 'research') {
-    return action.targetId
-      ? `/knowledge/ideas?expand=${encodeURIComponent(action.targetId)}`
-      : '/knowledge/ideas'
+function executeAction(action: RightPanelNextAction, router: ReturnType<typeof useRouter>) {
+  const seed = encodeURIComponent(action.targetId || '')
+  if (action.actionType === 'expand' || action.type === 'expand') {
+    router.push(`/knowledge/ideas?tab=expand&seed=${seed}`)
+  } else if (action.actionType === 'connect' || action.type === 'connect') {
+    router.push('/knowledge/graph')
+  } else if (action.actionType === 'write') {
+    router.push('/knowledge?new=true')
+  } else if (action.actionType === 'build') {
+    router.push(`/knowledge/ideas?tab=expand&seed=${seed}`)
+  } else if (action.type === 'research') {
+    router.push('/knowledge/research')
+  } else {
+    router.push('/knowledge/ideas')
   }
-  return '/knowledge/ideas'
 }
 
 function StrengthBar({ value }: { value: number }) {
@@ -92,17 +121,58 @@ export function RightPanel() {
   const confidence = useAppSelector(selectRightPanelConfidence)
   const confidenceReason = useAppSelector(selectRightPanelConfidenceReason)
   const patternShift = useAppSelector(selectRightPanelPatternShift)
+  const variableInsight = useAppSelector(selectRightPanelVariableInsight)
   const loading = useAppSelector(selectRightPanelLoading)
+
+  const missedCount = useAppSelector(selectMissedCount)
+  const ignoredCount = useAppSelector(selectIgnoredCount)
+  const currentNextMove = useAppSelector(selectCurrentNextMove)
+  const lockInActive = useAppSelector(selectLockInActive)
+  const lockInFocus = useAppSelector(selectLockInFocus)
+  const driftCount = useAppSelector(selectLockInDriftCount)
+  const cognitiveState = useAppSelector(selectCognitiveState)
+  const predictedState = useAppSelector(selectPredictedNextState)
+  const bestActionTypes = useAppSelector(selectBestActionTypes)
+  const worstActionTypes = useAppSelector(selectWorstActionTypes)
+  const respondsToPressure = useAppSelector(selectRespondsToPressure)
+  const committedIdentity = useAppSelector(selectCommittedIdentity)
 
   const context = getContext(pathname)
 
+  const doFetch = (force = false) => {
+    dispatch(fetchRightPanel({
+      force,
+      context,
+      lockInFocus: lockInActive ? (lockInFocus ?? undefined) : undefined,
+      missedCount,
+      ignoredCount,
+      cognitiveState,
+      predictedState: predictedState ?? undefined,
+      bestActionTypes,
+      worstActionTypes,
+      respondsToPressure,
+      committedIdentity: committedIdentity ?? undefined,
+    }))
+  }
+
   useEffect(() => {
-    dispatch(fetchRightPanel({ context }))
+    doFetch()
   }, [dispatch, context])
 
-  useAutoRefresh(() => {
-    dispatch(fetchRightPanel({ context }))
-  }, 3 * 60 * 1000)
+  useAutoRefresh(() => { doFetch() }, 3 * 60 * 1000)
+
+  // Auto-set global next move when data loads and no current move
+  useEffect(() => {
+    if (nextActions.length > 0 && !currentNextMove) {
+      dispatch(setNextMove({
+        text: nextActions[0].text,
+        source: 'right-panel',
+        actionType: nextActions[0].actionType,
+        estimatedMinutes: nextActions[0].estimatedMinutes,
+        difficulty: nextActions[0].difficulty,
+      }))
+    }
+  }, [nextActions])
 
   const hasData = !!(insight && confidence > 0)
 
@@ -160,6 +230,24 @@ export function RightPanel() {
               <ChevronRight className="h-3 w-3" />
             </button>
           </div>
+
+          {/* Predicted drift warning */}
+          {predictedState === 'drifting' && (
+            <div className="px-3 pt-1.5">
+              <p className="text-[8px] font-mono text-destructive/50">
+                → predicted: drifting if no action taken
+              </p>
+            </div>
+          )}
+
+          {/* Lock-in drift warning */}
+          {lockInActive && driftCount > 2 && (
+            <div className="px-3 pt-1.5">
+              <p className="text-[8px] font-mono text-amber-500/60">
+                ⚠ drift detected ({driftCount}x) — refocus on {lockInFocus}
+              </p>
+            </div>
+          )}
 
           {/* Scrollable content */}
           <div className="flex-1 overflow-y-auto px-3 py-2 space-y-3 scrollbar-hide">
@@ -220,6 +308,17 @@ export function RightPanel() {
                     </div>
                   )}
 
+                  {/* Variable Insight (surprise element) */}
+                  {variableInsight && (
+                    <div>
+                      <SectionLabel label={
+                        variableInsight.type === 'contradiction' ? 'Contradiction Detected' :
+                        variableInsight.type === 'pattern' ? 'Hidden Pattern' : 'Prediction'
+                      } />
+                      <p className="text-[9px] font-mono text-primary/60 leading-relaxed">{variableInsight.text}</p>
+                    </div>
+                  )}
+
                   {/* Connections */}
                   {connections.length > 0 && (
                     <div>
@@ -246,15 +345,37 @@ export function RightPanel() {
                         {nextActions.map((a, i) => (
                           <div key={i} className="space-y-1">
                             <p className="text-[9px] font-mono text-muted-foreground/80 leading-relaxed">{i + 1}. {a.text}</p>
-                            <button
-                              onClick={() => router.push(getActionRoute(a))}
-                              className={cn(
-                                'text-[8px] font-mono font-bold uppercase tracking-wider border rounded-sm px-1.5 py-px hover:bg-primary/10 transition-colors',
-                                ACTION_PRIORITY_COLOR[a.priority] || ACTION_PRIORITY_COLOR.low
-                              )}
-                            >
-                              Execute →
-                            </button>
+                            {(a.estimatedMinutes || a.difficulty) && (
+                              <p className="text-[8px] font-mono text-muted-foreground/30">
+                                {[a.estimatedMinutes ? `${a.estimatedMinutes} min` : '', a.difficulty || ''].filter(Boolean).join(' · ')}
+                              </p>
+                            )}
+                            <div className="flex gap-1.5 items-center">
+                              <button
+                                onClick={() => {
+                                  executeAction(a, router)
+                                  dispatch(completeNextMove())
+                                  dispatch(increaseMomentum(10))
+                                  dispatch(recordCompletion(a.actionType))
+                                  triggerMicroReward('+10 momentum')
+                                }}
+                                className={cn(
+                                  'text-[8px] font-mono font-bold uppercase tracking-wider border rounded-sm px-1.5 py-px hover:bg-primary/10 transition-colors',
+                                  ACTION_PRIORITY_COLOR[a.priority] || ACTION_PRIORITY_COLOR.low
+                                )}
+                              >
+                                Execute →
+                              </button>
+                              <button
+                                onClick={() => {
+                                  dispatch(dismissNextMove())
+                                  dispatch(recordIgnored(a.actionType))
+                                }}
+                                className="text-[8px] font-mono text-muted-foreground/25 hover:text-muted-foreground/60 transition-colors"
+                              >
+                                skip
+                              </button>
+                            </div>
                           </div>
                         ))}
                       </div>
@@ -286,7 +407,7 @@ export function RightPanel() {
           {/* Footer */}
           <div className="px-3 py-2 border-t border-border/20 space-y-1.5">
             <button
-              onClick={() => dispatch(fetchRightPanel({ force: true, context }))}
+              onClick={() => doFetch(true)}
               disabled={loading}
               className="flex items-center gap-1 text-[8px] font-mono text-muted-foreground/30 hover:text-muted-foreground/60 transition-colors disabled:opacity-30"
             >
@@ -299,6 +420,7 @@ export function RightPanel() {
             >
               Open Assistant →
             </Link>
+            <DailyClosurePrompt />
           </div>
         </div>
       )}

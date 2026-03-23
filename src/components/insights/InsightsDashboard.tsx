@@ -18,6 +18,9 @@ import { fetchTrajectory } from '@/state/slices/trajectorySlice'
 import { fetchWeeklyReview } from '@/state/slices/weeklyReviewSlice'
 import { cn } from '@/lib/utils'
 import Link from 'next/link'
+import { CognitiveSignature } from './CognitiveSignature'
+import { CognitiveHeatmap } from './CognitiveHeatmap'
+import { CognitiveDNA } from './CognitiveDNA'
 import { CognitiveMirrorCard } from './CognitiveMirrorCard'
 import { StrategyEngineCard } from './StrategyEngineCard'
 import { LifeTrajectoryCard } from './LifeTrajectoryCard'
@@ -72,6 +75,15 @@ export function InsightsDashboard() {
           {isGenerating ? '...' : 'Refresh'}
         </Button>
       </div>
+
+      {/* Cognitive Signature */}
+      <CognitiveSignature />
+
+      {/* Cognitive Heatmap */}
+      <CognitiveHeatmap notes={notes} />
+
+      {/* Cognitive DNA */}
+      <CognitiveDNA />
 
       {/* Cognitive Mirror */}
       <CognitiveMirrorCard />

@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useAppDispatch, useAppSelector } from '@/state/hooks'
 import {
-  fetchNotes, generateIdeas, detectGaps,
+  fetchNotes, generateIdeas, detectGaps, createNote,
   selectAllNotes, selectLastIdeas, selectLastGaps,
   selectKnowledgeGenerating, selectKnowledgeError,
 } from '@/state/slices/knowledgeSlice'
@@ -222,6 +222,15 @@ export default function IdeasPage() {
                         </div>
                       </div>
                     )}
+
+                    <div className="mt-3 pt-2 border-t border-border/20">
+                      <button
+                        onClick={() => { setSeedIdea(idea.title + ': ' + idea.description); setActiveTab('expand') }}
+                        className="text-[10px] font-mono text-cyan-400 hover:text-cyan-300 transition-colors"
+                      >
+                        Build This →
+                      </button>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -353,6 +362,22 @@ export default function IdeasPage() {
                   <ul className="space-y-0.5">
                     {expansion.risks.map((r, i) => <li key={i} className="text-xs text-foreground/80">⚠ {r}</li>)}
                   </ul>
+                </div>
+
+                {/* Create Project */}
+                <div className="flex justify-end pt-1">
+                  <button
+                    onClick={() => dispatch(createNote({
+                      title: expansion.title,
+                      type: 'project',
+                      content: `# ${expansion.title}\n\n${expansion.oneLiner}\n\n## First Steps\n${expansion.nextSteps?.map(s => `- ${s}`).join('\n')}`,
+                      tags: ['project'],
+                      source: 'AI',
+                    }) as any)}
+                    className="text-[10px] font-mono border border-emerald-500/40 text-emerald-400 hover:bg-emerald-500/10 px-3 py-1.5 transition-colors"
+                  >
+                    Create Project →
+                  </button>
                 </div>
               </div>
             )}

@@ -515,3 +515,19 @@ input:-webkit-autofill:focus {
     transform: translateX(0);
   }
 }
+
+/* Environmental immersion — Lock-In high momentum */
+.lock-in-focused {
+  --background: 0 0% 2%;
+  --card: 0 0% 4%;
+  --border: 0 0% 12%;
+}
+
+/* Cognitive load balancer — overwhelmed mode */
+.overwhelmed-mode .secondary-content {
+  opacity: 0.2;
+  pointer-events: none;
+}
+.overwhelmed-mode .primary-content {
+  border-color: hsl(var(--primary) / 0.4);
+}

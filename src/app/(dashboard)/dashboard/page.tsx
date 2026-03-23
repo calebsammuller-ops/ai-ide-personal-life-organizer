@@ -1,13 +1,12 @@
 'use client'
 
-import { useEffect, useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { motion } from 'framer-motion'
 import { Brain, Sparkles, RefreshCw, Network, Zap, X, ArrowRight, MessageCircle, Lightbulb, Link2 } from 'lucide-react'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { SeismicWave } from '@/components/ui/SeismicWave'
 import { useAppDispatch, useAppSelector } from '@/state/hooks'
-import { openModal } from '@/state/slices/uiSlice'
 import { useRegisterPageContext } from '@/hooks/useRegisterPageContext'
 import {
   fetchNotes, fetchBriefing, generateBriefing,
@@ -17,6 +16,16 @@ import {
 } from '@/state/slices/knowledgeSlice'
 import { fetchCognitiveMirror, selectCognitiveMirrorData } from '@/state/slices/cognitiveMirrorSlice'
 import { fetchTrajectory, selectTrajectoryData } from '@/state/slices/trajectorySlice'
+import { selectIntelligenceScore } from '@/state/slices/intelligenceScoreSlice'
+import { selectMomentumScore, selectMomentumTrend, selectMomentumStreak, applyDecay } from '@/state/slices/momentumSlice'
+import { selectCognitiveState, setCognitiveState, setPredictedNextState, computeCognitiveState, predictNextState } from '@/state/slices/cognitiveStateSlice'
+import { selectIdentityTitle, selectIdentityTraits, evolveIdentity, setFutureProjection, commitIdentity, selectCommittedIdentity } from '@/state/slices/identitySlice'
+import { selectCurrentNextMove, selectMissedCount, selectIgnoredCount, selectNextMoveHistory, selectLastSessionMove, setNextMove } from '@/state/slices/nextMoveSlice'
+import { setWeeklyMetrics, computeWeeklyMetrics } from '@/state/slices/selfCompetitionSlice'
+import { selectLockInActive } from '@/state/slices/lockInSlice'
+import { selectFailurePatterns } from '@/state/slices/metaLearningSlice'
+import { SelfCompetitionCard } from '@/components/dashboard/SelfCompetitionCard'
+import { FutureSelfCard } from '@/components/dashboard/FutureSelfCard'
 import Link from 'next/link'
 import { cn } from '@/lib/utils'
 
@@ -31,6 +40,25 @@ export default function DashboardPage() {
   const predictions = useAppSelector(selectPredictions)
   const cognitiveData = useAppSelector(selectCognitiveMirrorData)
   const trajectoryData = useAppSelector(selectTrajectoryData)
+  const intelligenceScore = useAppSelector(selectIntelligenceScore)
+  const momentumScore = useAppSelector(selectMomentumScore)
+  const momentumTrend = useAppSelector(selectMomentumTrend)
+  const momentumStreak = useAppSelector(selectMomentumStreak)
+  const cognitiveState = useAppSelector(selectCognitiveState)
+  const identityTitle = useAppSelector(selectIdentityTitle)
+  const identityTraits = useAppSelector(selectIdentityTraits)
+  const committedIdentity = useAppSelector(selectCommittedIdentity)
+  const currentNextMove = useAppSelector(selectCurrentNextMove)
+  const missedCount = useAppSelector(selectMissedCount)
+  const ignoredCount = useAppSelector(selectIgnoredCount)
+  const nextMoveHistory = useAppSelector(selectNextMoveHistory)
+  const lastSessionMove = useAppSelector(selectLastSessionMove)
+  const lockInActive = useAppSelector(selectLockInActive)
+  const failurePatterns = useAppSelector(selectFailurePatterns)
+
+  const [showSessionRitual, setShowSessionRitual] = useState(false)
+  const [showDailyMirror, setShowDailyMirror] = useState(false)
+  const [showCommitmentModal, setShowCommitmentModal] = useState(false)
 
   useRegisterPageContext({
     pageTitle: 'Home',
@@ -47,7 +75,71 @@ export default function DashboardPage() {
     dispatch(fetchPredictions() as any)
     dispatch(fetchCognitiveMirror() as any)
     dispatch(fetchTrajectory() as any)
+    dispatch(applyDecay())
   }, [dispatch])
+
+  // Behavioral OS orchestration
+  useEffect(() => {
+    if (knowledgeNotes.length === 0) return
+
+    const recentCount = knowledgeNotes.filter(n => {
+      const now = Date.now()
+      return (now - new Date(n.updatedAt).getTime()) < 24 * 60 * 60 * 1000
+    }).length
+
+    dispatch(setCognitiveState(computeCognitiveState(knowledgeNotes, missedCount, ignoredCount, lockInActive)))
+    dispatch(setPredictedNextState(predictNextState(momentumScore, missedCount, recentCount)))
+
+    // Identity evolution
+    const expandedCount = knowledgeNotes.filter(n => n.source === 'AI' && n.type === 'permanent').length
+    const executionRate = knowledgeNotes.length > 0 ? expandedCount / knowledgeNotes.length : 0
+    const score = intelligenceScore || 0
+    const newTitle =
+      score >= 100 && executionRate >= 0.30 ? 'Operator' :
+      score >= 50 && executionRate >= 0.15 ? 'Builder' :
+      knowledgeNotes.length >= 10 ? 'Explorer' : 'Seeker'
+
+    const prevTitle = identityTitle
+    dispatch(evolveIdentity({
+      title: newTitle as any,
+      level: Math.min(100, score),
+      traits: cognitiveData?.thinkingBiases || [],
+    }))
+
+    if ((newTitle === 'Builder' || newTitle === 'Operator') &&
+        prevTitle !== newTitle &&
+        committedIdentity === null) {
+      setShowCommitmentModal(true)
+    }
+
+    dispatch(setWeeklyMetrics(computeWeeklyMetrics(knowledgeNotes, knowledgeLinks, nextMoveHistory)))
+
+    if (trajectoryData?.narrative?.headline) {
+      dispatch(setFutureProjection(trajectoryData.narrative.headline.slice(0, 80)))
+    }
+  }, [knowledgeNotes, cognitiveData, trajectoryData, missedCount, ignoredCount, lockInActive, momentumScore, intelligenceScore])
+
+  // Zeigarnik: restore last session move
+  useEffect(() => {
+    const unfinished = localStorage.getItem('lastSessionMove')
+    if (unfinished && !currentNextMove) {
+      try {
+        const parsed = JSON.parse(unfinished)
+        dispatch(setNextMove({ ...parsed, source: 'system' }))
+      } catch {}
+    }
+  }, [])
+
+  // Once-per-day session ritual + mirror
+  useEffect(() => {
+    const today = new Date().toDateString()
+    if (localStorage.getItem('lastSessionDate') !== today) {
+      setShowSessionRitual(true)
+    }
+    if (cognitiveData && localStorage.getItem('lastMirrorDate') !== today) {
+      setShowDailyMirror(true)
+    }
+  }, [cognitiveData])
 
   const stats = [
     { label: 'IDEAS CAPTURED', value: knowledgeNotes.filter(n => !n.tags?.includes('ai-insight')).length, href: '/knowledge' },
@@ -56,7 +148,6 @@ export default function DashboardPage() {
     { label: 'CONCEPTS DEVELOPED', value: predictions.length, href: '/insights' },
   ]
 
-  // TODAY'S FOCUS: top 3 non-ai-insight notes by importance desc
   const todaysFocus = useMemo(() => {
     return knowledgeNotes
       .filter(n => !n.tags?.includes('ai-insight'))
@@ -64,19 +155,48 @@ export default function DashboardPage() {
       .slice(0, 3)
   }, [knowledgeNotes])
 
-  // CURIOSITY TRIGGER: find an orphan note (no links) updated most recently
   const orphanNote = useMemo(() => {
     if (knowledgeNotes.length < 5) return null
-    const linkedIds = new Set(
-      knowledgeLinks.flatMap(l => [l.sourceNoteId, l.targetNoteId])
-    )
+    const linkedIds = new Set(knowledgeLinks.flatMap(l => [l.sourceNoteId, l.targetNoteId]))
     return knowledgeNotes
       .filter(n => !n.tags?.includes('ai-insight') && !linkedIds.has(n.id))
       .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime())[0] || null
   }, [knowledgeNotes, knowledgeLinks])
 
+  const expandedCount = knowledgeNotes.filter(n => n.source === 'AI' && n.type === 'permanent').length
+  const executionRate = knowledgeNotes.length > 0 ? expandedCount / knowledgeNotes.length : 0
+  const topFailurePattern = failurePatterns?.[0] || null
+
   return (
     <main className="flex flex-col h-[calc(100vh-3rem)] md:h-[calc(100vh-0px)] p-3 md:p-4 pb-16 md:pb-4 overflow-y-auto gap-3">
+
+      {/* Identity Commitment Modal */}
+      {showCommitmentModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
+          <Card className="rounded-sm border-primary/40 bg-card w-[280px]">
+            <CardContent className="pt-4 pb-4 px-4">
+              <p className="text-xs font-mono font-bold text-primary">You are operating at {identityTitle} level.</p>
+              <p className="text-[10px] font-mono text-muted-foreground mt-1">
+                Commit? This increases pressure and removes passive suggestions.
+              </p>
+              <div className="flex gap-2 mt-3">
+                <button
+                  onClick={() => { dispatch(commitIdentity(identityTitle as any)); setShowCommitmentModal(false) }}
+                  className="flex-1 text-[10px] font-mono border border-primary/40 text-primary hover:bg-primary/10 py-1.5 transition-colors"
+                >
+                  Commit →
+                </button>
+                <button
+                  onClick={() => setShowCommitmentModal(false)}
+                  className="flex-1 text-[10px] font-mono border border-border/40 text-muted-foreground hover:bg-muted/10 py-1.5 transition-colors"
+                >
+                  Not yet
+                </button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
 
       {/* Header */}
       <div className="flex-shrink-0 flex items-center justify-between mb-1">
@@ -97,7 +217,7 @@ export default function DashboardPage() {
       <SeismicWave height={40} className="opacity-50 flex-shrink-0" />
 
       {/* Stats strip */}
-      <div className="flex-shrink-0 grid grid-cols-4 gap-2">
+      <div className="flex-shrink-0 grid grid-cols-4 gap-2 secondary-content">
         {stats.map((stat) => (
           <Link key={stat.label} href={stat.href}>
             <div className="border border-border/50 bg-card p-2 hover:border-primary/30 hover:bg-primary/5 transition-colors">
@@ -109,7 +229,7 @@ export default function DashboardPage() {
       </div>
 
       {/* Quick actions */}
-      <div className="flex-shrink-0 grid grid-cols-3 gap-2">
+      <div className="flex-shrink-0 grid grid-cols-3 gap-2 secondary-content">
         <Link href="/knowledge">
           <Button variant="outline" size="sm" className="w-full h-8 text-[10px] font-mono justify-start gap-2">
             <Brain className="h-3 w-3" /> New Idea
@@ -126,6 +246,117 @@ export default function DashboardPage() {
           </Button>
         </Link>
       </div>
+
+      {/* Identity Gap Alert */}
+      {identityTitle === 'Builder' && executionRate < 0.15 && knowledgeNotes.length >= 5 && (
+        <Card className="rounded-sm border-destructive/20 bg-destructive/5">
+          <CardContent className="pt-3 pb-2">
+            <p className="text-[9px] font-mono text-destructive/70 uppercase tracking-widest">IDENTITY GAP</p>
+            <p className="text-[10px] font-mono text-foreground/70 mt-1">
+              You identify as <strong>Builder</strong> but act like Explorer.
+            </p>
+            <p className="text-[9px] font-mono text-destructive/50 mt-1">Execution rate {Math.round(executionRate * 100)}% — target 15%.</p>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Failure Pattern Detected */}
+      {topFailurePattern && topFailurePattern.frequency > 2 && (
+        <Card className="rounded-sm border-destructive/20 bg-destructive/5">
+          <CardContent className="pt-3 pb-2">
+            <p className="text-[8px] font-mono uppercase text-destructive/50 tracking-widest">Failure Pattern Detected</p>
+            <p className="text-[10px] font-mono text-foreground/70 mt-1">
+              You repeatedly: {topFailurePattern.trigger}
+            </p>
+            <p className="text-[9px] font-mono text-destructive/40">Detected {topFailurePattern.frequency} times</p>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Identity + Momentum Card */}
+      {knowledgeNotes.length > 0 && (
+        <Card className="rounded-sm border-border/40 primary-content">
+          <CardContent className="pt-3 pb-2 flex items-center justify-between">
+            <div>
+              <p className="text-[8px] font-mono text-muted-foreground/30 uppercase tracking-widest">You are becoming</p>
+              <p className="text-xl font-mono font-bold text-primary">{identityTitle}</p>
+              <div className="flex gap-1 mt-1 flex-wrap">
+                {identityTraits.slice(0, 3).map(t => (
+                  <span key={t} className="text-[8px] font-mono text-primary/40 border border-primary/15 rounded-sm px-1">{t}</span>
+                ))}
+              </div>
+            </div>
+            <div className="text-right">
+              <p className="text-[8px] font-mono text-muted-foreground/30">momentum</p>
+              <p className="text-2xl font-mono font-bold text-foreground">{momentumScore}</p>
+              <p className="text-[8px] font-mono text-muted-foreground/25">
+                {momentumTrend === 'up' ? '↑ rising' : momentumTrend === 'down' ? '↓ falling' : '→ stable'}
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Session Ritual (once per day) */}
+      {showSessionRitual && (
+        <Card className="rounded-sm border-primary/20 bg-primary/[0.03]">
+          <CardContent className="pt-3 pb-2">
+            <p className="text-[9px] font-mono text-primary/50 uppercase tracking-widest mb-1">SESSION START</p>
+            <p className="text-[10px] font-mono text-foreground/70">
+              State: <span className={cn('font-bold',
+                cognitiveState === 'drifting' ? 'text-destructive/70' :
+                cognitiveState === 'executing' ? 'text-green-500/70' :
+                'text-primary/70'
+              )}>{cognitiveState}</span>
+              {momentumStreak > 0 && <span className="ml-2 text-muted-foreground/40">· {momentumStreak}d streak</span>}
+            </p>
+            {lastSessionMove && (
+              <p className="text-[10px] font-mono text-primary/60 mt-2">
+                You left mid-execution yesterday.
+                <br />→ {lastSessionMove.text}
+              </p>
+            )}
+            <button
+              onClick={() => {
+                localStorage.setItem('lastSessionDate', new Date().toDateString())
+                setShowSessionRitual(false)
+              }}
+              className="mt-2 text-[9px] font-mono text-muted-foreground/30 hover:text-muted-foreground/60 transition-colors"
+            >
+              dismiss ×
+            </button>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Execution Gap Card */}
+      {knowledgeNotes.length >= 5 && executionRate < 0.20 && (
+        <Card className="rounded-sm border-border/40 primary-content">
+          <CardContent className="pt-3 pb-2">
+            <p className="text-[9px] font-mono text-muted-foreground/40 uppercase tracking-widest mb-1">EXECUTION GAP</p>
+            <div className="flex items-center justify-between mb-1">
+              <p className="text-[10px] font-mono text-foreground/60">{Math.round(executionRate * 100)}% of ideas expanded</p>
+              <p className="text-[9px] font-mono text-muted-foreground/30">target: 20%</p>
+            </div>
+            <div className="h-1 bg-muted overflow-hidden">
+              <div className="h-full bg-primary/50 transition-all" style={{ width: `${Math.min(100, executionRate * 500)}%` }} />
+            </div>
+            <p className="text-[9px] font-mono text-muted-foreground/40 mt-1">
+              {executionRate < 0.05
+                ? 'You are collecting. Build something.'
+                : executionRate < 0.10
+                ? 'You have ideas. Start expanding them.'
+                : 'Close to execution threshold. Push through.'}
+            </p>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Self Competition */}
+      <SelfCompetitionCard />
+
+      {/* Future Self */}
+      <FutureSelfCard />
 
       {/* AI OBSERVATIONS */}
       <Card className="rounded-sm border-primary/20 bg-primary/5">
@@ -207,9 +438,35 @@ export default function DashboardPage() {
         </CardContent>
       </Card>
 
+      {/* Daily Mirror (once per day) */}
+      {showDailyMirror && cognitiveData && (
+        <Card className="rounded-sm border-border/40">
+          <CardContent className="pt-3 pb-2">
+            <p className="text-[9px] font-mono text-muted-foreground/40 uppercase tracking-widest mb-2">DAILY MIRROR</p>
+            <p className="text-[10px] font-mono text-foreground/70">
+              Pattern: <span className="text-primary/70">{cognitiveData.dominantStyle}</span>
+            </p>
+            {cognitiveData.thinkingBiases?.[0] && (
+              <p className="text-[9px] font-mono text-muted-foreground/50 mt-1">
+                Watch: {cognitiveData.thinkingBiases[0]}
+              </p>
+            )}
+            <button
+              onClick={() => {
+                localStorage.setItem('lastMirrorDate', new Date().toDateString())
+                setShowDailyMirror(false)
+              }}
+              className="mt-2 text-[9px] font-mono text-muted-foreground/30 hover:text-muted-foreground/60 transition-colors"
+            >
+              dismiss ×
+            </button>
+          </CardContent>
+        </Card>
+      )}
+
       {/* COGNITIVE PROFILE */}
       {cognitiveData && (
-        <Card className="rounded-sm border-border/50">
+        <Card className="rounded-sm border-border/50 secondary-content">
           <CardHeader className="flex flex-row items-center justify-between py-2 px-3 border-b border-border/50">
             <div className="flex items-center gap-2">
               <Brain className="h-3.5 w-3.5 text-primary" />
@@ -294,7 +551,7 @@ export default function DashboardPage() {
 
       {/* AI Predictions */}
       {(predictions.length > 0 || knowledgeNotes.length >= 3) && (
-        <Card className="rounded-sm border-purple-500/20 bg-purple-500/5">
+        <Card className="rounded-sm border-purple-500/20 bg-purple-500/5 secondary-content">
           <CardHeader className="flex flex-row items-center justify-between py-2 px-3 border-b border-purple-500/20">
             <div className="flex items-center gap-2">
               <Zap className="h-3.5 w-3.5 text-purple-400" />
