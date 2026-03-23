@@ -180,10 +180,10 @@ export default function IdeasPage() {
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
                 {ideas.map((idea, i) => (
-                  <div key={i} className={cn('border rounded-lg p-4 hover:shadow-lg transition-all', TYPE_COLORS[idea.type] || TYPE_COLORS.project)}>
+                  <div key={i} className={cn('border rounded-lg p-4 hover:shadow-lg transition-all', TYPE_COLORS[idea.type ?? ''] || TYPE_COLORS.project)}>
                     <div className="flex items-start justify-between gap-2 mb-2">
                       <div>
-                        <span className={cn('text-[9px] font-mono font-bold uppercase px-1.5 py-0.5 rounded border', TYPE_COLORS[idea.type] || TYPE_COLORS.project)}>
+                        <span className={cn('text-[9px] font-mono font-bold uppercase px-1.5 py-0.5 rounded border', TYPE_COLORS[idea.type ?? ''] || TYPE_COLORS.project)}>
                           {idea.type}
                         </span>
                         <h3 className="text-sm font-mono font-bold text-foreground mt-1.5">{idea.title}</h3>

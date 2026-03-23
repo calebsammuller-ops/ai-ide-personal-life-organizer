@@ -52,6 +52,9 @@ export interface KnowledgeIdea {
   description: string
   derivedFrom: string[]
   opportunity: string
+  type?: string
+  effort?: string
+  impact?: string
 }
 
 export interface KnowledgeGap {
@@ -59,6 +62,8 @@ export interface KnowledgeGap {
   reason: string
   relatedNotes: string[]
   suggestedLearning: string
+  priority?: string
+  type?: string
 }
 
 export interface CreateNoteInput {

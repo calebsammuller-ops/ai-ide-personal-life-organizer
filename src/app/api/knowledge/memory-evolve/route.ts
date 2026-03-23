@@ -40,8 +40,9 @@ export const POST = withApiHandler(withAuth(async (_request: Request, user: User
     .eq('relationship_type', 'contradicts')
     .limit(10)
 
+  type LinkRow = { source_note_id: string; target_note_id: string }
   const noteMap = Object.fromEntries(allNotes.map(n => [n.id, n.title]))
-  const contradictions = (contradictionLinks || [])
+  const contradictions = ((contradictionLinks as LinkRow[] | null) || [])
     .map(l => `${noteMap[l.source_note_id] || l.source_note_id} ↔ ${noteMap[l.target_note_id] || l.target_note_id}`)
     .join('\n') || 'None found'
 

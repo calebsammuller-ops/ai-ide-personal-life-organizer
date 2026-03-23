@@ -112,7 +112,7 @@ export default function DashboardPage() {
       setShowCommitmentModal(true)
     }
 
-    dispatch(setWeeklyMetrics(computeWeeklyMetrics(knowledgeNotes, knowledgeLinks, nextMoveHistory)))
+    dispatch(setWeeklyMetrics(computeWeeklyMetrics(knowledgeNotes, knowledgeLinks, nextMoveHistory.length)))
 
     if (trajectoryData?.narrative?.headline) {
       dispatch(setFutureProjection(trajectoryData.narrative.headline.slice(0, 80)))

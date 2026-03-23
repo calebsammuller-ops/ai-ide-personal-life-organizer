@@ -14,7 +14,7 @@ export function FutureSelfCard() {
   if (!trajectoryData) return null
 
   const headline = trajectoryData.narrative?.headline
-  const domain = trajectoryData.primaryDomain || trajectoryData.narrative?.headline?.split(' ').slice(0, 4).join(' ')
+  const domain = trajectoryData.risingTags?.[0] || trajectoryData.narrative?.headline?.split(' ').slice(0, 4).join(' ')
 
   return (
     <Card className="rounded-sm border-border/40">
