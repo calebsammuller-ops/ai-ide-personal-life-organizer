@@ -45,6 +45,7 @@ import {
 import { selectCommittedIdentity } from '@/state/slices/identitySlice'
 import { increaseMomentum } from '@/state/slices/momentumSlice'
 import { triggerMicroReward } from '@/components/ui/MicroReward'
+import { playExecute } from '@/lib/sounds'
 import { DailyClosurePrompt } from '@/components/dashboard/DailyClosurePrompt'
 import { useAutoRefresh } from '@/hooks/useAutoRefresh'
 import { cn } from '@/lib/utils'
@@ -353,11 +354,12 @@ export function RightPanel() {
                             <div className="flex gap-1.5 items-center">
                               <button
                                 onClick={() => {
+                                  playExecute()
                                   executeAction(a, router)
                                   dispatch(completeNextMove())
                                   dispatch(increaseMomentum(10))
                                   dispatch(recordCompletion(a.actionType))
-                                  triggerMicroReward('+10 momentum')
+                                  triggerMicroReward('Loop closed.')
                                 }}
                                 className={cn(
                                   'text-[8px] font-mono font-bold uppercase tracking-wider border rounded-sm px-1.5 py-px hover:bg-primary/10 transition-colors',

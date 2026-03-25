@@ -18,7 +18,7 @@ import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { useAppSelector, useAppDispatch } from '@/state/hooks'
 import { selectIsSidebarCollapsed, toggleSidebar, openModal } from '@/state/slices/uiSlice'
-import { selectLockInActive, deactivateLockIn } from '@/state/slices/lockInSlice'
+import { selectLockInActive, selectLockInFocus, deactivateLockIn } from '@/state/slices/lockInSlice'
 
 const navSections = [
   {
@@ -61,6 +61,7 @@ export function Sidebar() {
   const dispatch = useAppDispatch()
   const isCollapsed = useAppSelector(selectIsSidebarCollapsed)
   const lockInActive = useAppSelector(selectLockInActive)
+  const lockInFocus = useAppSelector(selectLockInFocus)
 
   return (
     <aside
@@ -155,12 +156,21 @@ export function Sidebar() {
         </Link>
         {!isCollapsed && (
           lockInActive ? (
-            <button
-              onClick={() => dispatch(deactivateLockIn())}
-              className="w-full flex items-center gap-2.5 px-3 py-1.5 border-l-2 border-destructive/40 text-destructive/60 hover:text-destructive/80 text-[9px] font-mono transition-colors"
-            >
-              EXIT LOCK-IN
-            </button>
+            <div className="lock-in-badge mx-0 mb-1 rounded-sm border border-green-500/30 bg-green-500/5 px-3 py-2">
+              <div className="flex items-center gap-1.5">
+                <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
+                <span className="text-[8px] font-mono font-bold text-green-400 uppercase tracking-widest">LOCK-IN ACTIVE</span>
+              </div>
+              {lockInFocus && (
+                <p className="text-[7px] font-mono text-green-500/50 mt-0.5 truncate">{lockInFocus}</p>
+              )}
+              <button
+                onClick={() => dispatch(deactivateLockIn())}
+                className="mt-1.5 w-full text-[7px] font-mono text-destructive/50 hover:text-destructive/80 border border-destructive/20 rounded-sm py-0.5 transition-colors"
+              >
+                EXIT LOCK-IN
+              </button>
+            </div>
           ) : (
             <button
               onClick={() => dispatch(openModal({ modalName: 'lockIn' }))}

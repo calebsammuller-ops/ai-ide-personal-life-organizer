@@ -1,7 +1,8 @@
 'use client'
 
 import { motion, AnimatePresence, HTMLMotionProps } from 'framer-motion'
-import { ReactNode } from 'react'
+import { ReactNode, useState, useEffect } from 'react'
+import { cn } from '@/lib/utils'
 
 // Page transition wrapper
 interface PageTransitionProps {
@@ -338,5 +339,39 @@ export function SlidePanel({ isOpen, onClose, children, side = 'right' }: SlideP
         </>
       )}
     </AnimatePresence>
+  )
+}
+
+
+// Animated counter: counts from 0 to value over 1 second
+export function AnimatedStat({ value, className }: { value: number; className?: string }) {
+  const [display, setDisplay] = useState(0)
+
+  useEffect(() => {
+    let raf: number
+    const start = performance.now()
+    const step = (now: number) => {
+      const p = Math.min((now - start) / 1000, 1)
+      setDisplay(Math.round(p * value))
+      if (p < 1) raf = requestAnimationFrame(step)
+    }
+    raf = requestAnimationFrame(step)
+    return () => cancelAnimationFrame(raf)
+  }, [value])
+
+  return <span className={className}>{display}</span>
+}
+
+// Animated fill bar with orange glow pulse
+export function GlowProgress({ value, className }: { value: number; className?: string }) {
+  return (
+    <div className={cn('h-1.5 bg-muted rounded-full overflow-hidden', className)}>
+      <motion.div
+        className="h-full bg-primary rounded-full progress-glow-bar"
+        initial={{ width: 0 }}
+        animate={{ width: `${Math.min(value, 100)}%` }}
+        transition={{ duration: 1.2, ease: [0.25, 0.46, 0.45, 0.94] }}
+      />
+    </div>
   )
 }

@@ -1,16 +1,19 @@
 'use client'
 
 import { useEffect, useState, useRef, useCallback } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import { useAppDispatch, useAppSelector } from '@/state/hooks'
 import {
   fetchNotes, createNote, updateNote, deleteNote,
   fetchLinks, createLink, deleteLink,
   generateInsights, generateIdeas, detectGaps, askSocratic, autoLink,
   setSelectedNoteId, setSearchQuery, setTypeFilter,
-  selectFilteredNotes, selectAllLinks, selectSelectedNote, selectSelectedNoteId,
+  selectFilteredNotes, selectAllNotes, selectAllLinks, selectSelectedNote, selectSelectedNoteId,
   selectKnowledgeLoading, selectKnowledgeGenerating, selectKnowledgeError,
   selectLastInsightSummary, selectLastSocratic, selectNoteLinks,
 } from '@/state/slices/knowledgeSlice'
+import { triggerMicroReward } from '@/components/ui/MicroReward'
+import { playCapture } from '@/lib/sounds'
 import {
   fetchIntelligenceScore,
   selectIntelligenceScore, selectScoreBreakdown, selectWeekGrowthPct,
@@ -291,6 +294,9 @@ export default function KnowledgePage() {
   // Idea evolution timeline
   const [evolutionTimeline, setEvolutionTimeline] = useState<{ id: string; evolutionType: string; summary: string; createdAt: string }[]>([])
 
+  // Loop hint after capture
+  const [loopHint, setLoopHint] = useState<string | null>(null)
+
   const saveTimeout = useRef<NodeJS.Timeout | null>(null)
 
   useEffect(() => {
@@ -332,6 +338,10 @@ export default function KnowledgePage() {
   const handleNewNote = async () => {
     const note = await dispatch(createNote({ title: 'New Note', type: 'fleeting', content: '' })).unwrap()
     dispatch(setSelectedNoteId(note.id))
+    playCapture()
+    triggerMicroReward('Captured.')
+    setLoopHint('Next: Expand this →')
+    setTimeout(() => setLoopHint(null), 6000)
   }
 
   const handleSave = useCallback(async () => {
@@ -1047,6 +1057,28 @@ export default function KnowledgePage() {
           </div>
         )}
 
+        {/* Memory Echo — "You thought this before" */}
+        {selectedNote && (() => {
+          const threeDaysAgo = Date.now() - 3 * 24 * 60 * 60 * 1000
+          const echoes = allNotes.filter(n =>
+            n.id !== selectedNote.id &&
+            new Date(n.createdAt).getTime() < threeDaysAgo &&
+            n.tags.some((t: string) => selectedNote.tags.includes(t))
+          ).slice(0, 2)
+          if (echoes.length === 0) return null
+          return (
+            <div className="p-3 border-t border-border/20">
+              <p className="text-[7px] font-mono text-muted-foreground/25 uppercase tracking-widest mb-1">You thought this before</p>
+              {echoes.map((n: { id: string; title: string }) => (
+                <button key={n.id} onClick={() => dispatch(setSelectedNoteId(n.id))}
+                  className="block text-[8px] font-mono text-primary/40 hover:text-primary/70 text-left mt-0.5">
+                  → {n.title}
+                </button>
+              ))}
+            </div>
+          )
+        })()}
+
         {/* Graph link */}
         <div className="p-3 border-t border-border/50">
           <a
@@ -1153,6 +1185,18 @@ export default function KnowledgePage() {
           {conversionToast}
         </div>
       )}
+
+      {/* Loop hint */}
+      <AnimatePresence>
+        {loopHint && (
+          <motion.p
+            className="fixed bottom-10 left-1/2 -translate-x-1/2 text-[8px] font-mono text-primary/40 pointer-events-none z-30"
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+          >
+            {loopHint}
+          </motion.p>
+        )}
+      </AnimatePresence>
 
       {/* Error toast */}
       {error && (

@@ -1,11 +1,12 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import { Brain, Sparkles, RefreshCw, Network, Zap, X, ArrowRight, MessageCircle, Lightbulb, Link2 } from 'lucide-react'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { SeismicWave } from '@/components/ui/SeismicWave'
+import { AnimatedStat, GlowProgress } from '@/components/ui/animated'
 import { useAppDispatch, useAppSelector } from '@/state/hooks'
 import { useRegisterPageContext } from '@/hooks/useRegisterPageContext'
 import {
@@ -19,7 +20,7 @@ import { fetchTrajectory, selectTrajectoryData } from '@/state/slices/trajectory
 import { selectIntelligenceScore } from '@/state/slices/intelligenceScoreSlice'
 import { selectMomentumScore, selectMomentumTrend, selectMomentumStreak, applyDecay } from '@/state/slices/momentumSlice'
 import { selectCognitiveState, setCognitiveState, setPredictedNextState, computeCognitiveState, predictNextState } from '@/state/slices/cognitiveStateSlice'
-import { selectIdentityTitle, selectIdentityTraits, evolveIdentity, setFutureProjection, commitIdentity, selectCommittedIdentity } from '@/state/slices/identitySlice'
+import { selectIdentityTitle, selectIdentityTraits, evolveIdentity, setFutureProjection, commitIdentity, selectCommittedIdentity, selectLastEvolved } from '@/state/slices/identitySlice'
 import { selectCurrentNextMove, selectMissedCount, selectIgnoredCount, selectNextMoveHistory, selectLastSessionMove, setNextMove } from '@/state/slices/nextMoveSlice'
 import { setWeeklyMetrics, computeWeeklyMetrics } from '@/state/slices/selfCompetitionSlice'
 import { selectLockInActive } from '@/state/slices/lockInSlice'
@@ -55,10 +56,13 @@ export default function DashboardPage() {
   const lastSessionMove = useAppSelector(selectLastSessionMove)
   const lockInActive = useAppSelector(selectLockInActive)
   const failurePatterns = useAppSelector(selectFailurePatterns)
+  const lastEvolved = useAppSelector(selectLastEvolved)
 
   const [showSessionRitual, setShowSessionRitual] = useState(false)
   const [showDailyMirror, setShowDailyMirror] = useState(false)
   const [showCommitmentModal, setShowCommitmentModal] = useState(false)
+  const [showEvolution, setShowEvolution] = useState(false)
+  const [evolvedTo, setEvolvedTo] = useState<string | null>(null)
 
   useRegisterPageContext({
     pageTitle: 'Home',
@@ -119,6 +123,18 @@ export default function DashboardPage() {
     }
   }, [knowledgeNotes, cognitiveData, trajectoryData, missedCount, ignoredCount, lockInActive, momentumScore, intelligenceScore])
 
+  // Identity evolution moment
+  useEffect(() => {
+    if (!lastEvolved) return
+    const key = `evolution_seen_${lastEvolved}`
+    if (!localStorage.getItem(key)) {
+      localStorage.setItem(key, '1')
+      setEvolvedTo(identityTitle)
+      setShowEvolution(true)
+      setTimeout(() => setShowEvolution(false), 2500)
+    }
+  }, [lastEvolved, identityTitle])
+
   // Zeigarnik: restore last session move
   useEffect(() => {
     const unfinished = localStorage.getItem('lastSessionMove')
@@ -170,6 +186,20 @@ export default function DashboardPage() {
   return (
     <main className="flex flex-col h-[calc(100vh-3rem)] md:h-[calc(100vh-0px)] p-3 md:p-4 pb-16 md:pb-4 overflow-y-auto gap-3">
 
+      {/* Identity Evolution Moment */}
+      <AnimatePresence>
+        {showEvolution && evolvedTo && (
+          <motion.div className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 pointer-events-none"
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.4 }}>
+            <motion.div className="text-center" initial={{ scale: 0.85 }} animate={{ scale: 1 }} exit={{ scale: 1.05 }}>
+              <p className="text-[9px] font-mono text-primary/50 uppercase tracking-widest mb-3">You are now becoming</p>
+              <p className="text-5xl font-mono font-bold text-primary">{evolvedTo}</p>
+              <motion.div className="h-px bg-primary/50 mt-4 mx-auto" initial={{ width: 0 }} animate={{ width: 160 }} transition={{ delay: 0.3, duration: 0.7 }} />
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Identity Commitment Modal */}
       {showCommitmentModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
@@ -220,9 +250,11 @@ export default function DashboardPage() {
       <div className="flex-shrink-0 grid grid-cols-4 gap-2 secondary-content">
         {stats.map((stat) => (
           <Link key={stat.label} href={stat.href}>
-            <div className="border border-border/50 bg-card p-2 hover:border-primary/30 hover:bg-primary/5 transition-colors">
+            <div className="card-glow border border-border/50 bg-card p-2 hover:border-primary/30 hover:bg-primary/5 transition-colors">
               <p className="text-[8px] font-mono uppercase tracking-widest text-muted-foreground/60 mb-1 leading-tight">{stat.label}</p>
-              <p className="text-lg font-mono font-bold text-primary leading-none">{stat.value}</p>
+              <p className="text-lg font-mono font-bold text-primary leading-none stat-glow">
+                <AnimatedStat value={stat.value} />
+              </p>
             </div>
           </Link>
         ))}
@@ -275,7 +307,7 @@ export default function DashboardPage() {
 
       {/* Identity + Momentum Card */}
       {knowledgeNotes.length > 0 && (
-        <Card className="rounded-sm border-border/40 primary-content">
+        <Card className="card-glow rounded-sm border-border/40 primary-content">
           <CardContent className="pt-3 pb-2 flex items-center justify-between">
             <div>
               <p className="text-[8px] font-mono text-muted-foreground/30 uppercase tracking-widest">You are becoming</p>
@@ -285,10 +317,33 @@ export default function DashboardPage() {
                   <span key={t} className="text-[8px] font-mono text-primary/40 border border-primary/15 rounded-sm px-1">{t}</span>
                 ))}
               </div>
+              {/* Identity Mirror */}
+              {identityTitle === 'Operator' && (
+                <p className="text-[8px] font-mono text-primary/35 pl-1 mt-1">You are acting with precision today.</p>
+              )}
+              {identityTitle === 'Builder' && executionRate >= 0.15 && (
+                <p className="text-[8px] font-mono text-primary/35 pl-1 mt-1">You are building, not just thinking.</p>
+              )}
+              {identityTitle === 'Explorer' && (
+                <p className="text-[8px] font-mono text-primary/35 pl-1 mt-1">Your curiosity is active.</p>
+              )}
+              {/* Identity Challenge */}
+              {identityTitle === 'Builder' && executionRate < 0.10 && (
+                <p className="text-[8px] font-mono text-destructive/40 pl-1 mt-1">This isn't how Builders work.</p>
+              )}
+              {identityTitle === 'Operator' && missedCount > 3 && (
+                <p className="text-[8px] font-mono text-destructive/40 pl-1 mt-1">Operators don't leave actions incomplete.</p>
+              )}
+              {/* Identity Streak */}
+              {momentumStreak > 0 && (
+                <p className="text-[8px] font-mono text-muted-foreground/25 mt-1">
+                  {momentumStreak} day{momentumStreak > 1 ? 's' : ''} acting as {identityTitle}
+                </p>
+              )}
             </div>
             <div className="text-right">
               <p className="text-[8px] font-mono text-muted-foreground/30">momentum</p>
-              <p className="text-2xl font-mono font-bold text-foreground">{momentumScore}</p>
+              <p className="text-2xl font-mono font-bold text-foreground stat-glow">{momentumScore}</p>
               <p className="text-[8px] font-mono text-muted-foreground/25">
                 {momentumTrend === 'up' ? '↑ rising' : momentumTrend === 'down' ? '↓ falling' : '→ stable'}
               </p>
@@ -297,9 +352,36 @@ export default function DashboardPage() {
         </Card>
       )}
 
+      {/* Unfinished Tension */}
+      {(() => {
+        const unexpandedIdeas = knowledgeNotes.filter(n => n.type === 'fleeting' && n.source !== 'AI').length
+        const missingConnections = knowledgeNotes.filter(n => !knowledgeLinks.some(l => l.sourceNoteId === n.id || l.targetNoteId === n.id)).length
+        if (unexpandedIdeas === 0 && missingConnections <= 5) return null
+        return (
+          <div className="secondary-content space-y-0.5 border-l-2 border-primary/20 pl-3">
+            {unexpandedIdeas > 0 && (
+              <Link href="/knowledge/ideas" className="flex items-center justify-between group">
+                <p className="text-[9px] font-mono text-muted-foreground/50">
+                  → {unexpandedIdeas} idea{unexpandedIdeas > 1 ? 's' : ''} unexpanded
+                </p>
+                <span className="text-[8px] font-mono text-primary/40 group-hover:text-primary/70">BUILD →</span>
+              </Link>
+            )}
+            {missingConnections > 5 && (
+              <Link href="/knowledge/graph" className="flex items-center justify-between group">
+                <p className="text-[9px] font-mono text-muted-foreground/50">
+                  → {missingConnections} notes without connections
+                </p>
+                <span className="text-[8px] font-mono text-primary/40 group-hover:text-primary/70">MAP →</span>
+              </Link>
+            )}
+          </div>
+        )
+      })()}
+
       {/* Session Ritual (once per day) */}
       {showSessionRitual && (
-        <Card className="rounded-sm border-primary/20 bg-primary/[0.03]">
+        <Card className="card-glow rounded-sm border-primary/20 bg-primary/[0.03] primary-content">
           <CardContent className="pt-3 pb-2">
             <p className="text-[9px] font-mono text-primary/50 uppercase tracking-widest mb-1">SESSION START</p>
             <p className="text-[10px] font-mono text-foreground/70">
@@ -331,16 +413,14 @@ export default function DashboardPage() {
 
       {/* Execution Gap Card */}
       {knowledgeNotes.length >= 5 && executionRate < 0.20 && (
-        <Card className="rounded-sm border-border/40 primary-content">
+        <Card className="card-glow rounded-sm border-border/40 primary-content">
           <CardContent className="pt-3 pb-2">
             <p className="text-[9px] font-mono text-muted-foreground/40 uppercase tracking-widest mb-1">EXECUTION GAP</p>
             <div className="flex items-center justify-between mb-1">
               <p className="text-[10px] font-mono text-foreground/60">{Math.round(executionRate * 100)}% of ideas expanded</p>
               <p className="text-[9px] font-mono text-muted-foreground/30">target: 20%</p>
             </div>
-            <div className="h-1 bg-muted overflow-hidden">
-              <div className="h-full bg-primary/50 transition-all" style={{ width: `${Math.min(100, executionRate * 500)}%` }} />
-            </div>
+            <GlowProgress value={Math.round(executionRate * 500)} className="mt-2" />
             <p className="text-[9px] font-mono text-muted-foreground/40 mt-1">
               {executionRate < 0.05
                 ? 'You are collecting. Build something.'

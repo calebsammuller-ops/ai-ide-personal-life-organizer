@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react'
 
 const ONBOARDING_KEY = 'lockin_onboarding_completed'
-const ONBOARDING_VERSION = '1.0' // Increment to show onboarding again after major updates
+const ONBOARDING_VERSION = '2.0' // Increment to show onboarding again after major updates
 
 interface OnboardingState {
   hasSeenOnboarding: boolean

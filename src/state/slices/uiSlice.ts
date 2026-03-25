@@ -20,6 +20,7 @@ interface UIState {
   isWinterArcMode: boolean
   isRightPanelOpen: boolean
   isRightPanelPinned: boolean
+  isFocusModeActive: boolean
 }
 
 const initialState: UIState = {
@@ -34,6 +35,7 @@ const initialState: UIState = {
   isWinterArcMode: false,
   isRightPanelOpen: true,
   isRightPanelPinned: false,
+  isFocusModeActive: false,
 }
 
 export const uiSlice = createSlice({
@@ -88,6 +90,9 @@ export const uiSlice = createSlice({
     toggleRightPanelPin: (state) => {
       state.isRightPanelPinned = !state.isRightPanelPinned
     },
+    toggleFocusMode: (state) => {
+      state.isFocusModeActive = !state.isFocusModeActive
+    },
   },
 })
 
@@ -105,6 +110,7 @@ export const {
   toggleWinterArcMode,
   toggleRightPanel,
   toggleRightPanelPin,
+  toggleFocusMode,
 } = uiSlice.actions
 
 export const selectActiveModal = (state: RootState) => state.ui.activeModal
@@ -118,5 +124,6 @@ export const selectIsSidebarCollapsed = (state: RootState) => state.ui.isSidebar
 export const selectIsWinterArcMode = (state: RootState) => state.ui.isWinterArcMode
 export const selectIsRightPanelOpen = (state: RootState) => state.ui.isRightPanelOpen
 export const selectIsRightPanelPinned = (state: RootState) => state.ui.isRightPanelPinned
+export const selectIsFocusModeActive = (state: RootState) => state.ui.isFocusModeActive
 
 export default uiSlice.reducer

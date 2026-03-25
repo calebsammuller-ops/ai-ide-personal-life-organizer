@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { useAppSelector, useAppDispatch } from '@/state/hooks'
 import { selectUser } from '@/state/slices/authSlice'
-import { setSearchOpen, openModal } from '@/state/slices/uiSlice'
+import { setSearchOpen, openModal, selectIsFocusModeActive, toggleFocusMode } from '@/state/slices/uiSlice'
 import { selectCognitiveState } from '@/state/slices/cognitiveStateSlice'
 import { selectMomentumScore, selectMomentumTrend, selectMomentumStreak } from '@/state/slices/momentumSlice'
 import { selectCurrentNextMove } from '@/state/slices/nextMoveSlice'
@@ -34,6 +34,7 @@ export function Header() {
   const momentumTrend = useAppSelector(selectMomentumTrend)
   const streak = useAppSelector(selectMomentumStreak)
   const currentNextMove = useAppSelector(selectCurrentNextMove)
+  const isFocusMode = useAppSelector(selectIsFocusModeActive)
 
   const getTitle = () => {
     for (const [path, title] of Object.entries(pageTitles)) {
@@ -68,23 +69,31 @@ export function Header() {
               cognitiveState === 'executing' ? 'border-green-500/30 text-green-500/60' :
               cognitiveState === 'overwhelmed' ? 'border-amber-500/30 text-amber-500/60' :
               'border-primary/25 text-primary/50'
-            )}>{cognitiveState}</span>
-
-            <span className="text-[8px] font-mono text-muted-foreground/30 shrink-0">
-              {momentumScore} {momentumTrend === 'up' ? '↑' : momentumTrend === 'down' ? '↓' : '→'}
-            </span>
+            )}>{cognitiveState}: {momentumScore} | momentum {momentumTrend === 'up' ? '↑' : momentumTrend === 'down' ? '↓' : '→'}</span>
 
             {currentNextMove && (
-              <span className="text-[8px] font-mono text-primary/40 truncate max-w-[120px]">
+              <span className="text-[8px] font-mono text-primary/40 truncate max-w-[160px]">
                 → {currentNextMove.text}
               </span>
             )}
 
             {streak > 0 && (
               <span className="text-[8px] font-mono text-muted-foreground/20 shrink-0">
-                consistency: {streak}d
+                {streak}d
               </span>
             )}
+
+            <button
+              onClick={() => dispatch(toggleFocusMode())}
+              className={cn(
+                'text-[8px] font-mono uppercase tracking-widest border rounded-sm px-1.5 py-px shrink-0 transition-colors',
+                isFocusMode
+                  ? 'border-primary/40 text-primary/80 bg-primary/10'
+                  : 'border-muted-foreground/20 text-muted-foreground/30 hover:border-primary/30 hover:text-primary/50'
+              )}
+            >
+              {isFocusMode ? '● focus' : 'focus'}
+            </button>
           </div>
 
           <div className="flex items-center gap-1">

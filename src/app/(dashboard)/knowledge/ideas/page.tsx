@@ -1,7 +1,9 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import { useAppDispatch, useAppSelector } from '@/state/hooks'
+import { triggerMicroReward } from '@/components/ui/MicroReward'
 import {
   fetchNotes, generateIdeas, detectGaps, createNote,
   selectAllNotes, selectLastIdeas, selectLastGaps,
@@ -39,6 +41,7 @@ export default function IdeasPage() {
   const [isExpanding, setIsExpanding] = useState(false)
   const [expandError, setExpandError] = useState<string | null>(null)
   const [savedNoteId, setSavedNoteId] = useState<string | null>(null)
+  const [loopHint, setLoopHint] = useState<string | null>(null)
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({ features: true, nextSteps: true })
 
   useEffect(() => {
@@ -78,7 +81,12 @@ export default function IdeasPage() {
       body: JSON.stringify({ seedIdea, save: true }),
     })
     const data = await res.json()
-    if (data.savedNoteId) setSavedNoteId(data.savedNoteId)
+    if (data.savedNoteId) {
+      setSavedNoteId(data.savedNoteId)
+      triggerMicroReward('Expanded.')
+      setLoopHint('Now connect it →')
+      setTimeout(() => setLoopHint(null), 6000)
+    }
   }
 
   const handleCollide = async () => {
@@ -532,6 +540,18 @@ export default function IdeasPage() {
           </div>
         )}
       </div>
+
+      {/* Loop hint after expansion */}
+      <AnimatePresence>
+        {loopHint && (
+          <motion.p
+            className="fixed bottom-10 left-1/2 -translate-x-1/2 text-[8px] font-mono text-primary/40 pointer-events-none z-30"
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+          >
+            {loopHint}
+          </motion.p>
+        )}
+      </AnimatePresence>
     </div>
   )
 }

@@ -531,3 +531,112 @@ input:-webkit-autofill:focus {
 .overwhelmed-mode .primary-content {
   border-color: hsl(var(--primary) / 0.4);
 }
+
+/* ========================================
+   COGNITIVE ENVIRONMENT SYSTEM
+   ======================================== */
+
+/* Depth layer — radial glow from top */
+#main-content {
+  background-image: radial-gradient(ellipse at 50% 0%, hsl(var(--primary) / 0.04) 0%, transparent 60%);
+}
+
+/* Cursor glow — follows mouse via CSS custom props */
+body::after {
+  content: '';
+  position: fixed;
+  pointer-events: none;
+  z-index: 1;
+  width: 360px;
+  height: 360px;
+  border-radius: 50%;
+  background: radial-gradient(circle, hsl(var(--primary) / 0.07) 0%, transparent 70%);
+  left: calc(var(--cursor-x, -999px) - 180px);
+  top: calc(var(--cursor-y, -999px) - 180px);
+  transition: left 0.12s ease, top 0.12s ease;
+}
+
+/* Breathing interface — cognitive state */
+@keyframes breathe-slow {
+  0%, 100% { box-shadow: inset 0 0 60px hsl(var(--primary) / 0.03); }
+  50% { box-shadow: inset 0 0 120px hsl(var(--primary) / 0.07); }
+}
+@keyframes breathe-sharp {
+  0%, 100% { filter: contrast(1.04); }
+  50% { filter: contrast(1.08); }
+}
+
+body.cog-focused #main-content { animation: breathe-slow 5s ease-in-out infinite; }
+body.cog-executing #main-content { animation: breathe-sharp 3s ease-in-out infinite; }
+body.cog-drifting #main-content { opacity: 0.93; transition: opacity 1s; }
+body.cog-overwhelmed #main-content { filter: saturate(0.8); transition: filter 1s; }
+
+/* Identity theming — visual evolution per level */
+body.identity-seeker {
+  --primary: 220 70% 52%;
+}
+body.identity-explorer {
+  --primary: 28 100% 54%;
+}
+body.identity-builder {
+  --primary: 17 100% 56%;
+}
+body.identity-operator {
+  --primary: 40 100% 55%;
+  --background: 15 8% 2%;
+  --card: 15 6% 4%;
+}
+body.identity-operator .starfield-canvas { opacity: 0.3 !important; }
+
+/* Time-based UI */
+body.time-morning {
+  --background: 15 8% 4%;
+  --foreground: 0 0% 94%;
+}
+
+/* Focus mode — show only primary content */
+body.focus-mode .secondary-content {
+  display: none !important;
+}
+body.focus-mode .primary-content {
+  border-color: hsl(var(--primary) / 0.3);
+}
+
+/* Card hover glow */
+.card-glow {
+  transition: box-shadow 0.25s ease, border-color 0.25s ease;
+}
+.card-glow:hover {
+  box-shadow: 0 0 0 1px hsl(var(--primary) / 0.2), 0 4px 24px hsl(var(--primary) / 0.09);
+  border-color: hsl(var(--primary) / 0.25);
+}
+
+/* Glowing animated progress bar fill */
+@keyframes progress-glow {
+  0%, 100% { box-shadow: 0 0 6px hsl(var(--primary) / 0.5); }
+  50% { box-shadow: 0 0 16px hsl(var(--primary) / 0.9), 0 0 32px hsl(var(--primary) / 0.3); }
+}
+.progress-glow-bar { animation: progress-glow 2.5s ease-in-out infinite; }
+
+/* Lock-In active badge pulse — green */
+@keyframes lock-in-pulse {
+  0%, 100% { box-shadow: 0 0 8px hsl(145 80% 45% / 0.5); }
+  50% { box-shadow: 0 0 20px hsl(145 80% 45% / 0.9), 0 0 40px hsl(145 80% 45% / 0.3); }
+}
+.lock-in-badge { animation: lock-in-pulse 2s ease-in-out infinite; }
+
+/* Stat hover glow */
+.stat-glow { transition: text-shadow 0.2s ease; }
+.stat-glow:hover { text-shadow: 0 0 14px hsl(var(--primary) / 0.7); }
+
+/* Soft blur panels */
+.glass-panel {
+  backdrop-filter: blur(8px);
+  background: hsl(var(--card) / 0.85);
+}
+
+/* Idle state — UI dims when user stops interacting */
+body.ui-idle #main-content { opacity: 0.7; transition: opacity 3s ease; }
+body.ui-idle .starfield-canvas { opacity: 0.35 !important; transition: opacity 3s ease; }
+body:not(.ui-idle) #main-content { opacity: 1; transition: opacity 0.4s ease; }
+body:not(.ui-idle) .starfield-canvas { opacity: 0.75 !important; transition: opacity 0.4s ease; }
