@@ -769,6 +769,13 @@ export default function KnowledgePage() {
               </div>
 
               <div className="flex items-center gap-1">
+                {/* Expand this idea — persistent next-step link */}
+                <a
+                  href={`/knowledge/ideas?tab=expand&seed=${selectedNote.id}`}
+                  className="hidden md:flex items-center h-6 px-2 text-[10px] font-mono font-bold text-cyan-400 border border-cyan-500/40 rounded hover:bg-cyan-500/10 transition-colors"
+                >
+                  EXPAND →
+                </a>
                 <Button
                   variant="ghost" size="icon" className="h-6 w-6"
                   onClick={() => setIsPreviewMode(!isPreviewMode)}
@@ -799,6 +806,17 @@ export default function KnowledgePage() {
                 value={editTitle}
                 onChange={e => { setEditTitle(e.target.value); setIsDirty(true) }}
               />
+
+              {/* Mobile next-step strip */}
+              <div className="md:hidden flex items-center justify-between mb-4 py-2 border-b border-primary/20">
+                <span className="text-[10px] font-mono text-muted-foreground/50">What's next?</span>
+                <a
+                  href={`/knowledge/ideas?tab=expand&seed=${selectedNote.id}`}
+                  className="text-[10px] font-mono font-bold text-cyan-400 flex items-center gap-1"
+                >
+                  EXPAND THIS IDEA →
+                </a>
+              </div>
 
               {/* Tags */}
               <div className="flex flex-wrap gap-1 mb-4 min-h-6">
@@ -894,6 +912,12 @@ export default function KnowledgePage() {
             <>
               {/* AI Actions */}
               <div className="p-3 border-b border-border/30 space-y-1.5">
+                {isGenerating && (
+                  <div className="flex items-center gap-2 py-1.5 px-1">
+                    <div className="h-3 w-3 border border-primary/40 border-t-primary animate-spin rounded-full shrink-0" />
+                    <span className="text-[9px] font-mono text-muted-foreground/50">AI thinking...</span>
+                  </div>
+                )}
                 <Button
                   onClick={handleGenerateInsights}
                   disabled={isGenerating}

@@ -41,7 +41,6 @@ export default function IdeasPage() {
   const [isExpanding, setIsExpanding] = useState(false)
   const [expandError, setExpandError] = useState<string | null>(null)
   const [savedNoteId, setSavedNoteId] = useState<string | null>(null)
-  const [loopHint, setLoopHint] = useState<string | null>(null)
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({ features: true, nextSteps: true })
 
   useEffect(() => {
@@ -84,8 +83,6 @@ export default function IdeasPage() {
     if (data.savedNoteId) {
       setSavedNoteId(data.savedNoteId)
       triggerMicroReward('Expanded.')
-      setLoopHint('Now connect it →')
-      setTimeout(() => setLoopHint(null), 6000)
     }
   }
 
@@ -293,9 +290,14 @@ export default function IdeasPage() {
                       <p className="text-sm text-cyan-300/80 italic">{expansion.oneLiner}</p>
                     </div>
                     {savedNoteId ? (
-                      <a href="/knowledge" className="flex items-center gap-1 text-[10px] font-mono text-emerald-400 border border-emerald-500/30 px-2 py-1 rounded hover:bg-emerald-500/10">
-                        <ExternalLink className="h-3 w-3" /> View Note
-                      </a>
+                      <div className="flex items-center gap-2">
+                        <a href="/knowledge" className="flex items-center gap-1 text-[10px] font-mono text-emerald-400 border border-emerald-500/30 px-2 py-1 rounded hover:bg-emerald-500/10">
+                          <ExternalLink className="h-3 w-3" /> View Note
+                        </a>
+                        <a href="/knowledge/graph" className="flex items-center gap-1 text-[10px] font-mono font-bold text-cyan-400 border border-cyan-500/40 px-2 py-1 rounded hover:bg-cyan-500/10">
+                          Connect in Graph →
+                        </a>
+                      </div>
                     ) : (
                       <Button onClick={handleSaveAsNote} size="sm" variant="outline" className="font-mono text-[10px] border-emerald-500/50 text-emerald-400 hover:bg-emerald-500/10">
                         <Save className="h-3 w-3 mr-1" /> Save as Note
@@ -541,17 +543,6 @@ export default function IdeasPage() {
         )}
       </div>
 
-      {/* Loop hint after expansion */}
-      <AnimatePresence>
-        {loopHint && (
-          <motion.p
-            className="fixed bottom-10 left-1/2 -translate-x-1/2 text-[8px] font-mono text-primary/40 pointer-events-none z-30"
-            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-          >
-            {loopHint}
-          </motion.p>
-        )}
-      </AnimatePresence>
     </div>
   )
 }
