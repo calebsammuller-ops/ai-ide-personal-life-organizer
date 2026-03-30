@@ -474,6 +474,7 @@ export default function KnowledgePage() {
     await dispatch(createLink({ sourceNoteId: selectedNoteId, targetNoteId: targetId, relationship }))
     await dispatch(fetchLinks())
     setShowLinkModal(false)
+    triggerMicroReward('Connected.')
   }
 
   const handleUnlink = async (linkId: string) => {
@@ -987,9 +988,14 @@ export default function KnowledgePage() {
 
               {insightSummary && (
                 <div className="p-3 m-2 bg-amber-500/10 border border-amber-500/30 rounded text-xs font-mono text-amber-300/80">
-                  <div className="flex items-center gap-1 mb-1">
-                    <Sparkles className="h-3 w-3" />
-                    <span className="font-bold text-[10px]">Last Insight</span>
+                  <div className="flex items-center justify-between gap-1 mb-1">
+                    <div className="flex items-center gap-1">
+                      <Sparkles className="h-3 w-3" />
+                      <span className="font-bold text-[10px]">Last Insight</span>
+                    </div>
+                    <a href="/insights" className="text-[8px] font-mono text-primary/60 hover:text-primary transition-colors">
+                      View all →
+                    </a>
                   </div>
                   {insightSummary.slice(0, 150)}{insightSummary.length > 150 ? '...' : ''}
                 </div>

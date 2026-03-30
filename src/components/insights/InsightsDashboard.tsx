@@ -213,6 +213,22 @@ export function InsightsDashboard() {
       {/* What If Simulator */}
       <WhatIfSimulator />
 
+      {/* Loop continuation CTA — pulls back into the capture cycle */}
+      <div className="mt-4 p-4 border border-border/30 rounded-sm bg-primary/3 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+        <div>
+          <p className="text-[10px] font-mono font-bold uppercase tracking-widest text-foreground/60">What happens next?</p>
+          <p className="text-[9px] font-mono text-muted-foreground/50 mt-0.5">Insights only compound when you keep adding to them.</p>
+        </div>
+        <div className="flex gap-2 shrink-0">
+          <a href="/knowledge" className="text-[10px] font-mono font-bold text-primary border border-primary/40 px-2.5 py-1.5 rounded-sm hover:bg-primary/10 transition-colors">
+            Capture →
+          </a>
+          <a href="/live-assistant" className="text-[10px] font-mono text-muted-foreground/60 border border-border/40 px-2.5 py-1.5 rounded-sm hover:bg-muted/30 transition-colors">
+            Think with AI →
+          </a>
+        </div>
+      </div>
+
       {/* Empty state */}
       {!briefing && predictions.length === 0 && insightNotes.length === 0 && (
         <Card>

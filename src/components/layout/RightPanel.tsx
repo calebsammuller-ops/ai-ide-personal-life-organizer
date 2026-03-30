@@ -360,6 +360,8 @@ export function RightPanel() {
                                   dispatch(increaseMomentum(10))
                                   dispatch(recordCompletion(a.actionType))
                                   triggerMicroReward('Loop closed.')
+                                  // Refresh panel after a beat so next action is ready
+                                  setTimeout(() => doFetch(true), 1200)
                                 }}
                                 className={cn(
                                   'text-[8px] font-mono font-bold uppercase tracking-wider border rounded-sm px-1.5 py-px hover:bg-primary/10 transition-colors',
@@ -381,6 +383,19 @@ export function RightPanel() {
                           </div>
                         ))}
                       </div>
+                    </div>
+                  )}
+
+                  {/* All actions complete CTA */}
+                  {nextActions.length === 0 && hasData && (
+                    <div className="py-2 border-t border-border/10">
+                      <p className="text-[8px] font-mono text-muted-foreground/40 mb-1.5">Loop complete.</p>
+                      <button
+                        onClick={() => doFetch(true)}
+                        className="text-[8px] font-mono text-primary/60 hover:text-primary transition-colors"
+                      >
+                        Generate next actions →
+                      </button>
                     </div>
                   )}
 
