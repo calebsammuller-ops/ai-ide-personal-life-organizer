@@ -16,7 +16,7 @@ import { cn } from '@/lib/utils'
 const pageTitles: Record<string, string> = {
   '/dashboard':            'COMMAND CENTER',
   '/live-assistant':       'THINKING PARTNER',
-  '/knowledge':            'CAPTURE',
+  '/knowledge':            'IDEAS',
   '/knowledge/ideas':      'EXPAND IDEAS',
   '/knowledge/research':   'RESEARCH',
   '/knowledge/timeline':   'TIMELINE',

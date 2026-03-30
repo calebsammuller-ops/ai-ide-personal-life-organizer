@@ -64,14 +64,14 @@ function NoteCard({ note, isSelected, onClick }: { note: KnowledgeNote; isSelect
     <button
       onClick={onClick}
       className={cn(
-        'w-full text-left p-3 border-l-2 transition-all hover:bg-primary/5',
+        'w-full text-left px-3 py-3.5 min-h-[52px] border-l-2 transition-all hover:bg-primary/5',
         TYPE_COLORS[note.type],
         isSelected ? 'bg-primary/10 border-primary' : 'border-opacity-50 hover:border-opacity-100'
       )}
     >
       <div className="flex items-start justify-between gap-2">
         <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-1.5 mb-0.5">
+          <div className="flex items-center gap-1.5 mb-1">
             <span className={cn('text-[9px] font-mono font-bold uppercase px-1 py-0.5 rounded', TYPE_BG[note.type], TYPE_COLORS[note.type])}>
               {note.type}
             </span>
@@ -79,19 +79,18 @@ function NoteCard({ note, isSelected, onClick }: { note: KnowledgeNote; isSelect
               <span className="text-[9px] font-mono text-amber-400 font-bold">AI</span>
             )}
           </div>
-          <p className="text-xs font-mono font-semibold text-foreground truncate">{note.title}</p>
+          <p className="text-xs font-mono font-semibold text-foreground leading-snug line-clamp-2">{note.title}</p>
           {note.zettelId && (
-            <p className="text-[9px] font-mono text-muted-foreground/50 mt-0.5">{note.zettelId}</p>
+            <p className="text-[9px] font-mono text-muted-foreground/40 mt-0.5">{note.zettelId}</p>
           )}
         </div>
-        <div className="flex flex-col items-end gap-1 shrink-0">
-          <div className="h-1 w-12 bg-muted rounded-full overflow-hidden">
+        <div className="flex flex-col items-end gap-1 shrink-0 pt-0.5">
+          <div className="h-1 w-10 bg-muted rounded-full overflow-hidden">
             <div
               className="h-full bg-primary/60 rounded-full"
               style={{ width: `${(note.confidence || 0) * 100}%` }}
             />
           </div>
-          <span className="text-[8px] text-muted-foreground/50">{Math.round((note.confidence || 0) * 100)}%</span>
         </div>
       </div>
       {note.tags.length > 0 && (
@@ -601,7 +600,7 @@ export default function KnowledgePage() {
   return (
     <div className="h-screen flex overflow-hidden bg-background">
       {/* LEFT PANEL — Note List */}
-      <div className="w-72 flex flex-col border-r border-border/50 bg-background/50">
+      <div className={cn('flex-col border-r border-border/50 bg-background/50', selectedNoteId ? 'hidden md:flex md:w-72' : 'flex w-full md:w-72')}>
         {/* Header */}
         <div className="p-3 border-b border-border/50">
           <div className="flex items-center justify-between mb-2">
@@ -636,7 +635,7 @@ export default function KnowledgePage() {
         </div>
 
         {/* Type filter chips */}
-        <div className="flex gap-1 p-2 flex-wrap border-b border-border/30">
+        <div className="flex gap-1 p-2 overflow-x-auto scrollbar-none border-b border-border/30" style={{ WebkitOverflowScrolling: 'touch' }}>
           {['all', ...NOTE_TYPES].map(t => (
             <button
               key={t}
@@ -654,7 +653,7 @@ export default function KnowledgePage() {
         </div>
 
         {/* Note list */}
-        <div className="flex-1 overflow-y-auto">
+        <div className="flex-1 overflow-y-auto pb-16 md:pb-0">
           {isLoading && (
             <div className="flex items-center justify-center h-24">
               <div className="h-4 w-4 border border-primary/50 border-t-primary animate-spin rounded-full" />
@@ -720,12 +719,19 @@ export default function KnowledgePage() {
       </div>
 
       {/* CENTER — Note Editor */}
-      <div className="flex-1 flex flex-col overflow-hidden">
+      <div className={cn('flex-col overflow-hidden', !selectedNoteId ? 'hidden md:flex md:flex-1' : 'flex flex-1')}>
         {selectedNote ? (
           <>
             {/* Editor toolbar */}
             <div className="flex items-center justify-between px-4 py-2 border-b border-border/50 bg-background/80 backdrop-blur-sm">
               <div className="flex items-center gap-3">
+                {/* Mobile back button */}
+                <button
+                  className="md:hidden flex items-center gap-1 text-[10px] font-mono uppercase tracking-widest text-muted-foreground hover:text-foreground mr-1"
+                  onClick={() => dispatch(setSelectedNoteId(null))}
+                >
+                  ← IDEAS
+                </button>
                 {/* Type selector */}
                 <div className="relative">
                   <select
@@ -877,8 +883,8 @@ export default function KnowledgePage() {
         )}
       </div>
 
-      {/* RIGHT PANEL — Brain Panel */}
-      <div className="w-72 flex flex-col border-l border-border/50 bg-background/50 overflow-hidden">
+      {/* RIGHT PANEL — Brain Panel (desktop only) */}
+      <div className="hidden md:flex w-72 flex-col border-l border-border/50 bg-background/50 overflow-hidden">
         <div className="p-3 border-b border-border/50">
           <span className="text-[9px] font-mono font-bold uppercase tracking-widest text-muted-foreground/50">Brain Panel</span>
         </div>
