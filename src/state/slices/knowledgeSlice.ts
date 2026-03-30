@@ -454,9 +454,34 @@ export const knowledgeSlice = createSlice({
       .addCase(fetchNotes.pending, (state) => { state.isLoading = true; state.error = null })
       .addCase(fetchNotes.fulfilled, (state, action) => { state.isLoading = false; state.notes = action.payload })
       .addCase(fetchNotes.rejected, (state, action) => { state.isLoading = false; state.error = action.error.message ?? 'Error' })
-      // Create note
+      // Create note — optimistic insert on pending, replace on fulfilled
+      .addCase(createNote.pending, (state, action) => {
+        const tempNote: KnowledgeNote = {
+          id: `temp-${Date.now()}`,
+          userId: '',
+          title: action.meta.arg.title || 'New Note',
+          type: action.meta.arg.type || 'fleeting',
+          content: action.meta.arg.content || '',
+          tags: action.meta.arg.tags || [],
+          confidence: action.meta.arg.confidence ?? 0.8,
+          importance: action.meta.arg.importance ?? 0.5,
+          source: action.meta.arg.source || 'user',
+          isArchived: false,
+          metadata: {},
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        }
+        state.notes.unshift(tempNote)
+        state.selectedNoteId = tempNote.id
+      })
       .addCase(createNote.fulfilled, (state, action) => {
-        state.notes.unshift(action.payload)
+        // Replace the temp note with the real server-confirmed note
+        const tempIdx = state.notes.findIndex(n => n.id.startsWith('temp-'))
+        if (tempIdx !== -1) {
+          state.notes[tempIdx] = action.payload
+        } else {
+          state.notes.unshift(action.payload)
+        }
         state.selectedNoteId = action.payload.id
       })
       // Update note

@@ -334,17 +334,16 @@ export default function KnowledgePage() {
     dispatch(setTypeFilter(type))
   }
 
-  const handleNewNote = async () => {
-    const note = await dispatch(createNote({ title: 'New Note', type: 'fleeting', content: '' })).unwrap()
-    dispatch(setSelectedNoteId(note.id))
+  const handleNewNote = () => {
+    // Note appears instantly via optimistic insert in createNote.pending
+    dispatch(createNote({ title: 'New Note', type: 'fleeting', content: '' }))
     playCapture()
     triggerMicroReward('Captured.')
-    setLoopHint('Next: Expand this →')
-    setTimeout(() => setLoopHint(null), 6000)
   }
 
   const handleSave = useCallback(async () => {
     if (!selectedNoteId || !isDirty) return
+    if (selectedNoteId.startsWith('temp-')) return // don't save until server confirms
     await dispatch(updateNote({
       id: selectedNoteId,
       updates: { title: editTitle, content: editContent, type: editType, tags: editTags, confidence: editConfidence },

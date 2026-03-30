@@ -324,9 +324,9 @@ export default function LiveAssistantPage() {
 
   return (
     <PageContainer className="flex flex-col h-[calc(100vh-8rem)] md:h-[calc(100vh-5rem)]">
-      {/* AI Loading Overlay */}
+      {/* AI Loading Overlay — only on first message, in-chat typing indicator handles the rest */}
       <AnimatePresence>
-        {isTyping && !voiceEnabled && <AILoadingOverlay />}
+        {isTyping && !voiceEnabled && messages.length <= 1 && <AILoadingOverlay />}
       </AnimatePresence>
 
       {/* Voice Mode Overlay */}

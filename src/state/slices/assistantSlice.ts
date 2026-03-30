@@ -186,14 +186,25 @@ export const assistantSlice = createSlice({
         state.currentConversationId = action.payload.conversationId
         state.messages = action.payload.messages
       })
-      .addCase(sendMessage.pending, (state) => {
+      .addCase(sendMessage.pending, (state, action) => {
         state.isTyping = true
         state.lastActionResult = null
         state.lastExecutedIntent = null
+        // Optimistic user message — appears instantly before server responds
+        state.messages.push({
+          id: `pending-${Date.now()}`,
+          role: 'user',
+          content: action.meta.arg.content,
+          createdAt: new Date().toISOString(),
+          conversationId: state.currentConversationId ?? '',
+          feedback: null,
+        } as AssistantMessage)
       })
       .addCase(sendMessage.fulfilled, (state, action) => {
         state.isTyping = false
         state.currentConversationId = action.payload.conversationId
+        // Replace the optimistic user message with the confirmed ones
+        state.messages = state.messages.filter(m => !m.id.startsWith('pending-'))
         state.messages.push(action.payload.userMessage)
         state.messages.push(action.payload.assistantMessage)
         state.lastActionResult = action.payload.actionResult
