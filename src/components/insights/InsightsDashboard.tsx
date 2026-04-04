@@ -59,17 +59,17 @@ export function InsightsDashboard() {
   return (
     <div className="space-y-3">
       <div className="flex-shrink-0 flex items-center justify-between mb-1">
-        <div className="flex items-center gap-2">
-          <div className="w-0.5 h-5 bg-primary" />
-          <h2 className="text-xs font-mono font-bold uppercase tracking-widest text-primary">INTELLIGENCE HUB</h2>
-          <span className="text-[9px] font-mono text-muted-foreground/40">{notes.length} ideas · {links.length} links · {insightNotes.length} insights</span>
+        <div className="flex items-center gap-2.5">
+          <div className="w-1 h-5 bg-primary rounded-full" />
+          <h2 className="text-base font-semibold text-foreground">Intelligence Hub</h2>
+          <span className="text-xs text-muted-foreground/40">{notes.length} ideas · {links.length} links</span>
         </div>
         <Button
           onClick={() => dispatch(generateBriefing() as any)}
           disabled={isGenerating}
           variant="ghost"
           size="sm"
-          className="h-6 px-2 text-[10px] font-mono text-amber-400 hover:bg-amber-500/10"
+          className="h-7 px-2.5 text-xs text-amber-400 hover:bg-amber-500/10 rounded-lg"
         >
           <RefreshCw className={cn('h-3 w-3 mr-1', isGenerating && 'animate-spin')} />
           {isGenerating ? '...' : 'Refresh'}
@@ -102,23 +102,27 @@ export function InsightsDashboard() {
 
       {/* Knowledge Briefing */}
       {briefing && (
-        <Card className="rounded-sm border-amber-500/20 bg-amber-500/5">
-          <CardHeader className="flex flex-row items-center justify-between py-2 px-3 border-b border-amber-500/20">
+        <Card className="rounded-xl border-amber-500/15 bg-amber-500/[0.03]">
+          <CardHeader className="flex flex-row items-center justify-between py-3 px-4 border-b border-amber-500/15">
             <CardTitle className="flex items-center gap-2">
-              <Brain className="h-3.5 w-3.5 text-primary" />
-              <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-primary/80">AI BRIEFING</span>
+              <div className="p-1 rounded-lg bg-primary/10">
+                <Brain className="h-3.5 w-3.5 text-primary" />
+              </div>
+              <span className="text-xs font-semibold text-foreground/80">AI Briefing</span>
             </CardTitle>
           </CardHeader>
-          <CardContent className="p-3 space-y-2">
+          <CardContent className="p-4 space-y-2.5">
             {briefing.briefing && (
-              <p className="text-xs text-muted-foreground/80 font-mono leading-relaxed">{briefing.briefing}</p>
+              <p className="text-sm text-muted-foreground/80 leading-relaxed">{briefing.briefing}</p>
             )}
             {briefing.insights?.map((insight: { title: string; content: string }, i: number) => (
-              <div key={i} className="flex items-start gap-2 p-1.5 bg-amber-500/5 border border-amber-500/20 rounded-sm group">
-                <span className="text-[10px] font-mono font-bold text-amber-500/60 shrink-0 mt-0.5">{String(i + 1).padStart(2, '0')}</span>
+              <div key={i} className="flex items-start gap-2.5 p-2.5 bg-amber-500/5 border border-amber-500/15 rounded-lg group">
+                <div className="p-1 rounded-md bg-amber-500/10 mt-0.5">
+                  <Sparkles className="h-3 w-3 text-amber-400/70" />
+                </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-[10px] font-mono font-bold text-amber-400">{insight.title}</p>
-                  <p className="text-[9px] text-muted-foreground/70">{insight.content}</p>
+                  <p className="text-xs font-semibold text-amber-400">{insight.title}</p>
+                  <p className="text-xs text-muted-foreground/60 mt-0.5 leading-relaxed">{insight.content}</p>
                 </div>
                 <button
                   onClick={() => setSharingNote({ title: insight.title, content: insight.content, tags: [] })}
@@ -134,18 +138,20 @@ export function InsightsDashboard() {
 
       {/* AI Predictions */}
       {predictions.length > 0 && (
-        <Card className="rounded-sm border-purple-500/20 bg-purple-500/5">
-          <CardHeader className="flex flex-row items-center justify-between py-2 px-3 border-b border-purple-500/20">
+        <Card className="rounded-xl border-purple-500/15 bg-purple-500/[0.03]">
+          <CardHeader className="flex flex-row items-center justify-between py-3 px-4 border-b border-purple-500/15">
             <CardTitle className="flex items-center gap-2">
-              <Lightbulb className="h-3.5 w-3.5 text-purple-400" />
-              <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-purple-400/80">AI PREDICTIONS</span>
-              <span className="text-[9px] font-mono text-muted-foreground/40">{predictions.length} active</span>
+              <div className="p-1 rounded-lg bg-purple-500/10">
+                <Lightbulb className="h-3.5 w-3.5 text-purple-400" />
+              </div>
+              <span className="text-xs font-semibold text-foreground/80">AI Predictions</span>
+              <span className="text-[10px] text-muted-foreground/40">{predictions.length} active</span>
             </CardTitle>
             <Button
               variant="ghost" size="sm"
               onClick={() => dispatch(generatePredictions() as any)}
               disabled={isGenerating}
-              className="h-6 px-2 text-[10px] font-mono text-purple-400 hover:bg-purple-500/10"
+              className="h-7 px-2.5 text-xs text-purple-400 hover:bg-purple-500/10 rounded-lg"
             >
               <RefreshCw className={cn('h-3 w-3 mr-1', isGenerating && 'animate-spin')} />
               {isGenerating ? '...' : 'Refresh'}
@@ -154,15 +160,15 @@ export function InsightsDashboard() {
           <CardContent className="p-3">
             <div className="space-y-1.5">
               {predictions.map(p => (
-                <div key={p.id} className="flex items-start gap-2 p-1.5 bg-purple-500/5 border border-purple-500/20 rounded-sm">
+                <div key={p.id} className="flex items-start gap-2.5 p-2.5 bg-purple-500/5 border border-purple-500/15 rounded-lg">
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-1.5 mb-0.5">
-                      <span className="text-[8px] font-mono uppercase px-1 py-0.5 rounded-sm bg-purple-500/20 text-purple-400">
+                    <div className="flex items-center gap-1.5 mb-1">
+                      <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-purple-500/15 text-purple-400">
                         {p.predictionType.replace(/_/g, ' ')}
                       </span>
-                      <span className="text-[8px] font-mono text-muted-foreground/30">{Math.round(p.confidence * 100)}%</span>
+                      <span className="text-[10px] text-muted-foreground/30">{Math.round(p.confidence * 100)}%</span>
                     </div>
-                    <p className="text-[10px] font-mono text-foreground/80 leading-relaxed">{p.description}</p>
+                    <p className="text-xs text-foreground/80 leading-relaxed">{p.description}</p>
                   </div>
                 </div>
               ))}
@@ -173,22 +179,24 @@ export function InsightsDashboard() {
 
       {/* AI-Generated Insight Notes */}
       {insightNotes.length > 0 && (
-        <Card className="rounded-sm border-border/50">
-          <CardHeader className="flex flex-row items-center justify-between py-2 px-3 border-b border-border/50">
+        <Card className="rounded-xl border-border/30">
+          <CardHeader className="flex flex-row items-center justify-between py-3 px-4 border-b border-border/30">
             <CardTitle className="flex items-center gap-2">
-              <Network className="h-3.5 w-3.5 text-primary" />
-              <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-primary/80">AUTONOMOUS INSIGHTS</span>
-              <span className="text-[9px] font-mono text-muted-foreground/40">{insightNotes.length}</span>
+              <div className="p-1 rounded-lg bg-primary/10">
+                <Network className="h-3.5 w-3.5 text-primary" />
+              </div>
+              <span className="text-xs font-semibold text-foreground/80">Autonomous Insights</span>
+              <span className="text-[10px] text-muted-foreground/40">{insightNotes.length}</span>
             </CardTitle>
           </CardHeader>
-          <CardContent className="p-3">
-            <div className="space-y-1.5">
+          <CardContent className="p-4">
+            <div className="space-y-2">
               {insightNotes.slice(0, 5).map(note => (
-                <div key={note.id} className="flex items-start gap-2 p-2 border border-border/40 bg-card/50 hover:border-primary/30 hover:bg-primary/5 transition-colors group rounded-sm">
+                <div key={note.id} className="flex items-start gap-2.5 p-3 border border-border/30 bg-card/50 hover:border-primary/30 hover:bg-primary/5 transition-all group rounded-xl hover-lift">
                   <Link href={`/knowledge?noteId=${note.id}`} className="flex-1 min-w-0">
-                    <p className="text-xs font-mono font-bold text-foreground/80 truncate">{note.title}</p>
-                    <p className="text-[9px] text-muted-foreground/60 mt-0.5 line-clamp-2 leading-relaxed">{note.content}</p>
-                    <p className="text-[8px] font-mono text-muted-foreground/30 mt-0.5">
+                    <p className="text-sm font-medium text-foreground/80 truncate">{note.title}</p>
+                    <p className="text-xs text-muted-foreground/60 mt-0.5 line-clamp-2 leading-relaxed">{note.content}</p>
+                    <p className="text-[10px] text-muted-foreground/30 mt-1">
                       {new Date(note.createdAt).toLocaleDateString()}
                     </p>
                   </Link>
@@ -201,7 +209,7 @@ export function InsightsDashboard() {
                 </div>
               ))}
               {insightNotes.length > 5 && (
-                <Link href="/knowledge" className="text-[9px] font-mono text-primary/60 hover:text-primary block text-center pt-1">
+                <Link href="/knowledge" className="text-xs text-primary/60 hover:text-primary block text-center pt-1">
                   View all {insightNotes.length} insights →
                 </Link>
               )}
@@ -214,16 +222,16 @@ export function InsightsDashboard() {
       <WhatIfSimulator />
 
       {/* Loop continuation CTA — pulls back into the capture cycle */}
-      <div className="mt-4 p-4 border border-border/30 rounded-sm bg-primary/3 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+      <div className="mt-4 p-5 border border-border/30 rounded-xl bg-primary/[0.03] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
         <div>
-          <p className="text-[10px] font-mono font-bold uppercase tracking-widest text-foreground/60">What happens next?</p>
-          <p className="text-[9px] font-mono text-muted-foreground/50 mt-0.5">Insights only compound when you keep adding to them.</p>
+          <p className="text-sm font-semibold text-foreground/70">Keep the loop going</p>
+          <p className="text-xs text-muted-foreground/50 mt-0.5">Every idea you add sharpens the next insight.</p>
         </div>
         <div className="flex gap-2 shrink-0">
-          <a href="/knowledge" className="text-[10px] font-mono font-bold text-primary border border-primary/40 px-2.5 py-1.5 rounded-sm hover:bg-primary/10 transition-colors">
+          <a href="/knowledge" className="text-xs font-medium text-primary border border-primary/30 px-3 py-2 rounded-lg hover:bg-primary/10 transition-colors">
             Capture →
           </a>
-          <a href="/live-assistant" className="text-[10px] font-mono text-muted-foreground/60 border border-border/40 px-2.5 py-1.5 rounded-sm hover:bg-muted/30 transition-colors">
+          <a href="/live-assistant" className="text-xs text-muted-foreground/60 border border-border/40 px-3 py-2 rounded-lg hover:bg-muted/30 transition-colors">
             Think with AI →
           </a>
         </div>

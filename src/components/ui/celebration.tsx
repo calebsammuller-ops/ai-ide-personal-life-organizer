@@ -114,7 +114,7 @@ export function CelebrationToast({ show, message, xp, onComplete }: CelebrationT
           exit={{ opacity: 0, y: -20, scale: 0.9 }}
           className="fixed bottom-20 left-1/2 -translate-x-1/2 z-50"
         >
-          <div className="flex items-center gap-3 bg-gradient-to-r from-primary to-orange-700 text-white px-4 py-3 rounded-sm shadow-lg border border-primary/30">
+          <div className="flex items-center gap-3 bg-gradient-to-r from-primary to-violet-700 text-white px-4 py-3 rounded-sm shadow-lg border border-primary/30">
             <motion.div
               animate={{ rotate: [0, 10, -10, 0] }}
               transition={{ duration: 0.5, repeat: 2 }}
@@ -173,7 +173,7 @@ export function StreakCelebration({ streak, show, onComplete }: StreakCelebratio
             animate={{ scale: 1, rotate: 0 }}
             exit={{ scale: 0, rotate: 180 }}
             transition={{ type: 'spring', damping: 15 }}
-            className="bg-gradient-to-br from-orange-500 to-red-600 rounded-3xl p-8 text-center text-white shadow-2xl"
+            className="bg-gradient-to-br from-violet-500 to-indigo-600 rounded-3xl p-8 text-center text-white shadow-2xl"
           >
             <motion.div
               animate={{ scale: [1, 1.2, 1] }}
@@ -248,7 +248,7 @@ export function LevelUpCelebration({ level, levelName, show, onComplete }: Level
                 scale: [1, 1.2, 1],
               }}
               transition={{ duration: 2, repeat: Infinity }}
-              className="w-32 h-32 mx-auto mb-6 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full flex items-center justify-center shadow-2xl"
+              className="w-32 h-32 mx-auto mb-6 bg-gradient-to-br from-violet-400 to-purple-500 rounded-full flex items-center justify-center shadow-2xl"
             >
               <span className="text-5xl font-bold text-white">{level}</span>
             </motion.div>

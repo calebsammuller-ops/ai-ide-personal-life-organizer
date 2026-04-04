@@ -54,9 +54,9 @@ export function Header() {
 
       <div className="bg-background/90 backdrop-blur-xl">
         <div className="flex h-12 items-center justify-between px-4">
-          <div className="flex items-center gap-2">
-            <div className="w-0.5 h-4 bg-primary" />
-            <h1 className="text-xs font-bold tracking-widest uppercase text-foreground font-mono">
+          <div className="flex items-center gap-2.5">
+            <div className="w-1 h-4 bg-primary rounded-full" />
+            <h1 className="text-sm font-semibold text-foreground">
               {getTitle()}
             </h1>
           </div>
@@ -64,35 +64,37 @@ export function Header() {
           {/* Cognitive status indicators — desktop only */}
           <div className="hidden md:flex items-center gap-2 flex-1 px-4 overflow-hidden">
             <span className={cn(
-              'text-[8px] font-mono uppercase tracking-widest border rounded-sm px-1.5 py-px shrink-0',
-              cognitiveState === 'drifting' ? 'border-destructive/40 text-destructive/60' :
-              cognitiveState === 'executing' ? 'border-green-500/30 text-green-500/60' :
-              cognitiveState === 'overwhelmed' ? 'border-amber-500/30 text-amber-500/60' :
-              'border-primary/25 text-primary/50'
-            )}>{cognitiveState}: {momentumScore} | momentum {momentumTrend === 'up' ? '↑' : momentumTrend === 'down' ? '↓' : '→'}</span>
+              'text-[10px] font-medium border rounded-full px-2.5 py-0.5 shrink-0',
+              cognitiveState === 'drifting' ? 'border-destructive/30 text-destructive/70 bg-destructive/5' :
+              cognitiveState === 'executing' ? 'border-green-500/30 text-green-500/70 bg-green-500/5' :
+              cognitiveState === 'overwhelmed' ? 'border-amber-500/30 text-amber-500/70 bg-amber-500/5' :
+              'border-primary/20 text-primary/60 bg-primary/5'
+            )}>
+              {cognitiveState} · {momentumScore} {momentumTrend === 'up' ? '↑' : momentumTrend === 'down' ? '↓' : '→'}
+            </span>
 
             {currentNextMove && (
-              <span className="text-[8px] font-mono text-primary/40 truncate max-w-[160px]">
+              <span className="text-[10px] text-muted-foreground/50 truncate max-w-[180px]">
                 → {currentNextMove.text}
               </span>
             )}
 
             {streak > 0 && (
-              <span className="text-[8px] font-mono text-muted-foreground/20 shrink-0">
-                {streak}d
+              <span className="text-[10px] text-muted-foreground/30 shrink-0">
+                {streak}d streak
               </span>
             )}
 
             <button
               onClick={() => dispatch(toggleFocusMode())}
               className={cn(
-                'text-[8px] font-mono uppercase tracking-widest border rounded-sm px-1.5 py-px shrink-0 transition-colors',
+                'text-[10px] font-medium border rounded-full px-2.5 py-0.5 shrink-0 transition-all',
                 isFocusMode
-                  ? 'border-primary/40 text-primary/80 bg-primary/10'
-                  : 'border-muted-foreground/20 text-muted-foreground/30 hover:border-primary/30 hover:text-primary/50'
+                  ? 'border-primary/40 text-primary bg-primary/10'
+                  : 'border-border/50 text-muted-foreground/40 hover:border-primary/30 hover:text-primary/60 hover:bg-primary/5'
               )}
             >
-              {isFocusMode ? '● focus' : 'focus'}
+              {isFocusMode ? '● Focus' : 'Focus'}
             </button>
           </div>
 
@@ -131,10 +133,9 @@ export function Header() {
 
             <Link href="/settings/profile" className="ml-1">
               <div className="relative group">
-                <div className="absolute -inset-0.5 bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
-                <Avatar className="relative h-7 w-7 border border-border group-hover:border-primary/50 transition-colors rounded-sm">
+                <Avatar className="relative h-7 w-7 border border-border/50 group-hover:border-primary/50 transition-colors rounded-full ring-2 ring-transparent group-hover:ring-primary/20">
                   <AvatarImage src={user?.user_metadata?.avatar_url} />
-                  <AvatarFallback className="bg-secondary text-secondary-foreground text-xs font-mono font-bold rounded-sm">
+                  <AvatarFallback className="bg-primary/10 text-primary text-xs font-semibold rounded-full">
                     {getInitials()}
                   </AvatarFallback>
                 </Avatar>

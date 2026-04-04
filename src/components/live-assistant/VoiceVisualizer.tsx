@@ -45,7 +45,7 @@ export function VoiceVisualizer({ state, audioLevel = 0, className }: VoiceVisua
           {[0, 1, 2].map((i) => (
             <motion.div
               key={`ripple-${i}`}
-              className="absolute w-32 h-32 rounded-full border border-orange-500/30"
+              className="absolute w-32 h-32 rounded-full border border-violet-500/30"
               initial={{ scale: 0.8, opacity: 0.6 }}
               animate={{ scale: 1.8, opacity: 0 }}
               transition={{
@@ -65,7 +65,7 @@ export function VoiceVisualizer({ state, audioLevel = 0, className }: VoiceVisua
           {[0, 1, 2, 3].map((i) => (
             <motion.div
               key={`wave-${i}`}
-              className="absolute w-32 h-32 rounded-full border-2 border-orange-400/40"
+              className="absolute w-32 h-32 rounded-full border-2 border-violet-400/40"
               animate={{
                 scale: [1, 1.4 + i * 0.15, 1],
                 opacity: [0.4, 0, 0.4],
@@ -186,7 +186,7 @@ export function VoiceVisualizer({ state, audioLevel = 0, className }: VoiceVisua
             {[0, 1, 2].map((i) => (
               <motion.div
                 key={`dot-${i}`}
-                className="w-2.5 h-2.5 bg-orange-300 rounded-sm"
+                className="w-2.5 h-2.5 bg-violet-300 rounded-sm"
                 animate={{
                   y: [0, -8, 0],
                   scale: [1, 1.2, 1],

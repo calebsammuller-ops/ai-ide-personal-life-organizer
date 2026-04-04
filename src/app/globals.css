@@ -60,34 +60,34 @@
     --glow-blue: 220 100% 60%;
   }
 
-  /* Dark Mode - Cognitive Command Center / Warm Near-Black */
+  /* Dark Mode - Deep Violet Cognitive Space */
   .dark {
-    /* Warm near-black backgrounds */
-    --background: 15 8% 3%;
-    --foreground: 0 0% 90%;
+    /* Deep blue-black backgrounds */
+    --background: 240 18% 4%;
+    --foreground: 220 15% 88%;
 
-    /* Warm carbon card */
-    --card: 15 6% 6%;
-    --card-foreground: 0 0% 90%;
+    /* Slightly elevated blue-black card */
+    --card: 240 15% 7%;
+    --card-foreground: 220 15% 88%;
 
     /* Popover */
-    --popover: 15 5% 8%;
-    --popover-foreground: 0 0% 90%;
+    --popover: 240 14% 9%;
+    --popover-foreground: 220 15% 88%;
 
-    /* Primary - Burnt Orange #FF5A1F */
-    --primary: 17 100% 56%;
+    /* Primary - Vibrant Violet #8B5CF6 */
+    --primary: 258 89% 66%;
     --primary-foreground: 0 0% 100%;
 
-    /* Secondary - dark warm surface */
-    --secondary: 15 5% 10%;
-    --secondary-foreground: 0 0% 78%;
+    /* Secondary - dark blue surface */
+    --secondary: 240 12% 11%;
+    --secondary-foreground: 220 12% 65%;
 
     /* Muted */
-    --muted: 15 4% 9%;
-    --muted-foreground: 0 0% 36%;
+    --muted: 240 11% 10%;
+    --muted-foreground: 240 8% 40%;
 
-    /* Accent - slightly brighter orange */
-    --accent: 22 100% 52%;
+    /* Accent - electric indigo */
+    --accent: 270 75% 60%;
     --accent-foreground: 0 0% 100%;
 
     /* Destructive - stays red */
@@ -103,20 +103,20 @@
     --warning-foreground: 0 0% 100%;
 
     /* Borders and inputs */
-    --border: 15 6% 13%;
-    --input: 15 5% 11%;
-    --ring: 17 100% 56%;
+    --border: 240 12% 15%;
+    --input: 240 11% 12%;
+    --ring: 258 89% 66%;
 
-    /* Radius: sharp 4px max */
-    --radius: 0.25rem;
+    /* Radius: modern rounded */
+    --radius: 0.75rem;
   }
 
   /* Winter Arc Mode - deeper, darker tones */
   .winter-arc {
-    --background: 0 0% 2%;
-    --card: 0 0% 5%;
-    --border: 0 0% 14%;
-    --primary: 18 100% 48%;
+    --background: 240 20% 2%;
+    --card: 240 18% 5%;
+    --border: 240 14% 12%;
+    --primary: 258 89% 58%;
   }
 }
 
@@ -210,14 +210,14 @@
 
   .gradient-primary {
     background: linear-gradient(135deg,
-      hsl(17 100% 56%) 0%,
-      hsl(18 100% 40%) 100%);
+      hsl(258 89% 66%) 0%,
+      hsl(270 75% 50%) 100%);
   }
 
   .gradient-accent {
     background: linear-gradient(135deg,
-      hsl(22 100% 52%) 0%,
-      hsl(35 100% 55%) 100%);
+      hsl(258 89% 66%) 0%,
+      hsl(220 90% 60%) 100%);
   }
 
   .glow-primary {
@@ -242,11 +242,11 @@
     animation: float 3s ease-in-out infinite;
   }
 
-  /* Body: subtle orange vignette (top-left warm glow) */
+  /* Body: subtle violet vignette (top-left glow + bottom-right indigo) */
   body {
     background-image:
-      radial-gradient(ellipse 80% 40% at 0% 0%, hsl(17 100% 56% / 0.045) 0%, transparent 60%),
-      radial-gradient(ellipse 50% 25% at 100% 100%, hsl(17 100% 40% / 0.025) 0%, transparent 50%);
+      radial-gradient(ellipse 80% 40% at 0% 0%, hsl(258 89% 66% / 0.06) 0%, transparent 60%),
+      radial-gradient(ellipse 50% 25% at 100% 100%, hsl(220 90% 60% / 0.04) 0%, transparent 50%);
   }
 
   /* Orange left-bar glow for active nav items */
@@ -573,18 +573,18 @@ body.cog-overwhelmed #main-content { filter: saturate(0.8); transition: filter 1
 
 /* Identity theming — visual evolution per level */
 body.identity-seeker {
-  --primary: 220 70% 52%;
+  --primary: 240 70% 62%;
 }
 body.identity-explorer {
-  --primary: 28 100% 54%;
+  --primary: 258 80% 62%;
 }
 body.identity-builder {
-  --primary: 17 100% 56%;
+  --primary: 258 89% 66%;
 }
 body.identity-operator {
-  --primary: 40 100% 55%;
-  --background: 15 8% 2%;
-  --card: 15 6% 4%;
+  --primary: 270 85% 68%;
+  --background: 240 20% 3%;
+  --card: 240 18% 5%;
 }
 body.identity-operator .starfield-canvas { opacity: 0.3 !important; }
 
@@ -640,3 +640,121 @@ body.ui-idle #main-content { opacity: 0.7; transition: opacity 3s ease; }
 body.ui-idle .starfield-canvas { opacity: 0.35 !important; transition: opacity 3s ease; }
 body:not(.ui-idle) #main-content { opacity: 1; transition: opacity 0.4s ease; }
 body:not(.ui-idle) .starfield-canvas { opacity: 0.75 !important; transition: opacity 0.4s ease; }
+
+/* ========================================
+   MICRO-INTERACTIONS & TRANSITIONS
+   ======================================== */
+
+/* Smooth card press — adds tactile feel to all interactive cards */
+.card-press {
+  transition: transform 0.15s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+}
+.card-press:active {
+  transform: scale(0.98);
+}
+
+/* Button ripple-like press */
+button, [role="button"] {
+  transition: transform 0.1s ease, opacity 0.15s ease;
+}
+button:active:not(:disabled), [role="button"]:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+/* Smooth link hover underline slide */
+.link-slide {
+  position: relative;
+}
+.link-slide::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  width: 0;
+  height: 1px;
+  background: hsl(var(--primary));
+  transition: width 0.25s ease;
+}
+.link-slide:hover::after {
+  width: 100%;
+}
+
+/* Badge pulse — draws attention to new items */
+@keyframes badge-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.08); }
+}
+.badge-pulse {
+  animation: badge-pulse 2s ease-in-out infinite;
+}
+
+/* Typing indicator dots */
+@keyframes typing-bounce {
+  0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+  30% { transform: translateY(-4px); opacity: 1; }
+}
+.typing-dot:nth-child(1) { animation: typing-bounce 1.2s ease-in-out infinite; }
+.typing-dot:nth-child(2) { animation: typing-bounce 1.2s ease-in-out 0.15s infinite; }
+.typing-dot:nth-child(3) { animation: typing-bounce 1.2s ease-in-out 0.3s infinite; }
+
+/* Streaming text cursor blink */
+@keyframes cursor-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+.streaming-cursor::after {
+  content: '▊';
+  display: inline;
+  color: hsl(var(--primary));
+  animation: cursor-blink 0.8s step-end infinite;
+  margin-left: 1px;
+  font-size: 0.8em;
+}
+
+/* Smooth number counter flash */
+@keyframes stat-flash {
+  0% { color: hsl(var(--primary)); text-shadow: 0 0 8px hsl(var(--primary) / 0.5); }
+  100% { color: inherit; text-shadow: none; }
+}
+.stat-updated {
+  animation: stat-flash 0.6s ease-out;
+}
+
+/* Skeleton shimmer — smoother than default pulse */
+@keyframes skeleton-shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.skeleton-shimmer {
+  background: linear-gradient(90deg,
+    hsl(var(--muted)) 25%,
+    hsl(var(--muted-foreground) / 0.08) 50%,
+    hsl(var(--muted)) 75%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.8s ease-in-out infinite;
+}
+
+/* Message bubble entrance */
+@keyframes bubble-in {
+  0% { opacity: 0; transform: translateY(8px) scale(0.97); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+.bubble-enter {
+  animation: bubble-in 0.25s ease-out both;
+}
+
+/* Smooth scroll behavior for chat */
+.smooth-scroll {
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Hover lift for interactive elements */
+.hover-lift {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.hover-lift:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px hsl(var(--primary) / 0.1);
+}

@@ -14,11 +14,11 @@ import type { GraphMetrics } from '@/lib/knowledge/graphAnalytics'
 
 const TYPE_COLORS_HEX: Record<NoteType, string> = {
   fleeting: '#94a3b8',    // slate
-  permanent: '#fbbf24',   // amber
-  concept: '#3b82f6',     // blue
-  experience: '#10b981',  // emerald
-  project: '#a855f7',     // purple
-  hub: '#f97316',         // orange
+  permanent: '#a78bfa',   // violet (permanent ideas glow purple)
+  concept: '#60a5fa',     // sky blue
+  experience: '#34d399',  // emerald
+  project: '#f472b6',     // pink
+  hub: '#c084fc',         // bright purple (hub = primary color)
   reference: '#6b7280',   // gray
 }
 

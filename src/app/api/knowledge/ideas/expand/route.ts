@@ -75,7 +75,7 @@ export const POST = withApiHandler(withAuth(async (request: Request, user: User)
     // Record evolution: the saved note is an expansion of the seed idea
     // Use savedNoteId as both source and derived since it's a new note from scratch
     if (savedNoteId) {
-      recordEvolution(
+      await recordEvolution(
         supabase,
         user.id,
         savedNoteId,

@@ -18,6 +18,7 @@ import { CursorGlow } from '@/components/ui/CursorGlow'
 import { SessionFadeIn } from '@/components/ui/SessionFadeIn'
 import { IdleWatcher } from '@/components/ui/IdleWatcher'
 import { MicroObservation } from '@/components/ui/MicroObservation'
+import { PageTransition } from '@/components/ui/PageTransition'
 
 export default function DashboardLayout({
   children,
@@ -40,7 +41,7 @@ export default function DashboardLayout({
               <div className="flex flex-1 flex-col min-w-0">
                 <Header />
                 <LockInBanner />
-                {children}
+                <PageTransition>{children}</PageTransition>
                 <BottomNav />
               </div>
               <RightPanel />

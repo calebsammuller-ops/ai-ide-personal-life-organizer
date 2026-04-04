@@ -67,7 +67,7 @@ export function Sidebar() {
     <aside
       className={cn(
         'hidden md:flex flex-col h-screen sticky top-0 transition-all duration-300 border-r border-border/50',
-        'bg-[hsl(15_8%_2%)]',
+        'bg-background/95',
         isCollapsed ? 'w-14' : 'w-60'
       )}
     >

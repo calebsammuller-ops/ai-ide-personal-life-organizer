@@ -60,9 +60,9 @@ const config = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
-        // Winter Arc tactical colors
+        // Glow accent colors
         glow: {
-          primary: "hsl(17 100% 56%)",
+          primary: "hsl(var(--primary))",
           amber:   "hsl(35 100% 55%)",
           red:     "hsl(0 80% 55%)",
           green:   "hsl(145 80% 45%)",
@@ -74,7 +74,7 @@ const config = {
         sm: "calc(var(--radius) - 4px)",
       },
       fontFamily: {
-        sans: ['var(--font-mono)', 'JetBrains Mono', 'monospace'],
+        sans: ['var(--font-sans)', 'Inter', 'system-ui', 'sans-serif'],
         mono: ['var(--font-mono)', 'JetBrains Mono', 'monospace'],
       },
       fontSize: {
@@ -95,12 +95,12 @@ const config = {
         'safe-right': 'env(safe-area-inset-right)',
       },
       boxShadow: {
-        'glow-sm':     '0 0 10px hsl(17 100% 56% / 0.3)',
-        'glow':        '0 0 20px hsl(17 100% 56% / 0.4), 0 0 40px hsl(17 100% 56% / 0.2)',
-        'glow-lg':     '0 0 30px hsl(17 100% 56% / 0.5), 0 0 60px hsl(17 100% 56% / 0.3)',
+        'glow-sm':     '0 0 10px hsl(var(--primary) / 0.3)',
+        'glow':        '0 0 20px hsl(var(--primary) / 0.4), 0 0 40px hsl(var(--primary) / 0.2)',
+        'glow-lg':     '0 0 30px hsl(var(--primary) / 0.5), 0 0 60px hsl(var(--primary) / 0.3)',
         'glow-amber':  '0 0 20px hsl(35 100% 55% / 0.4), 0 0 40px hsl(35 100% 55% / 0.2)',
         'glow-success':'0 0 20px hsl(145 80% 45% / 0.4), 0 0 40px hsl(145 80% 45% / 0.2)',
-        'inner-glow':  'inset 0 0 20px hsl(17 100% 56% / 0.15)',
+        'inner-glow':  'inset 0 0 20px hsl(var(--primary) / 0.15)',
       },
       keyframes: {
         "accordion-down": {
@@ -113,10 +113,10 @@ const config = {
         },
         "pulse-glow": {
           "0%, 100%": {
-            boxShadow: "0 0 20px hsl(17 100% 56% / 0.4)",
+            boxShadow: "0 0 20px hsl(var(--primary) / 0.4)",
           },
           "50%": {
-            boxShadow: "0 0 40px hsl(17 100% 56% / 0.6), 0 0 60px hsl(17 100% 56% / 0.4)",
+            boxShadow: "0 0 40px hsl(var(--primary) / 0.6), 0 0 60px hsl(var(--primary) / 0.4)",
           },
         },
         "processing-scan": {
@@ -164,8 +164,8 @@ const config = {
         'gradient-radial':   'radial-gradient(var(--tw-gradient-stops))',
         'gradient-dark':     'linear-gradient(180deg, hsl(0 0% 5%) 0%, hsl(0 0% 2%) 100%)',
         'gradient-card':     'linear-gradient(135deg, hsl(0 0% 9%) 0%, hsl(0 0% 5%) 100%)',
-        'gradient-primary':  'linear-gradient(135deg, hsl(17 100% 56%) 0%, hsl(18 100% 40%) 100%)',
-        'gradient-accent':   'linear-gradient(135deg, hsl(22 100% 52%) 0%, hsl(35 100% 55%) 100%)',
+        'gradient-primary':  'linear-gradient(135deg, hsl(258 89% 66%) 0%, hsl(270 75% 50%) 100%)',
+        'gradient-accent':   'linear-gradient(135deg, hsl(258 89% 66%) 0%, hsl(220 90% 60%) 100%)',
         'noise': "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E\")",
       },
     },

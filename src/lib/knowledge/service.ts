@@ -66,7 +66,7 @@ export async function generateEmbedding(text: string): Promise<number[] | null> 
  * Does NOT block the response — call without await.
  */
 export function triggerAutoLink(noteId: string, userId: string): void {
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000')
   const cronSecret = process.env.CRON_SECRET ?? ''
   fetch(`${baseUrl}/api/knowledge/auto-link`, {
     method: 'POST',

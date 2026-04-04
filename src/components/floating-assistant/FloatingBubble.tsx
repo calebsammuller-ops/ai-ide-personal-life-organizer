@@ -29,10 +29,10 @@ const AVATAR_MOOD: Record<AvatarState, MascotMood> = {
 }
 
 const AVATAR_GLOW: Record<AvatarState, string> = {
-  neutral: 'from-primary/30 to-orange-700/30',
-  attentive: 'from-primary/50 to-orange-600/50',
-  focused: 'from-orange-600/40 to-red-700/40',
-  concerned: 'from-amber-500/50 to-orange-500/50',
+  neutral: 'from-primary/30 to-violet-700/30',
+  attentive: 'from-primary/50 to-violet-600/50',
+  focused: 'from-violet-600/40 to-indigo-700/40',
+  concerned: 'from-amber-500/50 to-violet-500/50',
   still: 'from-muted/10 to-muted/10',
 }
 
@@ -117,7 +117,7 @@ export function FloatingBubble({
             )}
           >
             <motion.div
-              className="w-2 h-2 rounded-sm bg-orange-300"
+              className="w-2 h-2 rounded-sm bg-violet-300"
               animate={{ scale: [1, 1.3, 1], opacity: [1, 0.7, 1] }}
               transition={{ duration: 1.5, repeat: Infinity }}
             />

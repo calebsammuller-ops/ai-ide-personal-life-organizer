@@ -131,7 +131,7 @@ Return JSON: {"title": string, "content": string, "tags": string[]}`
         // Record insight evolution for the hub note of the cluster
         const hubNote = clusterNotes[0]
         if (hubNote) {
-          recordEvolution(
+          await recordEvolution(
             supabase,
             userId,
             hubNote.id,

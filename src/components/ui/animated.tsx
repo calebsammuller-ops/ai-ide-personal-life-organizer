@@ -362,7 +362,7 @@ export function AnimatedStat({ value, className }: { value: number; className?: 
   return <span className={className}>{display}</span>
 }
 
-// Animated fill bar with orange glow pulse
+// Animated fill bar with primary glow pulse
 export function GlowProgress({ value, className }: { value: number; className?: string }) {
   return (
     <div className={cn('h-1.5 bg-muted rounded-full overflow-hidden', className)}>

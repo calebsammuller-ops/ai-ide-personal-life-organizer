@@ -38,7 +38,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Create portal session
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000')
     const session = await createPortalSession(
       subData.subscription.stripeCustomerId,
       `${appUrl}/settings/subscription`

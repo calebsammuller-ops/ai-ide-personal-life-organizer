@@ -169,7 +169,7 @@ async function handleAutoLink(
     }).catch(() => null)
 
     // Record connection evolution for the source note
-    recordEvolution(
+    await recordEvolution(
       supabase,
       userId,
       noteId,

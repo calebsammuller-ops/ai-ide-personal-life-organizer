@@ -210,9 +210,9 @@ export function VoiceMode({ onClose, onAudioLevel }: VoiceModeProps) {
               voiceState === 'listening'
                 ? 'text-primary'
                 : voiceState === 'speaking'
-                  ? 'text-orange-300'
+                  ? 'text-violet-300'
                   : voiceState === 'processing'
-                    ? 'text-orange-400 animate-tactical-blink'
+                    ? 'text-violet-400 animate-tactical-blink'
                     : 'text-muted-foreground'
             )}
           >
@@ -304,10 +304,10 @@ export function VoiceMode({ onClose, onAudioLevel }: VoiceModeProps) {
               voiceState === 'listening'
                 ? 'bg-red-500 hover:bg-red-600 shadow-red-500/30'
                 : voiceState === 'speaking'
-                  ? 'bg-orange-500 hover:bg-orange-600 shadow-orange-500/30'
+                  ? 'bg-violet-500 hover:bg-violet-600 shadow-violet-500/30'
                   : voiceState === 'processing'
-                    ? 'bg-orange-900 opacity-50 cursor-not-allowed'
-                    : 'bg-gradient-to-br from-orange-600 to-red-700 hover:from-orange-500 hover:to-red-600 shadow-orange-500/30'
+                    ? 'bg-violet-900 opacity-50 cursor-not-allowed'
+                    : 'bg-gradient-to-br from-violet-600 to-indigo-700 hover:from-violet-500 hover:to-indigo-600 shadow-violet-500/30'
             )}
           >
             {voiceState === 'listening' ? (
