@@ -270,10 +270,10 @@ export default function KnowledgeGraphPage() {
           <a href="/knowledge" className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground transition-colors">
             <ChevronLeft className="h-4 w-4" />
             <Brain className="h-4 w-4 text-primary" />
-            <span className="text-xs font-mono font-bold uppercase tracking-widest">Knowledge Graph</span>
+            <span className="text-xs font-semibold">Knowledge Graph</span>
           </a>
           <div className="h-4 w-px bg-border/50" />
-          <span className="text-[10px] font-mono text-muted-foreground/50">{simNodes.length} nodes · {edges.length} edges</span>
+          <span className="text-[10px] text-muted-foreground/50">{simNodes.length} nodes · {edges.length} edges</span>
         </div>
 
         <div className="flex items-center gap-2">
@@ -281,13 +281,13 @@ export default function KnowledgeGraphPage() {
           <div className="flex gap-1">
             <button
               onClick={() => setTypeFilter('all')}
-              className={cn('text-[8px] font-mono uppercase px-1.5 py-0.5 rounded', typeFilter === 'all' ? 'bg-primary text-white' : 'bg-muted/30 text-muted-foreground')}
+              className={cn('text-[10px] uppercase px-1.5 py-0.5 rounded', typeFilter === 'all' ? 'bg-primary text-white' : 'bg-muted/30 text-muted-foreground')}
             >All</button>
             {NOTE_TYPES.map(t => (
               <button
                 key={t}
                 onClick={() => setTypeFilter(t)}
-                className={cn('text-[8px] font-mono uppercase px-1.5 py-0.5 rounded', typeFilter === t ? 'bg-primary text-white' : 'bg-muted/30 text-muted-foreground')}
+                className={cn('text-[10px] uppercase px-1.5 py-0.5 rounded', typeFilter === t ? 'bg-primary text-white' : 'bg-muted/30 text-muted-foreground')}
               >{t.slice(0, 3)}</button>
             ))}
           </div>
@@ -305,7 +305,7 @@ export default function KnowledgeGraphPage() {
           </Button>
           <Button
             variant="ghost" size="sm"
-            className="h-7 text-[10px] font-mono text-amber-400 hover:bg-amber-500/10"
+            className="h-7 text-[10px] text-amber-400 hover:bg-amber-500/10"
             onClick={() => { dispatch(analyzeGraph()); setSimulationRunning(true) }}
             disabled={isGenerating}
           >
@@ -314,7 +314,7 @@ export default function KnowledgeGraphPage() {
           </Button>
           <Button
             variant="ghost" size="sm"
-            className={`h-7 text-[10px] font-mono hover:bg-primary/10 ${showMetrics ? 'text-primary' : 'text-muted-foreground'}`}
+            className={`h-7 text-[10px] hover:bg-primary/10 ${showMetrics ? 'text-primary' : 'text-muted-foreground'}`}
             onClick={() => setShowMetrics(s => !s)}
           >
             <BarChart2 className="h-3.5 w-3.5 mr-1" />
@@ -325,20 +325,20 @@ export default function KnowledgeGraphPage() {
 
       {/* Legend */}
       <div className="absolute bottom-4 left-4 z-10 bg-background/90 border border-border/50 rounded p-2 backdrop-blur-sm">
-        <p className="text-[8px] font-mono font-bold uppercase text-muted-foreground/50 mb-1.5">Note Types</p>
+        <p className="text-[10px] font-semibold text-muted-foreground/50 mb-1.5">Note Types</p>
         <div className="grid grid-cols-2 gap-x-3 gap-y-0.5">
           {NOTE_TYPES.map(t => (
             <div key={t} className="flex items-center gap-1">
               <div className="h-2 w-2 rounded-full" style={{ background: TYPE_COLORS_HEX[t as NoteType] }} />
-              <span className="text-[8px] font-mono text-muted-foreground/60">{t}</span>
+              <span className="text-[10px] text-muted-foreground/60">{t}</span>
             </div>
           ))}
         </div>
-        <p className="text-[8px] font-mono font-bold uppercase text-muted-foreground/50 mt-1.5 mb-1">Relationships</p>
+        <p className="text-[10px] font-semibold text-muted-foreground/50 mt-1.5 mb-1">Relationships</p>
         {Object.entries(RELATIONSHIP_COLORS).slice(0, 4).map(([r, c]) => (
           <div key={r} className="flex items-center gap-1">
             <div className="h-px w-4" style={{ background: c }} />
-            <span className="text-[8px] font-mono text-muted-foreground/60">{r}</span>
+            <span className="text-[10px] text-muted-foreground/60">{r}</span>
           </div>
         ))}
       </div>
@@ -346,18 +346,18 @@ export default function KnowledgeGraphPage() {
       {/* Analysis panel */}
       {analysis && (
         <div className="absolute top-16 right-4 z-10 w-56 bg-background/90 border border-border/50 rounded p-3 backdrop-blur-sm max-h-64 overflow-y-auto">
-          <p className="text-[9px] font-mono font-bold uppercase text-muted-foreground/50 mb-2">Graph Analysis</p>
+          <p className="text-[10px] font-semibold text-muted-foreground/50 mb-2">Graph Analysis</p>
           <div className="space-y-1">
-            <p className="text-[10px] text-foreground font-mono">
+            <p className="text-[10px] text-foreground">
               Health: <span className="text-primary">{Math.round((analysis.structuralHealth || 0) * 100)}%</span>
             </p>
-            <p className="text-[10px] text-foreground font-mono">
+            <p className="text-[10px] text-foreground">
               Phase: <span className="text-amber-400">{analysis.evolutionPhase}</span>
             </p>
             {analysis.clusters?.slice(0, 3).map((c, i) => (
               <div key={i} className="mt-1 p-1.5 bg-primary/5 rounded">
-                <p className="text-[9px] font-mono font-bold text-primary">{c.name}</p>
-                <p className="text-[8px] text-muted-foreground/60">{c.notes.length} notes</p>
+                <p className="text-[10px] font-semibold text-primary">{c.name}</p>
+                <p className="text-[10px] text-muted-foreground/60">{c.notes.length} notes</p>
               </div>
             ))}
           </div>
@@ -367,8 +367,8 @@ export default function KnowledgeGraphPage() {
       {/* Graph Metrics panel */}
       {showMetrics && graphMetrics && (
         <div className="absolute top-16 left-4 z-10 w-52 bg-background/90 border border-border/50 rounded p-3 backdrop-blur-sm">
-          <p className="text-[9px] font-mono font-bold uppercase text-muted-foreground/50 mb-2">Graph Metrics</p>
-          <div className="space-y-1.5 text-[10px] font-mono">
+          <p className="text-[10px] font-semibold text-muted-foreground/50 mb-2">Graph Metrics</p>
+          <div className="space-y-1.5 text-[10px]">
             <div className="flex justify-between">
               <span className="text-muted-foreground">Orphan notes</span>
               <span className="text-amber-400">{graphMetrics.orphanCount}</span>
@@ -387,15 +387,15 @@ export default function KnowledgeGraphPage() {
             </div>
             {graphMetrics.mostLinkedNote && (
               <div className="mt-1.5 pt-1.5 border-t border-border/30">
-                <p className="text-muted-foreground/60 text-[8px] uppercase mb-0.5">Most linked</p>
+                <p className="text-muted-foreground/60 text-[10px] mb-0.5">Most linked</p>
                 <p className="text-foreground truncate">{graphMetrics.mostLinkedNote.title}</p>
               </div>
             )}
             {graphMetrics.hubNodes.length > 0 && (
               <div className="mt-1.5 pt-1.5 border-t border-border/30">
-                <p className="text-muted-foreground/60 text-[8px] uppercase mb-1">Hub nodes (≥3 links)</p>
+                <p className="text-muted-foreground/60 text-[10px] mb-1">Hub nodes (≥3 links)</p>
                 {graphMetrics.hubNodes.slice(0, 3).map(n => (
-                  <p key={n.id} className="text-orange-400 truncate text-[9px]">{n.title}</p>
+                  <p key={n.id} className="text-orange-400 truncate text-[10px]">{n.title}</p>
                 ))}
               </div>
             )}
@@ -515,14 +515,14 @@ export default function KnowledgeGraphPage() {
               width={200}
               height={90}
             >
-              <div className="bg-background/95 border border-border/50 rounded p-2 text-xs font-mono shadow-xl">
+              <div className="bg-background/95 border border-border/50 rounded p-2 text-xs shadow-xl">
                 <p className="font-bold text-foreground truncate">{tooltip.node.title}</p>
-                <p className="text-muted-foreground/60 text-[9px]">[{tooltip.node.type}]</p>
-                <p className="text-muted-foreground/60 text-[9px]">Confidence: {Math.round(tooltip.node.confidence * 100)}%</p>
+                <p className="text-muted-foreground/60 text-[10px]">[{tooltip.node.type}]</p>
+                <p className="text-muted-foreground/60 text-[10px]">Confidence: {Math.round(tooltip.node.confidence * 100)}%</p>
                 {tooltip.node.tags.length > 0 && (
-                  <p className="text-muted-foreground/50 text-[9px] truncate">#{tooltip.node.tags.slice(0, 3).join(' #')}</p>
+                  <p className="text-muted-foreground/50 text-[10px] truncate">#{tooltip.node.tags.slice(0, 3).join(' #')}</p>
                 )}
-                <p className="text-primary/60 text-[9px] mt-1">Double-click to open →</p>
+                <p className="text-primary/60 text-[10px] mt-1">Double-click to open →</p>
               </div>
             </foreignObject>
           )}

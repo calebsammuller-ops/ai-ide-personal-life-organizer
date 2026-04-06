@@ -20,11 +20,11 @@ export function CognitiveDNA() {
 
   if (loading && !hasData) {
     return (
-      <div className="rounded-sm border border-border/40 bg-card p-3">
-        <div className="h-1.5 w-24 bg-muted/60 animate-pulse rounded-sm mb-2" />
+      <div className="rounded-lg border border-border/40 bg-card p-3">
+        <div className="h-1.5 w-24 bg-muted/60 animate-pulse rounded-lg mb-2" />
         <div className="space-y-1">
           {[...Array(3)].map((_, i) => (
-            <div key={i} className="h-1.5 bg-muted/40 animate-pulse rounded-sm" style={{ width: `${70 + i * 10}%` }} />
+            <div key={i} className="h-1.5 bg-muted/40 animate-pulse rounded-lg" style={{ width: `${70 + i * 10}%` }} />
           ))}
         </div>
       </div>
@@ -34,18 +34,18 @@ export function CognitiveDNA() {
   if (!hasData) return null
 
   return (
-    <div className="rounded-sm border border-border/40 bg-card">
+    <div className="rounded-lg border border-border/40 bg-card">
       <div className="flex items-center gap-2 px-3 py-2 border-b border-border/30">
         <div className="w-0.5 h-3 bg-primary" />
-        <p className="text-[9px] font-mono font-bold uppercase tracking-widest text-primary/70">Cognitive DNA</p>
+        <p className="text-[10px] font-semibold text-primary/70">Cognitive DNA</p>
       </div>
       <div className="p-3 space-y-3">
         {beliefs.length > 0 && (
           <div>
-            <p className="text-[8px] font-mono uppercase tracking-widest text-primary/40 mb-1">Core Beliefs</p>
+            <p className="text-[10px] font-medium text-primary/40 mb-1">Core Beliefs</p>
             <ul className="space-y-0.5">
               {beliefs.map((b, i) => (
-                <li key={i} className="text-[9px] font-mono text-foreground/70 flex gap-1.5">
+                <li key={i} className="text-[10px] text-foreground/70 flex gap-1.5">
                   <span className="text-primary/30 shrink-0">·</span>{b}
                 </li>
               ))}
@@ -54,10 +54,10 @@ export function CognitiveDNA() {
         )}
         {patterns.length > 0 && (
           <div>
-            <p className="text-[8px] font-mono uppercase tracking-widest text-primary/40 mb-1">Recurring Patterns</p>
+            <p className="text-[10px] font-medium text-primary/40 mb-1">Recurring Patterns</p>
             <ul className="space-y-0.5">
               {patterns.map((p, i) => (
-                <li key={i} className="text-[9px] font-mono text-foreground/70 flex gap-1.5">
+                <li key={i} className="text-[10px] text-foreground/70 flex gap-1.5">
                   <span className="text-primary/30 shrink-0">·</span>{p}
                 </li>
               ))}
@@ -66,10 +66,10 @@ export function CognitiveDNA() {
         )}
         {blindSpots.length > 0 && (
           <div>
-            <p className="text-[8px] font-mono uppercase tracking-widest text-destructive/40 mb-1">Blind Spots</p>
+            <p className="text-[10px] font-medium text-destructive/40 mb-1">Blind Spots</p>
             <ul className="space-y-0.5">
               {blindSpots.map((b, i) => (
-                <li key={i} className="text-[9px] font-mono text-destructive/60 flex gap-1.5">
+                <li key={i} className="text-[10px] text-destructive/60 flex gap-1.5">
                   <span className="shrink-0">⚠</span>{b}
                 </li>
               ))}
@@ -78,10 +78,10 @@ export function CognitiveDNA() {
         )}
         {strengths.length > 0 && (
           <div>
-            <p className="text-[8px] font-mono uppercase tracking-widest text-primary/40 mb-1">Strengths</p>
+            <p className="text-[10px] font-medium text-primary/40 mb-1">Strengths</p>
             <ul className="space-y-0.5">
               {strengths.map((s, i) => (
-                <li key={i} className="text-[9px] font-mono text-foreground/70 flex gap-1.5">
+                <li key={i} className="text-[10px] text-foreground/70 flex gap-1.5">
                   <span className="text-primary/40 shrink-0">✓</span>{s}
                 </li>
               ))}

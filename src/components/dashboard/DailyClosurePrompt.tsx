@@ -34,19 +34,19 @@ export function DailyClosurePrompt() {
 
   return (
     <div className="pt-2 border-t border-border/20 space-y-1.5">
-      <p className="text-[8px] font-mono text-muted-foreground/40 uppercase tracking-widest">Before you leave</p>
-      <p className="text-[9px] font-mono text-muted-foreground/60">What did you move forward today?</p>
+      <p className="text-[10px] text-muted-foreground/40 font-medium">Before you leave</p>
+      <p className="text-[10px] text-muted-foreground/60">What did you move forward today?</p>
       <textarea
         value={value}
         onChange={e => setValue(e.target.value)}
         placeholder="type here..."
         rows={2}
-        className="w-full bg-muted/10 border border-border/30 rounded-sm px-2 py-1 text-[9px] font-mono text-foreground/80 placeholder:text-muted-foreground/20 focus:outline-none focus:border-primary/30 resize-none"
+        className="w-full bg-muted/10 border border-border/30 rounded-lg px-2 py-1 text-[10px] text-foreground/80 placeholder:text-muted-foreground/20 focus:outline-none focus:border-primary/30 resize-none"
       />
       <button
         onClick={handleSave}
         disabled={!value.trim()}
-        className="text-[8px] font-mono text-primary/60 hover:text-primary transition-colors disabled:opacity-30"
+        className="text-[10px] text-primary/60 hover:text-primary transition-colors disabled:opacity-30"
       >
         save →
       </button>

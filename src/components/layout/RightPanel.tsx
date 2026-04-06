@@ -80,23 +80,23 @@ function StrengthBar({ value }: { value: number }) {
       <div className="h-px w-10 bg-border/40 overflow-hidden">
         <div className="h-full bg-primary/50" style={{ width: `${Math.round(value * 100)}%` }} />
       </div>
-      <span className="text-[8px] font-mono text-muted-foreground/30">{Math.round(value * 100)}%</span>
+      <span className="text-[10px] text-muted-foreground/30">{Math.round(value * 100)}%</span>
     </div>
   )
 }
 
 function SectionLabel({ label }: { label: string }) {
   return (
-    <p className="text-[8px] font-mono uppercase tracking-widest text-primary/40 mb-1">{label}</p>
+    <p className="text-[10px] font-medium text-primary/40 mb-1">{label}</p>
   )
 }
 
 function SkeletonBlock() {
   return (
     <div className="space-y-1.5">
-      <div className="h-1.5 w-full rounded-sm bg-muted/60 animate-pulse" />
-      <div className="h-1.5 w-4/5 rounded-sm bg-muted/60 animate-pulse" />
-      <div className="h-1.5 w-3/5 rounded-sm bg-muted/60 animate-pulse" />
+      <div className="h-1.5 w-full rounded-lg bg-muted/60 animate-pulse" />
+      <div className="h-1.5 w-4/5 rounded-lg bg-muted/60 animate-pulse" />
+      <div className="h-1.5 w-3/5 rounded-lg bg-muted/60 animate-pulse" />
     </div>
   )
 }
@@ -208,15 +208,15 @@ export function RightPanel() {
           <div className="flex items-center justify-between px-3 pt-3 pb-2 border-b border-border/20">
             <div className="flex items-center gap-1.5 min-w-0">
               <span className={cn(
-                'text-[7px] shrink-0 transition-colors',
+                'text-[9px] shrink-0 transition-colors',
                 priority === 'high' ? 'text-primary' : priority === 'medium' ? 'text-primary/40' : 'text-muted-foreground/20'
               )}>●</span>
-              <span className="text-[9px] font-mono font-bold uppercase tracking-widest text-primary/60 truncate">
+              <span className="text-[10px] font-semibold text-primary/60 truncate">
                 Intelligence
               </span>
               {hasData && (
                 <span className={cn(
-                  'text-[8px] font-mono font-bold uppercase shrink-0',
+                  'text-[10px] font-semibold shrink-0',
                   priority === 'high' ? 'text-primary' : priority === 'medium' ? 'text-primary/40' : 'text-muted-foreground/30'
                 )}>
                   {priority}
@@ -235,7 +235,7 @@ export function RightPanel() {
           {/* Predicted drift warning */}
           {predictedState === 'drifting' && (
             <div className="px-3 pt-1.5">
-              <p className="text-[8px] font-mono text-destructive/50">
+              <p className="text-[10px] text-destructive/50">
                 → predicted: drifting if no action taken
               </p>
             </div>
@@ -244,7 +244,7 @@ export function RightPanel() {
           {/* Lock-in drift warning */}
           {lockInActive && driftCount > 2 && (
             <div className="px-3 pt-1.5">
-              <p className="text-[8px] font-mono text-amber-500/60">
+              <p className="text-[10px] text-amber-500/60">
                 ⚠ drift detected ({driftCount}x) — refocus on {lockInFocus}
               </p>
             </div>
@@ -273,7 +273,7 @@ export function RightPanel() {
                   exit={{ opacity: 0 }}
                   className="pt-6 text-center"
                 >
-                  <p className="text-[9px] font-mono text-muted-foreground/40 leading-loose">
+                  <p className="text-[10px] text-muted-foreground/40 leading-loose">
                     Your intelligence<br />system is empty.<br /><br />
                     Start by capturing<br />your first idea.
                   </p>
@@ -290,14 +290,14 @@ export function RightPanel() {
                   {/* Insight */}
                   <div>
                     <SectionLabel label="Insight" />
-                    <p className="text-[10px] font-mono text-foreground/80 leading-relaxed">{insight}</p>
+                    <p className="text-[10px] text-foreground/80 leading-relaxed">{insight}</p>
                   </div>
 
                   {/* Why this matters */}
                   {whyThisMatters && (
                     <div>
                       <SectionLabel label="Why This Matters" />
-                      <p className="text-[9px] font-mono text-muted-foreground leading-relaxed">{whyThisMatters}</p>
+                      <p className="text-[10px] text-muted-foreground leading-relaxed">{whyThisMatters}</p>
                     </div>
                   )}
 
@@ -305,7 +305,7 @@ export function RightPanel() {
                   {pattern && (
                     <div>
                       <SectionLabel label="Pattern" />
-                      <p className="text-[9px] font-mono text-muted-foreground leading-relaxed">{pattern}</p>
+                      <p className="text-[10px] text-muted-foreground leading-relaxed">{pattern}</p>
                     </div>
                   )}
 
@@ -316,7 +316,7 @@ export function RightPanel() {
                         variableInsight.type === 'contradiction' ? 'Contradiction Detected' :
                         variableInsight.type === 'pattern' ? 'Hidden Pattern' : 'Prediction'
                       } />
-                      <p className="text-[9px] font-mono text-primary/60 leading-relaxed">{variableInsight.text}</p>
+                      <p className="text-[10px] text-primary/60 leading-relaxed">{variableInsight.text}</p>
                     </div>
                   )}
 
@@ -327,10 +327,10 @@ export function RightPanel() {
                       <div className="space-y-2">
                         {connections.map((c, i) => (
                           <div key={i} className="border-l border-primary/15 pl-2 space-y-0.5">
-                            <p className="text-[9px] font-mono text-foreground/60 leading-tight">
+                            <p className="text-[10px] text-foreground/60 leading-tight">
                               {c.noteA} <span className="text-primary/40">↔</span> {c.noteB}
                             </p>
-                            <p className="text-[8px] font-mono text-muted-foreground/50 leading-tight">{c.reason}</p>
+                            <p className="text-[10px] text-muted-foreground/50 leading-tight">{c.reason}</p>
                             {typeof c.strength === 'number' && <StrengthBar value={c.strength} />}
                           </div>
                         ))}
@@ -345,9 +345,9 @@ export function RightPanel() {
                       <div className="space-y-1.5">
                         {nextActions.map((a, i) => (
                           <div key={i} className="space-y-1">
-                            <p className="text-[9px] font-mono text-muted-foreground/80 leading-relaxed">{i + 1}. {a.text}</p>
+                            <p className="text-[10px] text-muted-foreground/80 leading-relaxed">{i + 1}. {a.text}</p>
                             {(a.estimatedMinutes || a.difficulty) && (
-                              <p className="text-[8px] font-mono text-muted-foreground/30">
+                              <p className="text-[10px] text-muted-foreground/30">
                                 {[a.estimatedMinutes ? `${a.estimatedMinutes} min` : '', a.difficulty || ''].filter(Boolean).join(' · ')}
                               </p>
                             )}
@@ -364,7 +364,7 @@ export function RightPanel() {
                                   setTimeout(() => doFetch(true), 1200)
                                 }}
                                 className={cn(
-                                  'text-[8px] font-mono font-bold uppercase tracking-wider border rounded-sm px-1.5 py-px hover:bg-primary/10 transition-colors',
+                                  'text-[10px] font-semibold border rounded-lg px-1.5 py-px hover:bg-primary/10 transition-colors',
                                   ACTION_PRIORITY_COLOR[a.priority] || ACTION_PRIORITY_COLOR.low
                                 )}
                               >
@@ -375,7 +375,7 @@ export function RightPanel() {
                                   dispatch(dismissNextMove())
                                   dispatch(recordIgnored(a.actionType))
                                 }}
-                                className="text-[8px] font-mono text-muted-foreground/25 hover:text-muted-foreground/60 transition-colors"
+                                className="text-[10px] text-muted-foreground/25 hover:text-muted-foreground/60 transition-colors"
                               >
                                 skip
                               </button>
@@ -389,10 +389,10 @@ export function RightPanel() {
                   {/* All actions complete CTA */}
                   {nextActions.length === 0 && hasData && (
                     <div className="py-2 border-t border-border/10">
-                      <p className="text-[8px] font-mono text-muted-foreground/40 mb-1.5">Loop complete.</p>
+                      <p className="text-[10px] text-muted-foreground/40 mb-1.5">Loop complete.</p>
                       <button
                         onClick={() => doFetch(true)}
-                        className="text-[8px] font-mono text-primary/60 hover:text-primary transition-colors"
+                        className="text-[10px] text-primary/60 hover:text-primary transition-colors"
                       >
                         Generate next actions →
                       </button>
@@ -403,17 +403,17 @@ export function RightPanel() {
                   {patternShift && (
                     <div>
                       <SectionLabel label="Pattern Shift" />
-                      <p className="text-[9px] font-mono text-primary/50 leading-relaxed">{patternShift}</p>
+                      <p className="text-[10px] text-primary/50 leading-relaxed">{patternShift}</p>
                     </div>
                   )}
 
                   {/* Confidence */}
                   <div className="space-y-0.5 pt-1 border-t border-border/10">
-                    <p className="text-[8px] font-mono text-muted-foreground/30">
+                    <p className="text-[10px] text-muted-foreground/30">
                       confidence: {Math.round(confidence * 100)}%
                     </p>
                     {confidenceReason && (
-                      <p className="text-[8px] font-mono text-muted-foreground/20 leading-tight">{confidenceReason}</p>
+                      <p className="text-[10px] text-muted-foreground/20 leading-tight">{confidenceReason}</p>
                     )}
                   </div>
                 </motion.div>
@@ -426,14 +426,14 @@ export function RightPanel() {
             <button
               onClick={() => doFetch(true)}
               disabled={loading}
-              className="flex items-center gap-1 text-[8px] font-mono text-muted-foreground/30 hover:text-muted-foreground/60 transition-colors disabled:opacity-30"
+              className="flex items-center gap-1 text-[10px] text-muted-foreground/30 hover:text-muted-foreground/60 transition-colors disabled:opacity-30"
             >
               <RefreshCw className={cn('h-2.5 w-2.5', loading && 'animate-spin')} />
               refresh
             </button>
             <Link
               href="/live-assistant"
-              className="block text-[8px] font-mono text-primary/40 hover:text-primary/70 transition-colors"
+              className="block text-[10px] text-primary/40 hover:text-primary/70 transition-colors"
             >
               Open Assistant →
             </Link>

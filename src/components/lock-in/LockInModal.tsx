@@ -34,10 +34,10 @@ export function LockInModal() {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm">
-      <div className="w-80 border border-primary/40 bg-background rounded-sm p-4 space-y-4">
+      <div className="w-80 border border-primary/40 bg-background rounded-lg p-4 space-y-4">
         <div className="flex items-center gap-2">
           <div className="w-0.5 h-4 bg-primary" />
-          <p className="text-[10px] font-mono font-bold uppercase tracking-widest text-primary">
+          <p className="text-[10px] font-semibold text-primary">
             {step === 1 ? 'Define Your Focus' : 'Set Duration'}
           </p>
         </div>
@@ -45,7 +45,7 @@ export function LockInModal() {
         {step === 1 && (
           <>
             <div>
-              <p className="text-[9px] font-mono text-muted-foreground/50 mb-2">
+              <p className="text-[10px] text-muted-foreground/50 mb-2">
                 What is the one thing you are building right now?
               </p>
               <input
@@ -54,13 +54,13 @@ export function LockInModal() {
                 onChange={e => setFocus(e.target.value)}
                 onKeyDown={e => e.key === 'Enter' && focus.trim() && setStep(2)}
                 placeholder="e.g. AI startup framework"
-                className="w-full bg-muted/20 border border-border/50 rounded-sm px-2 py-1.5 text-xs font-mono text-foreground/90 placeholder:text-muted-foreground/30 focus:outline-none focus:border-primary/50"
+                className="w-full bg-muted/20 border border-border/50 rounded-lg px-2 py-1.5 text-xs text-foreground/90 placeholder:text-muted-foreground/30 focus:outline-none focus:border-primary/50"
               />
             </div>
 
             {topTags.length > 0 && (
               <div>
-                <p className="text-[9px] font-mono text-muted-foreground/40 mb-1.5">
+                <p className="text-[10px] text-muted-foreground/40 mb-1.5">
                   Allowed topic tags (optional):
                 </p>
                 <div className="flex flex-wrap gap-1">
@@ -69,7 +69,7 @@ export function LockInModal() {
                       key={tag}
                       onClick={() => toggleTag(tag)}
                       className={cn(
-                        'text-[8px] font-mono px-1.5 py-0.5 border rounded-sm transition-colors',
+                        'text-[10px] px-1.5 py-0.5 border rounded-lg transition-colors',
                         selectedTags.includes(tag)
                           ? 'border-primary/60 bg-primary/10 text-primary'
                           : 'border-border/40 text-muted-foreground/50 hover:border-primary/30'
@@ -85,14 +85,14 @@ export function LockInModal() {
             <div className="flex gap-2 pt-1">
               <button
                 onClick={() => dispatch(closeModal())}
-                className="flex-1 text-[9px] font-mono text-muted-foreground/40 hover:text-muted-foreground border border-border/30 rounded-sm py-1.5 transition-colors"
+                className="flex-1 text-[10px] text-muted-foreground/40 hover:text-muted-foreground border border-border/30 rounded-lg py-1.5 transition-colors"
               >
                 Cancel
               </button>
               <button
                 onClick={() => focus.trim() && setStep(2)}
                 disabled={!focus.trim()}
-                className="flex-1 text-[9px] font-mono font-bold text-primary border border-primary/40 rounded-sm py-1.5 hover:bg-primary/10 transition-colors disabled:opacity-30"
+                className="flex-1 text-[10px] font-semibold text-primary border border-primary/40 rounded-lg py-1.5 hover:bg-primary/10 transition-colors disabled:opacity-30"
               >
                 Next →
               </button>
@@ -103,19 +103,19 @@ export function LockInModal() {
         {step === 2 && (
           <>
             <div>
-              <p className="text-[9px] font-mono text-muted-foreground/50 mb-1">Focus:</p>
-              <p className="text-xs font-mono font-bold text-primary">{focus}</p>
+              <p className="text-[10px] text-muted-foreground/50 mb-1">Focus:</p>
+              <p className="text-xs font-semibold text-primary">{focus}</p>
             </div>
 
             <div>
-              <p className="text-[9px] font-mono text-muted-foreground/40 mb-2">Duration:</p>
+              <p className="text-[10px] text-muted-foreground/40 mb-2">Duration:</p>
               <div className="flex gap-2">
                 {DURATIONS.map(d => (
                   <button
                     key={d}
                     onClick={() => setDuration(d)}
                     className={cn(
-                      'flex-1 text-[9px] font-mono py-2 border rounded-sm transition-colors',
+                      'flex-1 text-[10px] py-2 border rounded-lg transition-colors',
                       duration === d
                         ? 'border-primary/60 bg-primary/10 text-primary font-bold'
                         : 'border-border/40 text-muted-foreground/50 hover:border-primary/30'
@@ -127,20 +127,20 @@ export function LockInModal() {
               </div>
             </div>
 
-            <p className="text-[8px] font-mono text-muted-foreground/30 leading-relaxed">
+            <p className="text-[10px] text-muted-foreground/30 leading-relaxed">
               Activating will darken the UI and restrict AI guidance to your focus topic.
             </p>
 
             <div className="flex gap-2 pt-1">
               <button
                 onClick={() => setStep(1)}
-                className="flex-1 text-[9px] font-mono text-muted-foreground/40 hover:text-muted-foreground border border-border/30 rounded-sm py-1.5 transition-colors"
+                className="flex-1 text-[10px] text-muted-foreground/40 hover:text-muted-foreground border border-border/30 rounded-lg py-1.5 transition-colors"
               >
                 Back
               </button>
               <button
                 onClick={handleConfirm}
-                className="flex-1 text-[9px] font-mono font-bold text-primary border border-primary/60 rounded-sm py-1.5 hover:bg-primary/10 transition-colors"
+                className="flex-1 text-[10px] font-semibold text-primary border border-primary/60 rounded-lg py-1.5 hover:bg-primary/10 transition-colors"
               >
                 Activate →
               </button>

@@ -78,7 +78,7 @@ export function Sidebar() {
             <div className="h-7 w-7 bg-primary/90 flex items-center justify-center flex-shrink-0">
               <Brain className="h-4 w-4 text-white" />
             </div>
-            <span className="text-[9px] font-mono font-bold uppercase tracking-[0.25em] text-primary/65">
+            <span className="text-[10px] font-semibold text-primary/65">
               Thinking Partner
             </span>
           </Link>
@@ -102,7 +102,7 @@ export function Sidebar() {
         {navSections.map((section) => (
           <div key={section.label}>
             {!isCollapsed && (
-              <p className="px-3 py-1 text-[9px] font-mono font-bold uppercase tracking-[0.22em] text-muted-foreground/22">
+              <p className="px-3 py-1 text-[10px] font-semibold text-muted-foreground/22">
                 {section.label}
               </p>
             )}
@@ -127,7 +127,7 @@ export function Sidebar() {
                   >
                     <item.icon className="h-4 w-4 shrink-0" />
                     {!isCollapsed && (
-                      <span className="text-xs font-mono">{item.label}</span>
+                      <span className="text-xs">{item.label}</span>
                     )}
                   </Link>
                 )
@@ -152,21 +152,21 @@ export function Sidebar() {
           title={isCollapsed ? 'Settings' : undefined}
         >
           <Settings className="h-4 w-4 shrink-0" />
-          {!isCollapsed && <span className="text-xs font-mono">Settings</span>}
+          {!isCollapsed && <span className="text-xs">Settings</span>}
         </Link>
         {!isCollapsed && (
           lockInActive ? (
-            <div className="lock-in-badge mx-0 mb-1 rounded-sm border border-green-500/30 bg-green-500/5 px-3 py-2">
+            <div className="lock-in-badge mx-0 mb-1 rounded-lg border border-green-500/30 bg-green-500/5 px-3 py-2">
               <div className="flex items-center gap-1.5">
                 <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
-                <span className="text-[8px] font-mono font-bold text-green-400 uppercase tracking-widest">LOCK-IN ACTIVE</span>
+                <span className="text-[10px] font-semibold text-green-400">LOCK-IN ACTIVE</span>
               </div>
               {lockInFocus && (
-                <p className="text-[7px] font-mono text-green-500/50 mt-0.5 truncate">{lockInFocus}</p>
+                <p className="text-[9px] text-green-500/50 mt-0.5 truncate">{lockInFocus}</p>
               )}
               <button
                 onClick={() => dispatch(deactivateLockIn())}
-                className="mt-1.5 w-full text-[7px] font-mono text-destructive/50 hover:text-destructive/80 border border-destructive/20 rounded-sm py-0.5 transition-colors"
+                className="mt-1.5 w-full text-[9px] text-destructive/50 hover:text-destructive/80 border border-destructive/20 rounded-lg py-0.5 transition-colors"
               >
                 EXIT LOCK-IN
               </button>
@@ -174,7 +174,7 @@ export function Sidebar() {
           ) : (
             <button
               onClick={() => dispatch(openModal({ modalName: 'lockIn' }))}
-              className="w-full flex items-center gap-2.5 px-3 py-1.5 border-l-2 border-transparent text-primary/40 hover:text-primary/70 text-[9px] font-mono transition-colors"
+              className="w-full flex items-center gap-2.5 px-3 py-1.5 border-l-2 border-transparent text-primary/40 hover:text-primary/70 text-[10px] transition-colors"
             >
               LOCK-IN MODE
             </button>

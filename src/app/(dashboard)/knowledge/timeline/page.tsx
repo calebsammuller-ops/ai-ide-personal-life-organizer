@@ -65,12 +65,12 @@ function MarkdownReport({ content }: { content: string }) {
   return (
     <div className="space-y-1">
       {content.split('\n').map((line, i) => {
-        if (line.startsWith('# ')) return <h1 key={i} className="text-base font-mono font-bold text-foreground mt-4 mb-2">{line.slice(2)}</h1>
-        if (line.startsWith('## ')) return <h2 key={i} className="text-sm font-mono font-bold text-primary mt-3 mb-1 border-b border-primary/20 pb-1">{line.slice(3)}</h2>
-        if (line.startsWith('### ')) return <h3 key={i} className="text-xs font-mono font-bold text-amber-400 mt-2 mb-0.5">{line.slice(4)}</h3>
-        if (line.startsWith('- ') || line.startsWith('• ')) return <p key={i} className="text-xs font-mono text-foreground/70 ml-3">· {line.slice(2)}</p>
+        if (line.startsWith('# ')) return <h1 key={i} className="text-base font-bold text-foreground mt-4 mb-2">{line.slice(2)}</h1>
+        if (line.startsWith('## ')) return <h2 key={i} className="text-sm font-semibold text-primary mt-3 mb-1 border-b border-primary/20 pb-1">{line.slice(3)}</h2>
+        if (line.startsWith('### ')) return <h3 key={i} className="text-xs font-semibold text-amber-400 mt-2 mb-0.5">{line.slice(4)}</h3>
+        if (line.startsWith('- ') || line.startsWith('• ')) return <p key={i} className="text-xs text-foreground/70 ml-3">· {line.slice(2)}</p>
         if (line.trim() === '') return <div key={i} className="h-1.5" />
-        return <p key={i} className="text-xs font-mono text-foreground/70 leading-relaxed">{line}</p>
+        return <p key={i} className="text-xs text-foreground/70 leading-relaxed">{line}</p>
       })}
     </div>
   )
@@ -125,15 +125,15 @@ export default function TimelinePage() {
             <ChevronLeft className="h-4 w-4" />
             <Brain className="h-4 w-4 text-primary" />
           </a>
-          <span className="text-xs font-mono font-bold uppercase tracking-widest text-foreground">Cognitive Timeline</span>
-          <span className="text-[10px] font-mono text-muted-foreground/40">{events.length} events · {notes.length} notes</span>
+          <span className="text-xs font-semibold text-foreground">Cognitive Timeline</span>
+          <span className="text-[10px] text-muted-foreground/40">{events.length} events · {notes.length} notes</span>
         </div>
         <Button
           onClick={handleGenerateReport}
           disabled={isGenerating || notes.length === 0}
           size="sm"
           variant="outline"
-          className="font-mono text-xs border-cyan-500/40 text-cyan-400 hover:bg-cyan-500/10 h-7"
+          className="text-xs border-cyan-500/40 text-cyan-400 hover:bg-cyan-500/10 h-7"
         >
           {isGenerating
             ? <><Loader2 className="h-3 w-3 mr-1.5 animate-spin" />Generating...</>
@@ -149,13 +149,13 @@ export default function TimelinePage() {
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-2">
                 <BarChart2 className="h-3.5 w-3.5 text-primary/60" />
-                <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-muted-foreground/50">Note Velocity (30 days)</span>
+                <span className="text-[10px] font-semibold text-muted-foreground/50">Note Velocity (30 days)</span>
               </div>
               <div className="flex gap-3">
                 {Object.entries(eventTypeCount).slice(0, 4).map(([type, count]) => (
                   <div key={type} className="flex items-center gap-1">
                     {EVENT_ICONS[type]}
-                    <span className="text-[9px] font-mono text-muted-foreground/50">{count}</span>
+                    <span className="text-[10px] text-muted-foreground/50">{count}</span>
                   </div>
                 ))}
               </div>
@@ -190,7 +190,7 @@ export default function TimelinePage() {
               key={f}
               onClick={() => setFilterType(f)}
               className={cn(
-                'text-[9px] font-mono uppercase tracking-wider px-2 py-0.5 border rounded-sm transition-colors',
+                'text-[10px] font-medium px-2 py-0.5 border rounded-lg transition-colors',
                 filterType === f
                   ? 'border-primary/50 text-primary bg-primary/10'
                   : 'border-border/40 text-muted-foreground/40 hover:border-primary/25 hover:text-muted-foreground/60'
@@ -212,18 +212,18 @@ export default function TimelinePage() {
           {!isLoading && events.length === 0 && (
             <div className="flex flex-col items-center justify-center h-48">
               <Brain className="h-12 w-12 text-muted-foreground/10 mb-3" />
-              <p className="text-sm font-mono text-muted-foreground/40">No cognitive events yet</p>
-              <p className="text-xs font-mono text-muted-foreground/30 mt-1">Start creating notes to build your cognitive timeline</p>
-              <a href="/knowledge" className="mt-3 text-xs font-mono text-primary hover:underline">Create your first note →</a>
+              <p className="text-sm text-muted-foreground/40">No cognitive events yet</p>
+              <p className="text-xs text-muted-foreground/30 mt-1">Start creating notes to build your cognitive timeline</p>
+              <a href="/knowledge" className="mt-3 text-xs text-primary hover:underline">Create your first note →</a>
             </div>
           )}
 
           {groupedEvents.map(([label, groupEvents]) => (
             <div key={label}>
               <div className="flex items-center gap-2 mb-3">
-                <span className="text-[9px] font-mono font-bold uppercase tracking-widest text-muted-foreground/40">{label}</span>
+                <span className="text-[10px] font-semibold text-muted-foreground/40">{label}</span>
                 <div className="flex-1 h-px bg-border/30" />
-                <span className="text-[9px] font-mono text-muted-foreground/30">{groupEvents.length}</span>
+                <span className="text-[10px] text-muted-foreground/30">{groupEvents.length}</span>
               </div>
               <div className="space-y-2 pl-3 border-l border-border/30">
                 {groupEvents.map((event) => {

@@ -114,24 +114,24 @@ export default function IdeasPage() {
             <ChevronLeft className="h-4 w-4" />
             <Brain className="h-4 w-4 text-primary" />
           </a>
-          <span className="text-xs font-mono font-bold uppercase tracking-widest text-foreground">Idea Engine</span>
-          <span className="text-[10px] font-mono text-muted-foreground/40">{notes.length} notes in brain</span>
+          <span className="text-xs font-semibold text-foreground">Idea Engine</span>
+          <span className="text-[10px] text-muted-foreground/40">{notes.length} notes in brain</span>
         </div>
         <div className="flex gap-2">
           {activeTab === 'ideas' && (
-            <Button onClick={handleGenerateIdeas} disabled={isGenerating} size="sm" className="font-mono text-xs bg-purple-600 hover:bg-purple-700 text-white">
+            <Button onClick={handleGenerateIdeas} disabled={isGenerating} size="sm" className="text-xs bg-purple-600 hover:bg-purple-700 text-white">
               <Lightbulb className="h-3.5 w-3.5 mr-1.5" />
               {isGenerating ? 'Thinking...' : 'Generate Ideas'}
             </Button>
           )}
           {activeTab === 'gaps' && (
-            <Button onClick={handleDetectGaps} disabled={isGenerating} size="sm" variant="outline" className="font-mono text-xs border-amber-500/50 text-amber-400 hover:bg-amber-500/10">
+            <Button onClick={handleDetectGaps} disabled={isGenerating} size="sm" variant="outline" className="text-xs border-amber-500/50 text-amber-400 hover:bg-amber-500/10">
               <Search className="h-3.5 w-3.5 mr-1.5" />
               Detect Gaps
             </Button>
           )}
           {activeTab === 'collide' && collision && (
-            <Button onClick={handleCollide} disabled={colliding} size="sm" variant="outline" className="font-mono text-xs border-orange-500/50 text-orange-400 hover:bg-orange-500/10">
+            <Button onClick={handleCollide} disabled={colliding} size="sm" variant="outline" className="text-xs border-orange-500/50 text-orange-400 hover:bg-orange-500/10">
               <RefreshCw className={cn('h-3.5 w-3.5 mr-1.5', colliding && 'animate-spin')} />
               {colliding ? 'Colliding...' : 'New Collision'}
             </Button>
@@ -141,16 +141,16 @@ export default function IdeasPage() {
 
       {/* Tabs */}
       <div className="flex border-b border-border/50">
-        <button onClick={() => setActiveTab('ideas')} className={cn('px-4 py-2 text-xs font-mono font-bold uppercase transition-colors', activeTab === 'ideas' ? 'border-b-2 border-primary text-primary' : 'text-muted-foreground hover:text-foreground')}>
+        <button onClick={() => setActiveTab('ideas')} className={cn('px-4 py-2 text-xs font-medium transition-colors', activeTab === 'ideas' ? 'border-b-2 border-primary text-primary' : 'text-muted-foreground hover:text-foreground')}>
           Ideas ({ideas.length})
         </button>
-        <button onClick={() => setActiveTab('gaps')} className={cn('px-4 py-2 text-xs font-mono font-bold uppercase transition-colors', activeTab === 'gaps' ? 'border-b-2 border-amber-400 text-amber-400' : 'text-muted-foreground hover:text-foreground')}>
+        <button onClick={() => setActiveTab('gaps')} className={cn('px-4 py-2 text-xs font-medium transition-colors', activeTab === 'gaps' ? 'border-b-2 border-amber-400 text-amber-400' : 'text-muted-foreground hover:text-foreground')}>
           Knowledge Gaps ({gaps.length})
         </button>
-        <button onClick={() => setActiveTab('expand')} className={cn('px-4 py-2 text-xs font-mono font-bold uppercase transition-colors', activeTab === 'expand' ? 'border-b-2 border-cyan-400 text-cyan-400' : 'text-muted-foreground hover:text-foreground')}>
+        <button onClick={() => setActiveTab('expand')} className={cn('px-4 py-2 text-xs font-medium transition-colors', activeTab === 'expand' ? 'border-b-2 border-cyan-400 text-cyan-400' : 'text-muted-foreground hover:text-foreground')}>
           Expand Idea
         </button>
-        <button onClick={() => setActiveTab('collide')} className={cn('px-4 py-2 text-xs font-mono font-bold uppercase transition-colors flex items-center gap-1.5', activeTab === 'collide' ? 'border-b-2 border-orange-400 text-orange-400' : 'text-muted-foreground hover:text-foreground')}>
+        <button onClick={() => setActiveTab('collide')} className={cn('px-4 py-2 text-xs font-medium transition-colors flex items-center gap-1.5', activeTab === 'collide' ? 'border-b-2 border-orange-400 text-orange-400' : 'text-muted-foreground hover:text-foreground')}>
           <Atom className="h-3 w-3" />
           Collide
         </button>
@@ -161,13 +161,13 @@ export default function IdeasPage() {
           <div className="flex items-center justify-center h-40">
             <div className="text-center">
               <div className="h-8 w-8 border-2 border-primary/30 border-t-primary animate-spin rounded-full mx-auto mb-3" />
-              <p className="text-xs font-mono text-muted-foreground/60">AI is analyzing your knowledge graph...</p>
+              <p className="text-xs text-muted-foreground/60">AI is analyzing your knowledge graph...</p>
             </div>
           </div>
         )}
 
         {error && (
-          <div className="flex items-center gap-2 p-3 bg-red-900/20 border border-red-500/30 rounded mb-4 text-red-400 text-xs font-mono">
+          <div className="flex items-center gap-2 p-3 bg-red-900/20 border border-red-500/30 rounded mb-4 text-red-400 text-xs">
             <AlertCircle className="h-4 w-4 shrink-0" />
             {error}
           </div>
@@ -178,8 +178,8 @@ export default function IdeasPage() {
             {ideas.length === 0 ? (
               <div className="flex flex-col items-center justify-center h-64">
                 <Lightbulb className="h-16 w-16 text-muted-foreground/10 mb-4" />
-                <p className="text-sm font-mono text-muted-foreground/40">No ideas generated yet</p>
-                <p className="text-xs font-mono text-muted-foreground/30 mt-1">Add at least 3 notes to your knowledge base first</p>
+                <p className="text-sm text-muted-foreground/40">Nothing generated yet.</p>
+                <p className="text-xs text-muted-foreground/30 mt-1">You need at least 3 ideas in your base.</p>
                 <Button onClick={handleGenerateIdeas} className="mt-4" size="sm">Generate Ideas</Button>
               </div>
             ) : (
@@ -188,10 +188,10 @@ export default function IdeasPage() {
                   <div key={i} className={cn('border rounded-lg p-4 hover:shadow-lg transition-all', TYPE_COLORS[idea.type ?? ''] || TYPE_COLORS.project)}>
                     <div className="flex items-start justify-between gap-2 mb-2">
                       <div>
-                        <span className={cn('text-[9px] font-mono font-bold uppercase px-1.5 py-0.5 rounded border', TYPE_COLORS[idea.type ?? ''] || TYPE_COLORS.project)}>
+                        <span className={cn('text-[10px] font-medium px-1.5 py-0.5 rounded border', TYPE_COLORS[idea.type ?? ''] || TYPE_COLORS.project)}>
                           {idea.type}
                         </span>
-                        <h3 className="text-sm font-mono font-bold text-foreground mt-1.5">{idea.title}</h3>
+                        <h3 className="text-sm font-semibold text-foreground mt-1.5">{idea.title}</h3>
                       </div>
                     </div>
 
@@ -199,17 +199,17 @@ export default function IdeasPage() {
 
                     {idea.opportunity && (
                       <div className="mb-3 p-2 bg-primary/5 border border-primary/20 rounded">
-                        <p className="text-[9px] font-mono font-bold uppercase text-muted-foreground/50 mb-0.5">Opportunity</p>
+                        <p className="text-[10px] font-medium text-muted-foreground/50 mb-0.5">Opportunity</p>
                         <p className="text-xs text-foreground/80">{idea.opportunity}</p>
                       </div>
                     )}
 
                     <div className="flex items-center justify-between">
                       <div className="flex gap-2">
-                        <span className={cn('text-[10px] font-mono', EFFORT_COLORS[idea.effort as keyof typeof EFFORT_COLORS] || 'text-muted-foreground')}>
+                        <span className={cn('text-[10px]', EFFORT_COLORS[idea.effort as keyof typeof EFFORT_COLORS] || 'text-muted-foreground')}>
                           effort: {idea.effort}
                         </span>
-                        <span className={cn('text-[10px] font-mono', IMPACT_COLORS[idea.impact as keyof typeof IMPACT_COLORS] || 'text-muted-foreground')}>
+                        <span className={cn('text-[10px]', IMPACT_COLORS[idea.impact as keyof typeof IMPACT_COLORS] || 'text-muted-foreground')}>
                           impact: {idea.impact}
                         </span>
                       </div>
@@ -217,10 +217,10 @@ export default function IdeasPage() {
 
                     {idea.derivedFrom?.length > 0 && (
                       <div className="mt-2 pt-2 border-t border-border/30">
-                        <p className="text-[8px] font-mono text-muted-foreground/40 mb-1">Derived from:</p>
+                        <p className="text-[10px] text-muted-foreground/40 mb-1">Derived from:</p>
                         <div className="flex flex-wrap gap-1">
                           {idea.derivedFrom.slice(0, 4).map((title, j) => (
-                            <span key={j} className="text-[8px] font-mono bg-muted/30 px-1 py-0.5 rounded text-muted-foreground/60 truncate max-w-32">
+                            <span key={j} className="text-[10px] bg-muted/30 px-1 py-0.5 rounded text-muted-foreground/60 truncate max-w-32">
                               {title}
                             </span>
                           ))}
@@ -231,7 +231,7 @@ export default function IdeasPage() {
                     <div className="mt-3 pt-2 border-t border-border/20">
                       <button
                         onClick={() => { setSeedIdea(idea.title + ': ' + idea.description); setActiveTab('expand') }}
-                        className="text-[10px] font-mono text-cyan-400 hover:text-cyan-300 transition-colors"
+                        className="text-[10px] text-cyan-400 hover:text-cyan-300 transition-colors"
                       >
                         Build This →
                       </button>
@@ -246,7 +246,7 @@ export default function IdeasPage() {
         {activeTab === 'expand' && (
           <div className="max-w-3xl">
             <div className="mb-6">
-              <h2 className="text-sm font-mono font-bold text-foreground mb-1">Expand a Seed Idea</h2>
+              <h2 className="text-sm font-semibold text-foreground mb-1">Expand a Seed Idea</h2>
               <p className="text-xs text-muted-foreground/60 mb-3">Describe any idea — AI will build a full market analysis, features list, business model, and action plan.</p>
               <div className="flex gap-2">
                 <textarea
@@ -254,27 +254,27 @@ export default function IdeasPage() {
                   onChange={e => setSeedIdea(e.target.value)}
                   onKeyDown={e => { if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) handleExpandIdea() }}
                   placeholder="e.g. AI-powered fitness coaching subscription platform..."
-                  className="flex-1 bg-muted/20 border border-border/50 rounded p-3 text-sm font-mono text-foreground/90 placeholder:text-muted-foreground/30 resize-none focus:outline-none focus:border-cyan-500/50 min-h-[80px]"
+                  className="flex-1 bg-muted/20 border border-border/50 rounded p-3 text-sm text-foreground/90 placeholder:text-muted-foreground/30 resize-none focus:outline-none focus:border-cyan-500/50 min-h-[80px]"
                 />
               </div>
               <div className="flex items-center gap-2 mt-2">
-                <Button onClick={handleExpandIdea} disabled={isExpanding || !seedIdea.trim()} size="sm" className="font-mono text-xs bg-cyan-600 hover:bg-cyan-700 text-white">
+                <Button onClick={handleExpandIdea} disabled={isExpanding || !seedIdea.trim()} size="sm" className="text-xs bg-cyan-600 hover:bg-cyan-700 text-white">
                   <Zap className="h-3.5 w-3.5 mr-1.5" />
                   {isExpanding ? 'Expanding...' : 'Expand Idea'}
                 </Button>
-                <span className="text-[10px] font-mono text-muted-foreground/40">⌘+Enter to expand</span>
+                <span className="text-[10px] text-muted-foreground/40">⌘+Enter to expand</span>
               </div>
             </div>
 
             {isExpanding && (
               <div className="flex items-center gap-3 p-4 bg-cyan-500/5 border border-cyan-500/20 rounded">
                 <div className="h-4 w-4 border-2 border-cyan-500/30 border-t-cyan-500 animate-spin rounded-full shrink-0" />
-                <p className="text-xs font-mono text-cyan-400/80">Building full breakdown from your knowledge context...</p>
+                <p className="text-xs text-cyan-400/80">Building full breakdown from your knowledge context...</p>
               </div>
             )}
 
             {expandError && (
-              <div className="flex items-center gap-2 p-3 bg-red-900/20 border border-red-500/30 rounded text-red-400 text-xs font-mono">
+              <div className="flex items-center gap-2 p-3 bg-red-900/20 border border-red-500/30 rounded text-red-400 text-xs">
                 <AlertCircle className="h-4 w-4 shrink-0" />
                 {expandError}
               </div>
@@ -286,20 +286,20 @@ export default function IdeasPage() {
                 <div className="p-4 bg-cyan-500/5 border border-cyan-500/30 rounded-lg">
                   <div className="flex items-start justify-between gap-3">
                     <div>
-                      <h3 className="text-base font-mono font-bold text-foreground mb-1">{expansion.title}</h3>
+                      <h3 className="text-base font-bold text-foreground mb-1">{expansion.title}</h3>
                       <p className="text-sm text-cyan-300/80 italic">{expansion.oneLiner}</p>
                     </div>
                     {savedNoteId ? (
                       <div className="flex items-center gap-2">
-                        <a href="/knowledge" className="flex items-center gap-1 text-[10px] font-mono text-emerald-400 border border-emerald-500/30 px-2 py-1 rounded hover:bg-emerald-500/10">
+                        <a href="/knowledge" className="flex items-center gap-1 text-[10px] text-emerald-400 border border-emerald-500/30 px-2 py-1 rounded hover:bg-emerald-500/10">
                           <ExternalLink className="h-3 w-3" /> View Note
                         </a>
-                        <a href="/knowledge/graph" className="flex items-center gap-1 text-[10px] font-mono font-bold text-cyan-400 border border-cyan-500/40 px-2 py-1 rounded hover:bg-cyan-500/10">
+                        <a href="/knowledge/graph" className="flex items-center gap-1 text-[10px] font-bold text-cyan-400 border border-cyan-500/40 px-2 py-1 rounded hover:bg-cyan-500/10">
                           Connect in Graph →
                         </a>
                       </div>
                     ) : (
-                      <Button onClick={handleSaveAsNote} size="sm" variant="outline" className="font-mono text-[10px] border-emerald-500/50 text-emerald-400 hover:bg-emerald-500/10">
+                      <Button onClick={handleSaveAsNote} size="sm" variant="outline" className="text-[10px] border-emerald-500/50 text-emerald-400 hover:bg-emerald-500/10">
                         <Save className="h-3 w-3 mr-1" /> Save as Note
                       </Button>
                     )}
@@ -308,14 +308,14 @@ export default function IdeasPage() {
 
                 {/* Market */}
                 <div className="p-3 bg-background/50 border border-border/50 rounded">
-                  <p className="text-[9px] font-mono font-bold uppercase text-muted-foreground/40 mb-1">Market Opportunity</p>
+                  <p className="text-[10px] font-medium text-muted-foreground/40 mb-1">Market Opportunity</p>
                   <p className="text-xs text-foreground/80">{expansion.market}</p>
                 </div>
 
                 {/* Features */}
                 <div className="border border-border/50 rounded overflow-hidden">
                   <button onClick={() => toggleSection('features')} className="w-full flex items-center justify-between p-3 text-left hover:bg-muted/20">
-                    <span className="text-[9px] font-mono font-bold uppercase text-muted-foreground/40">Core Features ({expansion.features.length})</span>
+                    <span className="text-[10px] font-medium text-muted-foreground/40">Core Features ({expansion.features.length})</span>
                     {expandedSections.features ? <ChevronUp className="h-3 w-3 text-muted-foreground/40" /> : <ChevronDown className="h-3 w-3 text-muted-foreground/40" />}
                   </button>
                   {expandedSections.features && (
@@ -332,11 +332,11 @@ export default function IdeasPage() {
                 {/* Business Model + Competitors */}
                 <div className="grid grid-cols-2 gap-3">
                   <div className="p-3 bg-background/50 border border-border/50 rounded">
-                    <p className="text-[9px] font-mono font-bold uppercase text-muted-foreground/40 mb-1">Business Model</p>
+                    <p className="text-[10px] font-medium text-muted-foreground/40 mb-1">Business Model</p>
                     <p className="text-xs text-foreground/80">{expansion.businessModel}</p>
                   </div>
                   <div className="p-3 bg-background/50 border border-border/50 rounded">
-                    <p className="text-[9px] font-mono font-bold uppercase text-muted-foreground/40 mb-1">Competitors / Analogs</p>
+                    <p className="text-[10px] font-medium text-muted-foreground/40 mb-1">Competitors / Analogs</p>
                     <ul className="space-y-0.5">
                       {expansion.competitors.map((c, i) => <li key={i} className="text-xs text-foreground/80">• {c}</li>)}
                     </ul>
@@ -345,21 +345,21 @@ export default function IdeasPage() {
 
                 {/* Unique Advantage */}
                 <div className="p-3 bg-purple-500/5 border border-purple-500/30 rounded">
-                  <p className="text-[9px] font-mono font-bold uppercase text-purple-400/60 mb-1">Your Unique Advantage</p>
+                  <p className="text-[10px] font-medium text-purple-400/60 mb-1">Your Unique Advantage</p>
                   <p className="text-xs text-foreground/80">{expansion.uniqueAdvantage}</p>
                 </div>
 
                 {/* Next Steps */}
                 <div className="border border-border/50 rounded overflow-hidden">
                   <button onClick={() => toggleSection('nextSteps')} className="w-full flex items-center justify-between p-3 text-left hover:bg-muted/20">
-                    <span className="text-[9px] font-mono font-bold uppercase text-muted-foreground/40">Next Steps</span>
+                    <span className="text-[10px] font-medium text-muted-foreground/40">Next Steps</span>
                     {expandedSections.nextSteps ? <ChevronUp className="h-3 w-3 text-muted-foreground/40" /> : <ChevronDown className="h-3 w-3 text-muted-foreground/40" />}
                   </button>
                   {expandedSections.nextSteps && (
                     <ol className="px-3 pb-3 space-y-1">
                       {expansion.nextSteps.map((s, i) => (
                         <li key={i} className="flex items-start gap-2 text-xs text-foreground/80">
-                          <span className="text-emerald-400 shrink-0 font-mono">{i + 1}.</span>{s}
+                          <span className="text-emerald-400 shrink-0">{i + 1}.</span>{s}
                         </li>
                       ))}
                     </ol>
@@ -368,7 +368,7 @@ export default function IdeasPage() {
 
                 {/* Risks */}
                 <div className="p-3 bg-red-500/5 border border-red-500/20 rounded">
-                  <p className="text-[9px] font-mono font-bold uppercase text-red-400/60 mb-1">Key Risks</p>
+                  <p className="text-[10px] font-medium text-red-400/60 mb-1">Key Risks</p>
                   <ul className="space-y-0.5">
                     {expansion.risks.map((r, i) => <li key={i} className="text-xs text-foreground/80">⚠ {r}</li>)}
                   </ul>
@@ -384,7 +384,7 @@ export default function IdeasPage() {
                       tags: ['project'],
                       source: 'AI',
                     }) as any)}
-                    className="text-[10px] font-mono border border-emerald-500/40 text-emerald-400 hover:bg-emerald-500/10 px-3 py-1.5 transition-colors"
+                    className="text-[10px] border border-emerald-500/40 text-emerald-400 hover:bg-emerald-500/10 px-3 py-1.5 transition-colors"
                   >
                     Create Project →
                   </button>
@@ -399,7 +399,7 @@ export default function IdeasPage() {
             {gaps.length === 0 ? (
               <div className="flex flex-col items-center justify-center h-64">
                 <Search className="h-16 w-16 text-muted-foreground/10 mb-4" />
-                <p className="text-sm font-mono text-muted-foreground/40">No gaps detected yet</p>
+                <p className="text-sm text-muted-foreground/40">No gaps found yet.</p>
                 <Button onClick={handleDetectGaps} className="mt-4" size="sm">Detect Knowledge Gaps</Button>
               </div>
             ) : (
@@ -408,27 +408,27 @@ export default function IdeasPage() {
                   <div key={i} className="border border-border/50 rounded-lg p-4 bg-background/50 hover:border-border/80 transition-colors">
                     <div className="flex items-start justify-between gap-3 mb-2">
                       <div className="flex items-center gap-2">
-                        <span className={cn('text-[9px] font-mono font-bold uppercase px-1.5 py-0.5 rounded border',
+                        <span className={cn('text-[10px] font-medium px-1.5 py-0.5 rounded border',
                           PRIORITY_COLORS[gap.priority as keyof typeof PRIORITY_COLORS] || 'text-blue-400 border-blue-500 bg-blue-500/10')}>
                           {(gap as { priority?: string }).priority || 'medium'}
                         </span>
-                        <span className="text-[9px] font-mono border border-border/50 bg-muted/20 px-1.5 py-0.5 rounded text-muted-foreground/60">
+                        <span className="text-[10px] border border-border/50 bg-muted/20 px-1.5 py-0.5 rounded text-muted-foreground/60">
                           {(gap as { type?: string }).type || 'concept'}
                         </span>
                       </div>
                     </div>
-                    <h3 className="text-sm font-mono font-bold text-foreground mb-1">{gap.topic}</h3>
+                    <h3 className="text-sm font-semibold text-foreground mb-1">{gap.topic}</h3>
                     <p className="text-xs text-muted-foreground/70 mb-2">{gap.reason}</p>
                     {gap.suggestedLearning && (
                       <div className="flex items-start gap-1.5 p-2 bg-blue-500/5 border border-blue-500/20 rounded">
                         <ExternalLink className="h-3 w-3 text-blue-400 shrink-0 mt-0.5" />
-                        <p className="text-xs text-blue-400/80 font-mono">{gap.suggestedLearning}</p>
+                        <p className="text-xs text-blue-400/80">{gap.suggestedLearning}</p>
                       </div>
                     )}
                     {gap.relatedNotes?.length > 0 && (
                       <div className="flex flex-wrap gap-1 mt-2">
                         {gap.relatedNotes.slice(0, 5).map((note, j) => (
-                          <span key={j} className="text-[8px] font-mono bg-muted/30 px-1 py-0.5 rounded text-muted-foreground/60">
+                          <span key={j} className="text-[10px] bg-muted/30 px-1 py-0.5 rounded text-muted-foreground/60">
                             {note}
                           </span>
                         ))}
@@ -443,7 +443,7 @@ export default function IdeasPage() {
         {activeTab === 'collide' && (
           <div className="max-w-3xl">
             {collideError && (
-              <div className="flex items-center gap-2 p-3 bg-red-900/20 border border-red-500/30 rounded mb-4 text-red-400 text-xs font-mono">
+              <div className="flex items-center gap-2 p-3 bg-red-900/20 border border-red-500/30 rounded mb-4 text-red-400 text-xs">
                 <AlertCircle className="h-4 w-4 shrink-0" />
                 {collideError}
               </div>
@@ -452,8 +452,8 @@ export default function IdeasPage() {
             {!collision && !colliding && (
               <div className="flex flex-col items-center justify-center h-64">
                 <Atom className="h-16 w-16 text-muted-foreground/10 mb-4" />
-                <p className="text-sm font-mono text-muted-foreground/40 mb-1">Idea Collision Engine</p>
-                <p className="text-xs font-mono text-muted-foreground/30 mb-4 text-center max-w-xs">
+                <p className="text-sm text-muted-foreground/40 mb-1">Idea Collision Engine</p>
+                <p className="text-xs text-muted-foreground/30 mb-4 text-center max-w-xs">
                   {notes.length < 6
                     ? `Add at least 6 ideas to enable collision detection (${notes.length}/6)`
                     : 'Collides two unrelated knowledge clusters to generate a breakthrough concept'}
@@ -462,7 +462,7 @@ export default function IdeasPage() {
                   onClick={handleCollide}
                   disabled={colliding || notes.length < 6}
                   size="sm"
-                  className="font-mono text-xs bg-orange-600 hover:bg-orange-700 text-white"
+                  className="text-xs bg-orange-600 hover:bg-orange-700 text-white"
                 >
                   <Atom className="h-3.5 w-3.5 mr-1.5" />
                   Collide Ideas
@@ -473,7 +473,7 @@ export default function IdeasPage() {
             {colliding && (
               <div className="flex items-center gap-3 p-4 bg-orange-500/5 border border-orange-500/20 rounded">
                 <div className="h-4 w-4 border-2 border-orange-500/30 border-t-orange-500 animate-spin rounded-full shrink-0" />
-                <p className="text-xs font-mono text-orange-400/80">Scanning knowledge clusters for hidden connections...</p>
+                <p className="text-xs text-orange-400/80">Scanning knowledge clusters for hidden connections...</p>
               </div>
             )}
 
@@ -481,11 +481,11 @@ export default function IdeasPage() {
               <div className="space-y-4">
                 {/* Cluster badges */}
                 <div className="flex items-center gap-3 flex-wrap">
-                  <span className="text-[9px] font-mono font-bold uppercase px-2 py-1 border border-blue-500/40 bg-blue-500/10 text-blue-400 rounded-sm">
+                  <span className="text-[10px] font-medium px-2 py-1 border border-blue-500/40 bg-blue-500/10 text-blue-400 rounded-lg">
                     {collision.clusterA.theme}
                   </span>
                   <span className="text-base">⚡</span>
-                  <span className="text-[9px] font-mono font-bold uppercase px-2 py-1 border border-purple-500/40 bg-purple-500/10 text-purple-400 rounded-sm">
+                  <span className="text-[10px] font-medium px-2 py-1 border border-purple-500/40 bg-purple-500/10 text-purple-400 rounded-lg">
                     {collision.clusterB.theme}
                   </span>
                 </div>
@@ -495,14 +495,14 @@ export default function IdeasPage() {
                   <div className="flex items-start gap-2 mb-3">
                     <Zap className="h-4 w-4 text-orange-400 shrink-0 mt-0.5" />
                     <div>
-                      <h3 className="text-sm font-mono font-bold text-foreground">{collision.collision.title}</h3>
+                      <h3 className="text-sm font-semibold text-foreground">{collision.collision.title}</h3>
                       <p className="text-xs text-muted-foreground/70 mt-1 leading-relaxed">{collision.collision.concept}</p>
                     </div>
                   </div>
 
                   {collision.collision.applications.length > 0 && (
-                    <div className="mb-3 p-2.5 bg-background/40 border border-border/40 rounded-sm">
-                      <p className="text-[9px] font-mono font-bold uppercase text-muted-foreground/40 mb-1.5">Applications</p>
+                    <div className="mb-3 p-2.5 bg-background/40 border border-border/40 rounded-lg">
+                      <p className="text-[10px] font-medium text-muted-foreground/40 mb-1.5">Applications</p>
                       <ul className="space-y-1">
                         {collision.collision.applications.map((app, i) => (
                           <li key={i} className="flex items-start gap-1.5 text-xs text-foreground/80">
@@ -513,13 +513,13 @@ export default function IdeasPage() {
                     </div>
                   )}
 
-                  <div className="mb-3 p-2.5 bg-background/40 border border-border/40 rounded-sm">
-                    <p className="text-[9px] font-mono font-bold uppercase text-muted-foreground/40 mb-1">Tech Approach</p>
+                  <div className="mb-3 p-2.5 bg-background/40 border border-border/40 rounded-lg">
+                    <p className="text-[10px] font-medium text-muted-foreground/40 mb-1">Tech Approach</p>
                     <p className="text-xs text-foreground/80">{collision.collision.techApproach}</p>
                   </div>
 
-                  <div className="p-2.5 bg-emerald-500/5 border border-emerald-500/20 rounded-sm">
-                    <p className="text-[9px] font-mono font-bold uppercase text-emerald-400/60 mb-1">First Step</p>
+                  <div className="p-2.5 bg-emerald-500/5 border border-emerald-500/20 rounded-lg">
+                    <p className="text-[10px] font-medium text-emerald-400/60 mb-1">First Step</p>
                     <p className="text-xs text-foreground/80">{collision.collision.firstStep}</p>
                   </div>
                 </div>
@@ -527,11 +527,11 @@ export default function IdeasPage() {
                 {/* Source notes */}
                 <div className="grid grid-cols-2 gap-3">
                   {[collision.clusterA, collision.clusterB].map((cluster, ci) => (
-                    <div key={ci} className="p-2.5 border border-border/40 bg-background/30 rounded-sm">
-                      <p className={cn('text-[9px] font-mono font-bold uppercase mb-1.5', ci === 0 ? 'text-blue-400/60' : 'text-purple-400/60')}>{cluster.theme}</p>
+                    <div key={ci} className="p-2.5 border border-border/40 bg-background/30 rounded-lg">
+                      <p className={cn('text-[10px] font-medium mb-1.5', ci === 0 ? 'text-blue-400/60' : 'text-purple-400/60')}>{cluster.theme}</p>
                       <div className="flex flex-wrap gap-1">
                         {cluster.notes.slice(0, 4).map((n, i) => (
-                          <span key={i} className="text-[8px] font-mono bg-muted/30 px-1 py-0.5 rounded text-muted-foreground/60">{n}</span>
+                          <span key={i} className="text-[10px] bg-muted/30 px-1 py-0.5 rounded text-muted-foreground/60">{n}</span>
                         ))}
                       </div>
                     </div>

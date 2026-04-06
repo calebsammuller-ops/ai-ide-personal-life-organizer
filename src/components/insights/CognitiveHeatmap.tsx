@@ -17,25 +17,25 @@ export function CognitiveHeatmap({ notes }: Props) {
   const neglected = all.slice(-2)
 
   return (
-    <div className="rounded-sm border border-border/40 bg-card">
+    <div className="rounded-lg border border-border/40 bg-card">
       <div className="flex items-center gap-2 px-3 py-2 border-b border-border/30">
         <div className="w-0.5 h-3 bg-primary" />
-        <p className="text-[9px] font-mono font-bold uppercase tracking-widest text-primary/70">Cognitive Heatmap</p>
+        <p className="text-[10px] font-semibold text-primary/70">Cognitive Heatmap</p>
       </div>
       <div className="p-3 space-y-1.5">
         {sorted.map(([tag, count]) => (
           <div key={tag} className="flex items-center gap-2">
-            <span className="text-[8px] font-mono text-muted-foreground/60 w-20 truncate">{tag}</span>
-            <div className="flex-1 h-1 bg-muted/30 overflow-hidden rounded-sm">
+            <span className="text-[10px] text-muted-foreground/60 w-20 truncate">{tag}</span>
+            <div className="flex-1 h-1 bg-muted/30 overflow-hidden rounded-lg">
               <div
                 className="h-full bg-primary/50 transition-all"
                 style={{ width: `${(count / max) * 100}%` }}
               />
             </div>
-            <span className="text-[8px] font-mono text-muted-foreground/30 w-4 text-right">{count}</span>
+            <span className="text-[10px] text-muted-foreground/30 w-4 text-right">{count}</span>
           </div>
         ))}
-        <p className="text-[8px] font-mono text-muted-foreground/30 pt-1 border-t border-border/20">
+        <p className="text-[10px] text-muted-foreground/30 pt-1 border-t border-border/20">
           Dominant: {dominant.join(', ')} · Neglected: {neglected.join(', ')}
         </p>
       </div>

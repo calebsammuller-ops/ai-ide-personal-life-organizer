@@ -17,18 +17,18 @@ export function FutureSelfCard() {
   const domain = trajectoryData.risingTags?.[0] || trajectoryData.narrative?.headline?.split(' ').slice(0, 4).join(' ')
 
   return (
-    <Card className="rounded-sm border-border/40">
+    <Card className="rounded-lg border-border/40">
       <CardContent className="pt-3 pb-2">
-        <p className="text-[8px] font-mono text-muted-foreground/30 uppercase tracking-widest mb-1.5">Future You (if you continue)</p>
+        <p className="text-[10px] text-muted-foreground/30 font-medium mb-1.5">Future You (if you continue)</p>
         <div className="space-y-1">
-          <p className="text-[9px] font-mono text-foreground/70">
-            → Becoming: <span className="text-primary font-bold uppercase">{identityTitle}</span>
+          <p className="text-[10px] text-foreground/70">
+            → Becoming: <span className="text-primary font-medium">{identityTitle}</span>
           </p>
           {domain && (
-            <p className="text-[9px] font-mono text-foreground/50">→ Domain: {domain}</p>
+            <p className="text-[10px] text-foreground/50">→ Domain: {domain}</p>
           )}
           {(futureProjection || headline) && (
-            <p className="text-[9px] font-mono text-muted-foreground/50 italic leading-relaxed">
+            <p className="text-[10px] text-muted-foreground/50 italic leading-relaxed">
               {(futureProjection || headline || '').slice(0, 80)}
             </p>
           )}
