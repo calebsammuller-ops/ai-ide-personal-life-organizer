@@ -3,10 +3,11 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { motion } from 'framer-motion'
-import { Brain, Network, MessageCircle, Sparkles } from 'lucide-react'
+import { Brain, Network, MessageCircle, Sparkles, Home } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 const primaryNav = [
+  { href: '/dashboard',        icon: Home,          label: 'Home' },
   { href: '/knowledge',        icon: Brain,         label: 'Ideas' },
   { href: '/knowledge/graph',  icon: Network,       label: 'Graph' },
   { href: '/insights',         icon: Sparkles,      label: 'Insights' },
@@ -40,14 +41,14 @@ export function BottomNav() {
                     transition={{ type: 'spring', stiffness: 400, damping: 30 }}
                   />
                 )}
-                <div className={cn('relative z-10 p-1 transition-all duration-200', isActive && 'bg-primary/15 rounded')}>
+                <div className={cn('relative z-10 p-1 transition-all duration-200', isActive && 'bg-primary/15 rounded-lg')}>
                   <item.icon className={cn(
                     'h-4 w-4 transition-all duration-200',
                     isActive && 'drop-shadow-[0_0_6px_hsl(var(--primary)/0.6)]'
                   )} />
                 </div>
                 <span className={cn(
-                  'relative z-10 text-[9px] font-mono font-semibold uppercase tracking-wider',
+                  'relative z-10 text-[10px] font-medium',
                   isActive ? 'text-primary' : 'text-muted-foreground/70'
                 )}>
                   {item.label}

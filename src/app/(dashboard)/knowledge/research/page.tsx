@@ -136,11 +136,11 @@ export default function ResearchPage() {
       <div className="flex items-center justify-between px-4 py-2.5 border-b border-border/50 flex-shrink-0">
         <div className="flex items-center gap-3">
           <div className="w-0.5 h-4 bg-primary" />
-          <span className="text-xs font-mono font-bold uppercase tracking-widest">RESEARCH</span>
-          <span className="text-[10px] font-mono text-muted-foreground/40">{notes.length} notes in brain</span>
+          <span className="text-xs font-semibold">RESEARCH</span>
+          <span className="text-[10px] text-muted-foreground/40">{notes.length} notes in brain</span>
         </div>
         {error && (
-          <div className="flex items-center gap-1.5 text-red-400 text-[10px] font-mono">
+          <div className="flex items-center gap-1.5 text-red-400 text-[10px]">
             <AlertCircle className="h-3 w-3" />{error}
           </div>
         )}
@@ -152,15 +152,15 @@ export default function ResearchPage() {
         {/* LEFT — Source Library */}
         <div className="w-56 flex-shrink-0 border-r border-border/50 flex flex-col bg-background/50">
           <div className="flex items-center justify-between px-3 py-2 border-b border-border/30">
-            <p className="text-[9px] font-mono font-bold uppercase tracking-widest text-muted-foreground/50">SOURCE LIBRARY</p>
-            <span className="text-[9px] font-mono text-muted-foreground/30">{sourcesLibrary.length}</span>
+            <p className="text-[9px] font-semibold text-muted-foreground/50">SOURCE LIBRARY</p>
+            <span className="text-[9px] text-muted-foreground/30">{sourcesLibrary.length}</span>
           </div>
           <div className="flex-1 overflow-y-auto">
             {sourcesLibrary.length === 0 ? (
               <div className="flex flex-col items-center justify-center h-full text-center px-3 pb-8">
                 <Link2 className="h-6 w-6 text-muted-foreground/10 mb-2" />
-                <p className="text-[9px] font-mono text-muted-foreground/30">No sources yet.</p>
-                <p className="text-[8px] font-mono text-muted-foreground/20 mt-1">Extract a URL to add your first source.</p>
+                <p className="text-[9px] text-muted-foreground/30">No sources yet.</p>
+                <p className="text-[8px] text-muted-foreground/20 mt-1">Extract a URL to add your first source.</p>
               </div>
             ) : (
               sourcesLibrary.map(note => (
@@ -172,13 +172,13 @@ export default function ResearchPage() {
                     selectedSource?.id === note.id && 'bg-primary/10 border-l-2 border-l-primary'
                   )}
                 >
-                  <p className="text-[10px] font-mono font-bold text-foreground/90 leading-tight line-clamp-2">{note.title}</p>
+                  <p className="text-[10px] font-semibold text-foreground/90 leading-tight line-clamp-2">{note.title}</p>
                   {note.sourceUrl && (
-                    <p className="text-[8px] font-mono text-muted-foreground/30 mt-0.5 truncate">
+                    <p className="text-[8px] text-muted-foreground/30 mt-0.5 truncate">
                       {(() => { try { return new URL(note.sourceUrl).hostname } catch { return note.sourceUrl } })()}
                     </p>
                   )}
-                  <p className="text-[8px] font-mono text-muted-foreground/25 mt-0.5">
+                  <p className="text-[8px] text-muted-foreground/25 mt-0.5">
                     {new Date(note.createdAt).toLocaleDateString()}
                   </p>
                 </button>
@@ -201,7 +201,7 @@ export default function ResearchPage() {
                 key={tool.id}
                 onClick={() => setActiveTool(tool.id)}
                 className={cn(
-                  'flex items-center gap-1.5 px-2.5 py-1 rounded-sm text-[10px] font-mono font-bold uppercase tracking-wide transition-colors',
+                  'flex items-center gap-1.5 px-2.5 py-1 rounded-sm text-[10px] font-bold uppercase tracking-wide transition-colors',
                   activeTool === tool.id
                     ? 'bg-primary/15 text-primary border border-primary/30'
                     : 'text-muted-foreground/50 hover:text-muted-foreground border border-transparent'
@@ -222,16 +222,16 @@ export default function ResearchPage() {
             {/* URL Extractor */}
             {activeTool === 'url' && (
               <div>
-                <p className="text-[10px] font-mono text-muted-foreground/40 mb-3">AI reads articles, papers, and websites — extracts atomic Zettelkasten notes</p>
+                <p className="text-[10px] text-muted-foreground/40 mb-3">AI reads articles, papers, and websites — extracts atomic Zettelkasten notes</p>
                 <div className="flex gap-2 mb-4">
                   <input
-                    className="flex-1 bg-muted/30 border border-border/50 rounded px-3 py-2 text-sm font-mono text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:ring-1 focus:ring-primary"
+                    className="flex-1 bg-muted/30 border border-border/50 rounded px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:ring-1 focus:ring-primary"
                     placeholder="https://..."
                     value={urlInput}
                     onChange={e => setUrlInput(e.target.value)}
                     onKeyDown={e => e.key === 'Enter' && handleExtractUrl()}
                   />
-                  <Button onClick={handleExtractUrl} disabled={!urlInput.trim() || isGenerating} className="font-mono text-xs shrink-0">
+                  <Button onClick={handleExtractUrl} disabled={!urlInput.trim() || isGenerating} className="text-xs shrink-0">
                     <Search className="h-3.5 w-3.5 mr-1.5" />{isGenerating ? 'Extracting...' : 'Extract'}
                   </Button>
                 </div>
@@ -239,8 +239,8 @@ export default function ResearchPage() {
                   <div className="flex items-center gap-3 p-4 bg-primary/5 border border-primary/20 rounded mb-4">
                     <div className="h-5 w-5 border-2 border-primary/30 border-t-primary animate-spin rounded-full shrink-0" />
                     <div>
-                      <p className="text-xs font-mono text-foreground">AI is analyzing the content...</p>
-                      <p className="text-[10px] font-mono text-muted-foreground/50">This may take 10–20 seconds</p>
+                      <p className="text-xs text-foreground">AI is analyzing the content...</p>
+                      <p className="text-[10px] text-muted-foreground/50">This may take 10–20 seconds</p>
                     </div>
                   </div>
                 )}
@@ -248,29 +248,29 @@ export default function ResearchPage() {
                   <div className="border border-emerald-500/30 bg-emerald-500/5 rounded-lg p-4">
                     <div className="flex items-center gap-2 mb-3">
                       <Check className="h-4 w-4 text-emerald-400" />
-                      <span className="text-sm font-mono font-bold text-emerald-400">{extractResult.notesCreated} notes extracted</span>
+                      <span className="text-sm font-bold text-emerald-400">{extractResult.notesCreated} notes extracted</span>
                     </div>
-                    <h3 className="text-sm font-mono font-bold text-foreground mb-1">{extractResult.sourceTitle}</h3>
+                    <h3 className="text-sm font-bold text-foreground mb-1">{extractResult.sourceTitle}</h3>
                     <p className="text-xs text-muted-foreground/70 mb-3">{extractResult.summary}</p>
                     {extractResult.keyTakeaway && (
                       <div className="p-2 bg-primary/10 border border-primary/30 rounded mb-3">
-                        <p className="text-[9px] font-mono font-bold uppercase text-primary/60 mb-0.5">Key Takeaway</p>
-                        <p className="text-xs text-foreground font-mono">{extractResult.keyTakeaway}</p>
+                        <p className="text-[9px] font-bold uppercase text-primary/60 mb-0.5">Key Takeaway</p>
+                        <p className="text-xs text-foreground">{extractResult.keyTakeaway}</p>
                       </div>
                     )}
                     <div className="space-y-2">
                       {extractResult.notes?.map((note, i) => (
                         <div key={i} className="border border-border/30 rounded p-3 bg-background/50">
                           <div className="flex items-center gap-2 mb-1">
-                            <span className={cn('text-[9px] font-mono border rounded px-1 py-0.5', TYPE_BADGE[note.type] || 'bg-muted/30 text-muted-foreground border-border')}>{note.type}</span>
-                            <span className="text-[9px] font-mono text-muted-foreground/40">conf: {Math.round((note.confidence || 0.7) * 100)}%</span>
+                            <span className={cn('text-[9px] border rounded px-1 py-0.5', TYPE_BADGE[note.type] || 'bg-muted/30 text-muted-foreground border-border')}>{note.type}</span>
+                            <span className="text-[9px] text-muted-foreground/40">conf: {Math.round((note.confidence || 0.7) * 100)}%</span>
                           </div>
-                          <p className="text-xs font-mono font-bold text-foreground">{note.title}</p>
+                          <p className="text-xs font-bold text-foreground">{note.title}</p>
                           <p className="text-xs text-muted-foreground/70 mt-0.5">{note.content?.slice(0, 160)}</p>
                         </div>
                       ))}
                     </div>
-                    <button onClick={() => { setExtractResult(null); setUrlInput('') }} className="mt-3 text-[10px] font-mono text-muted-foreground/40 hover:text-muted-foreground flex items-center gap-1">
+                    <button onClick={() => { setExtractResult(null); setUrlInput('') }} className="mt-3 text-[10px] text-muted-foreground/40 hover:text-muted-foreground flex items-center gap-1">
                       <X className="h-3 w-3" /> Clear
                     </button>
                   </div>
@@ -281,41 +281,41 @@ export default function ResearchPage() {
             {/* Skill Tree */}
             {activeTool === 'skillTree' && (
               <div>
-                <p className="text-[10px] font-mono text-muted-foreground/40 mb-3">Convert any skill tree or learning roadmap into an interconnected knowledge graph</p>
+                <p className="text-[10px] text-muted-foreground/40 mb-3">Convert any skill tree or learning roadmap into an interconnected knowledge graph</p>
                 <div className="flex gap-2 mb-3">
-                  <button onClick={() => setSkillFormat('text')} className={cn('text-xs font-mono px-3 py-1.5 rounded border transition-colors', skillFormat === 'text' ? 'border-primary bg-primary/10 text-primary' : 'border-border/50 text-muted-foreground')}>Indented Text</button>
-                  <button onClick={() => setSkillFormat('json')} className={cn('text-xs font-mono px-3 py-1.5 rounded border transition-colors', skillFormat === 'json' ? 'border-primary bg-primary/10 text-primary' : 'border-border/50 text-muted-foreground')}>JSON</button>
-                  <button onClick={() => setSkillTreeInput(EXAMPLE_SKILL_TREE)} className="text-xs font-mono px-3 py-1.5 rounded border border-border/30 text-muted-foreground hover:text-foreground ml-auto">Use Example</button>
+                  <button onClick={() => setSkillFormat('text')} className={cn('text-xs px-3 py-1.5 rounded border transition-colors', skillFormat === 'text' ? 'border-primary bg-primary/10 text-primary' : 'border-border/50 text-muted-foreground')}>Indented Text</button>
+                  <button onClick={() => setSkillFormat('json')} className={cn('text-xs px-3 py-1.5 rounded border transition-colors', skillFormat === 'json' ? 'border-primary bg-primary/10 text-primary' : 'border-border/50 text-muted-foreground')}>JSON</button>
+                  <button onClick={() => setSkillTreeInput(EXAMPLE_SKILL_TREE)} className="text-xs px-3 py-1.5 rounded border border-border/30 text-muted-foreground hover:text-foreground ml-auto">Use Example</button>
                 </div>
                 <textarea
-                  className="w-full h-48 mb-4 bg-muted/20 border border-border/50 rounded px-3 py-2 text-xs font-mono text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:ring-1 focus:ring-primary resize-none"
+                  className="w-full h-48 mb-4 bg-muted/20 border border-border/50 rounded px-3 py-2 text-xs text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:ring-1 focus:ring-primary resize-none"
                   placeholder="Programming\n- Python\n  - Data Science"
                   value={skillTreeInput}
                   onChange={e => setSkillTreeInput(e.target.value)}
                 />
-                <Button onClick={handleImportSkillTree} disabled={!skillTreeInput.trim() || isGenerating} className="font-mono text-xs">
+                <Button onClick={handleImportSkillTree} disabled={!skillTreeInput.trim() || isGenerating} className="text-xs">
                   <TreePine className="h-3.5 w-3.5 mr-1.5" />{isGenerating ? 'Importing...' : 'Import to Knowledge Graph'}
                 </Button>
                 {importResult && !isGenerating && (
                   <div className="mt-4 p-4 border border-emerald-500/30 bg-emerald-500/5 rounded-lg">
                     <div className="flex items-center gap-2 mb-2">
                       <Check className="h-4 w-4 text-emerald-400" />
-                      <span className="text-sm font-mono font-bold text-emerald-400">Import complete</span>
+                      <span className="text-sm font-bold text-emerald-400">Import complete</span>
                     </div>
                     <div className="grid grid-cols-2 gap-3">
                       <div className="text-center p-2 bg-background/50 rounded">
-                        <p className="text-2xl font-mono font-bold text-foreground">{importResult.notesCreated}</p>
-                        <p className="text-[10px] font-mono text-muted-foreground/60">Notes Created</p>
+                        <p className="text-2xl font-bold text-foreground">{importResult.notesCreated}</p>
+                        <p className="text-[10px] text-muted-foreground/60">Notes Created</p>
                       </div>
                       <div className="text-center p-2 bg-background/50 rounded">
-                        <p className="text-2xl font-mono font-bold text-foreground">{importResult.linksCreated}</p>
-                        <p className="text-[10px] font-mono text-muted-foreground/60">Links Created</p>
+                        <p className="text-2xl font-bold text-foreground">{importResult.linksCreated}</p>
+                        <p className="text-[10px] text-muted-foreground/60">Links Created</p>
                       </div>
                     </div>
-                    {importResult.summary && <p className="text-xs text-muted-foreground/70 font-mono mt-2">{importResult.summary}</p>}
+                    {importResult.summary && <p className="text-xs text-muted-foreground/70 mt-2">{importResult.summary}</p>}
                     <div className="flex gap-3 mt-3">
-                      <a href="/knowledge" className="text-[10px] font-mono text-primary hover:underline">View notes →</a>
-                      <a href="/knowledge/graph" className="text-[10px] font-mono text-primary hover:underline">View graph →</a>
+                      <a href="/knowledge" className="text-[10px] text-primary hover:underline">View notes →</a>
+                      <a href="/knowledge/graph" className="text-[10px] text-primary hover:underline">View graph →</a>
                     </div>
                   </div>
                 )}
@@ -326,36 +326,36 @@ export default function ResearchPage() {
             {activeTool === 'missions' && (
               <div>
                 <div className="border border-purple-500/30 bg-purple-500/5 rounded-lg p-4 mb-4">
-                  <p className="text-[9px] font-mono font-bold uppercase tracking-widest text-purple-400 mb-3">LAUNCH MISSION</p>
+                  <p className="text-[9px] font-semibold uppercase tracking-wide text-purple-400 mb-3">LAUNCH MISSION</p>
                   <input
-                    className="w-full mb-2 bg-background/50 border border-border/50 rounded px-3 py-2 text-sm font-mono text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:ring-1 focus:ring-purple-400"
+                    className="w-full mb-2 bg-background/50 border border-border/50 rounded px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:ring-1 focus:ring-purple-400"
                     placeholder="Research topic (e.g. 'RLHF')"
                     value={missionTopic}
                     onChange={e => setMissionTopic(e.target.value)}
                     onKeyDown={e => e.key === 'Enter' && !isGenerating && handleLaunchMission()}
                   />
                   <input
-                    className="w-full mb-3 bg-background/50 border border-border/50 rounded px-3 py-2 text-xs font-mono text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:ring-1 focus:ring-purple-400"
+                    className="w-full mb-3 bg-background/50 border border-border/50 rounded px-3 py-2 text-xs text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:ring-1 focus:ring-purple-400"
                     placeholder="Optional focus area..."
                     value={missionDesc}
                     onChange={e => setMissionDesc(e.target.value)}
                   />
-                  <Button onClick={handleLaunchMission} disabled={!missionTopic.trim() || isGenerating} className="font-mono text-xs bg-purple-600 hover:bg-purple-700 text-white">
+                  <Button onClick={handleLaunchMission} disabled={!missionTopic.trim() || isGenerating} className="text-xs bg-purple-600 hover:bg-purple-700 text-white">
                     {isGenerating ? <><Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" />Researching...</> : <><Rocket className="h-3.5 w-3.5 mr-1.5" />Launch Mission</>}
                   </Button>
-                  {isGenerating && <p className="text-[10px] font-mono text-muted-foreground/50 mt-2">Finding sources and extracting knowledge (30–60s)...</p>}
+                  {isGenerating && <p className="text-[10px] text-muted-foreground/50 mt-2">Finding sources and extracting knowledge (30–60s)...</p>}
                 </div>
                 {missions.length > 0 && (
                   <div className="space-y-2">
-                    <p className="text-[9px] font-mono font-bold uppercase tracking-widest text-muted-foreground/40 mb-2">HISTORY ({missions.length})</p>
+                    <p className="text-[9px] font-semibold uppercase tracking-wide text-muted-foreground/40 mb-2">HISTORY ({missions.length})</p>
                     {missions.map(m => (
                       <div key={m.id} className={cn('border rounded-lg p-3', MISSION_STATUS_COLOR[m.status] || 'border-border/30 bg-background/30')}>
                         <div className="flex items-start justify-between gap-2">
                           <div className="flex items-center gap-2 min-w-0">
                             {MISSION_STATUS_ICON[m.status]}
                             <div className="min-w-0">
-                              <p className="text-xs font-mono font-bold text-foreground truncate">{m.topic}</p>
-                              <p className="text-[9px] font-mono text-muted-foreground/40">{m.sourcesProcessed} sources · {m.notesGenerated} notes</p>
+                              <p className="text-xs font-bold text-foreground truncate">{m.topic}</p>
+                              <p className="text-[9px] text-muted-foreground/40">{m.sourcesProcessed} sources · {m.notesGenerated} notes</p>
                             </div>
                           </div>
                           <div className="flex items-center gap-1.5 shrink-0">
@@ -382,31 +382,31 @@ export default function ResearchPage() {
         <div className="w-64 flex-shrink-0 border-l border-border/50 flex flex-col bg-background/30">
           <div className="flex items-center gap-2 px-3 py-2 border-b border-border/30">
             <Network className="h-3 w-3 text-primary/60" />
-            <p className="text-[9px] font-mono font-bold uppercase tracking-widest text-muted-foreground/50">CONNECTIONS</p>
+            <p className="text-[9px] font-semibold uppercase tracking-wide text-muted-foreground/50">CONNECTIONS</p>
           </div>
 
           {!selectedSource && lastExtractedNotes.length === 0 ? (
             <div className="flex flex-col items-center justify-center flex-1 text-center px-4 pb-8">
               <Brain className="h-8 w-8 text-muted-foreground/10 mb-3" />
-              <p className="text-[9px] font-mono text-muted-foreground/30 leading-relaxed">Select a source or extract a URL to see AI-generated knowledge connections.</p>
+              <p className="text-[9px] text-muted-foreground/30 leading-relaxed">Select a source or extract a URL to see AI-generated knowledge connections.</p>
             </div>
           ) : (
             <div className="flex-1 overflow-y-auto p-3 space-y-3">
               {selectedSource && (
                 <div className="border border-border/40 rounded-sm p-2.5">
-                  <p className="text-[8px] font-mono font-bold uppercase tracking-widest text-muted-foreground/40 mb-1">SELECTED SOURCE</p>
-                  <p className="text-xs font-mono font-bold text-foreground/90 line-clamp-2">{selectedSource.title}</p>
+                  <p className="text-[8px] font-semibold uppercase tracking-wide text-muted-foreground/40 mb-1">SELECTED SOURCE</p>
+                  <p className="text-xs font-bold text-foreground/90 line-clamp-2">{selectedSource.title}</p>
                   {selectedSource.content && (
-                    <p className="text-[9px] font-mono text-muted-foreground/50 mt-1 line-clamp-3">{selectedSource.content.slice(0, 120)}</p>
+                    <p className="text-[9px] text-muted-foreground/50 mt-1 line-clamp-3">{selectedSource.content.slice(0, 120)}</p>
                   )}
                   {selectedSource.tags.length > 0 && (
                     <div className="flex flex-wrap gap-1 mt-1.5">
                       {selectedSource.tags.slice(0, 3).map(t => (
-                        <span key={t} className="text-[8px] font-mono text-primary/50 bg-primary/5 px-1 rounded">#{t}</span>
+                        <span key={t} className="text-[8px] text-primary/50 bg-primary/5 px-1 rounded">#{t}</span>
                       ))}
                     </div>
                   )}
-                  <button onClick={() => setSelectedSource(null)} className="mt-1.5 text-[8px] font-mono text-muted-foreground/30 hover:text-muted-foreground flex items-center gap-0.5">
+                  <button onClick={() => setSelectedSource(null)} className="mt-1.5 text-[8px] text-muted-foreground/30 hover:text-muted-foreground flex items-center gap-0.5">
                     <X className="h-2.5 w-2.5" /> Clear
                   </button>
                 </div>
@@ -414,15 +414,15 @@ export default function ResearchPage() {
 
               {relatedNotes.length > 0 && (
                 <div>
-                  <p className="text-[8px] font-mono font-bold uppercase tracking-widest text-muted-foreground/40 mb-1.5">RELATED IN YOUR BRAIN</p>
+                  <p className="text-[8px] font-semibold uppercase tracking-wide text-muted-foreground/40 mb-1.5">RELATED IN YOUR BRAIN</p>
                   <div className="space-y-1.5">
                     {relatedNotes.map(n => (
                       <a key={n.id} href={`/knowledge?noteId=${n.id}`}
                         className="block border border-border/30 rounded-sm p-2 hover:border-primary/30 hover:bg-primary/5 transition-colors">
-                        <p className="text-[10px] font-mono font-bold text-foreground/80 line-clamp-2">{n.title}</p>
+                        <p className="text-[10px] font-bold text-foreground/80 line-clamp-2">{n.title}</p>
                         <div className="flex flex-wrap gap-1 mt-1">
                           {n.tags.filter(t => selectedSource?.tags.includes(t)).slice(0, 2).map(t => (
-                            <span key={t} className="text-[8px] font-mono text-primary/50 bg-primary/5 px-1 rounded">#{t}</span>
+                            <span key={t} className="text-[8px] text-primary/50 bg-primary/5 px-1 rounded">#{t}</span>
                           ))}
                         </div>
                       </a>
@@ -432,7 +432,7 @@ export default function ResearchPage() {
               )}
 
               {relatedNotes.length === 0 && selectedSource && (
-                <p className="text-[9px] font-mono text-muted-foreground/30 text-center py-4">No related notes found yet. Add more ideas to build connections.</p>
+                <p className="text-[9px] text-muted-foreground/30 text-center py-4">No related notes found yet. Add more ideas to build connections.</p>
               )}
             </div>
           )}

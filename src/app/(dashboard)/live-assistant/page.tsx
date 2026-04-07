@@ -932,7 +932,7 @@ export default function LiveAssistantPage() {
                             <Button
                               variant="outline"
                               size="sm"
-                              className="text-[10px] font-mono uppercase tracking-wider h-6 px-2 rounded-xl"
+                              className="text-[10px] font-medium h-6 px-2.5 rounded-full"
                               onClick={() => handleSuggestedAction(action.label)}
                             >
                               {action.label}

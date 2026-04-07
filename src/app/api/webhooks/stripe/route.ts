@@ -86,7 +86,6 @@ export async function POST(request: NextRequest) {
       }
 
       default:
-        console.log(`Unhandled event type: ${event.type}`)
     }
 
     return NextResponse.json({ received: true })
@@ -137,11 +136,6 @@ async function handleSubscriptionChange(subscription: Stripe.Subscription) {
       ? new Date(subscription.trial_end * 1000)
       : undefined,
   })
-
-  console.log(`Subscription updated for user ${finalUserId}:`, {
-    tier: getTierFromPriceId(priceId),
-    status: subscription.status,
-  })
 }
 
 async function handleSubscriptionCanceled(subscription: Stripe.Subscription) {
@@ -167,7 +161,6 @@ async function handleSubscriptionCanceled(subscription: Stripe.Subscription) {
     await sendSubscriptionCanceledEmail(customer.email, customer.name || undefined)
   }
 
-  console.log(`Subscription canceled for user ${userId}`)
 }
 
 async function handlePaymentFailed(subscription: Stripe.Subscription) {
@@ -194,7 +187,6 @@ async function handlePaymentFailed(subscription: Stripe.Subscription) {
     await sendPaymentFailedEmail(customer.email, customer.name || undefined)
   }
 
-  console.log(`Payment failed for user ${userId}`)
 }
 
 async function handleTrialEnding(subscription: Stripe.Subscription) {
@@ -220,5 +212,4 @@ async function handleTrialEnding(subscription: Stripe.Subscription) {
     await sendTrialEndingEmail(customer.email, customer.name || undefined, daysRemaining)
   }
 
-  console.log(`Trial ending soon for user ${userId}`)
 }

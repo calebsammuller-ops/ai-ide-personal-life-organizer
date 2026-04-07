@@ -259,24 +259,16 @@ export async function canUseFeature(
 ): Promise<{ allowed: boolean; reason?: string }> {
   const subData = await getUserSubscription(userId)
 
+  // Paid members (any non-free tier with active/trialing status) have unlimited access
+  const tier = subData.subscription?.tier ?? 'free'
+  const status = subData.subscription?.status ?? 'active'
+  const isPaidMember = tier !== 'free' && ['active', 'trialing'].includes(status)
+  if (isPaidMember) return { allowed: true }
+
+  // Free tier limits
   switch (feature) {
     case 'web_search':
-      if (!subData.features.webSearchEnabled) {
-        return {
-          allowed: false,
-          reason: 'Web search is a Pro feature. Upgrade to access real-time information.',
-        }
-      }
-      if (
-        subData.features.webSearchesPerMonth !== -1 &&
-        subData.usage.webSearchesUsed >= subData.features.webSearchesPerMonth
-      ) {
-        return {
-          allowed: false,
-          reason: `You've used all ${subData.features.webSearchesPerMonth} web searches this month. Upgrade to Premium for unlimited searches.`,
-        }
-      }
-      return { allowed: true }
+      return { allowed: false, reason: 'Web search requires a membership.' }
 
     case 'ai_message':
       if (
@@ -285,28 +277,16 @@ export async function canUseFeature(
       ) {
         return {
           allowed: false,
-          reason: `You've used all ${subData.features.aiMessagesPerMonth} AI messages this month. Upgrade for more.`,
+          reason: `You've used all ${subData.features.aiMessagesPerMonth} free messages this month.`,
         }
       }
       return { allowed: true }
 
     case 'advanced_ai':
-      if (!subData.features.advancedAiFeatures) {
-        return {
-          allowed: false,
-          reason: 'Advanced AI features are available on Pro and Premium plans.',
-        }
-      }
-      return { allowed: true }
+      return { allowed: false, reason: 'Advanced AI requires a membership.' }
 
     case 'file_attachment':
-      if (!subData.features.fileAttachmentsEnabled) {
-        return {
-          allowed: false,
-          reason: 'File attachments are available on Pro and Premium plans.',
-        }
-      }
-      return { allowed: true }
+      return { allowed: false, reason: 'File attachments require a membership.' }
 
     default:
       return { allowed: true }

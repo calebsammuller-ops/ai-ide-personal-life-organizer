@@ -157,10 +157,10 @@ export default function DashboardPage() {
   }, [cognitiveData])
 
   const stats = [
-    { label: 'IDEAS CAPTURED', value: knowledgeNotes.filter(n => !n.tags?.includes('ai-insight')).length, href: '/knowledge' },
-    { label: 'CONNECTIONS', value: knowledgeLinks.length, href: '/knowledge/graph' },
-    { label: 'INSIGHTS GENERATED', value: knowledgeNotes.filter(n => n.tags?.includes('ai-insight')).length, href: '/insights' },
-    { label: 'CONCEPTS DEVELOPED', value: predictions.length, href: '/insights' },
+    { label: 'Ideas captured', value: knowledgeNotes.filter(n => !n.tags?.includes('ai-insight')).length, href: '/knowledge' },
+    { label: 'Connections', value: knowledgeLinks.length, href: '/knowledge/graph' },
+    { label: 'Insights generated', value: knowledgeNotes.filter(n => n.tags?.includes('ai-insight')).length, href: '/insights' },
+    { label: 'Concepts developed', value: predictions.length, href: '/insights' },
   ]
 
   const todaysFocus = useMemo(() => {
@@ -256,7 +256,7 @@ export default function DashboardPage() {
                 <p className="text-2xl font-semibold text-foreground leading-none mb-1">
                   <AnimatedStat value={stat.value} />
                 </p>
-                <p className="text-[11px] text-muted-foreground/60">{stat.label.charAt(0) + stat.label.slice(1).toLowerCase()}</p>
+                <p className="text-[11px] text-muted-foreground/60">{stat.label}</p>
               </div>
             </Link>
           )

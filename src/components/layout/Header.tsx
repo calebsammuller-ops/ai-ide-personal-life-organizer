@@ -14,15 +14,15 @@ import { selectCurrentNextMove } from '@/state/slices/nextMoveSlice'
 import { cn } from '@/lib/utils'
 
 const pageTitles: Record<string, string> = {
-  '/dashboard':            'COMMAND CENTER',
-  '/live-assistant':       'THINKING PARTNER',
-  '/knowledge':            'IDEAS',
-  '/knowledge/ideas':      'EXPAND IDEAS',
-  '/knowledge/research':   'RESEARCH',
-  '/knowledge/timeline':   'TIMELINE',
-  '/knowledge/graph':      'KNOWLEDGE MAP',
-  '/insights':             'INTEL',
-  '/settings':             'SETTINGS',
+  '/dashboard':            'Dashboard',
+  '/live-assistant':       'Think with AI',
+  '/knowledge':            'Ideas',
+  '/knowledge/ideas':      'Expand Ideas',
+  '/knowledge/research':   'Research',
+  '/knowledge/timeline':   'Timeline',
+  '/knowledge/graph':      'Knowledge Map',
+  '/insights':             'Insights',
+  '/settings':             'Settings',
 }
 
 export function Header() {
@@ -40,7 +40,7 @@ export function Header() {
     for (const [path, title] of Object.entries(pageTitles)) {
       if (pathname.startsWith(path)) return title
     }
-    return 'COMMAND OPS'
+    return 'Thinking Partner'
   }
 
   const getInitials = () => {

@@ -22,34 +22,34 @@ import { selectLockInActive, selectLockInFocus, deactivateLockIn } from '@/state
 
 const navSections = [
   {
-    label: 'COMMAND',
+    label: 'Home',
     items: [
-      { href: '/dashboard',      icon: Brain,          label: 'Command Center' },
-      { href: '/live-assistant', icon: MessageCircle,  label: 'Thinking Partner' },
+      { href: '/dashboard',      icon: Brain,          label: 'Dashboard' },
+      { href: '/live-assistant', icon: MessageCircle,  label: 'Think with AI' },
     ],
   },
   {
-    label: 'CAPTURE',
+    label: 'Capture',
     items: [
       { href: '/knowledge',          icon: Lightbulb, label: 'Ideas' },
       { href: '/knowledge/research', icon: Search,    label: 'Research' },
     ],
   },
   {
-    label: 'DEVELOP',
+    label: 'Develop',
     items: [
       { href: '/knowledge/ideas', icon: Sparkles, label: 'Expand Ideas' },
     ],
   },
   {
-    label: 'KNOWLEDGE',
+    label: 'Knowledge',
     items: [
       { href: '/knowledge/graph',    icon: Network, label: 'Knowledge Map' },
       { href: '/knowledge/timeline', icon: Clock,   label: 'Timeline' },
     ],
   },
   {
-    label: 'INTELLIGENCE',
+    label: 'Intelligence',
     items: [
       { href: '/insights', icon: Brain, label: 'AI Insights' },
     ],
@@ -75,10 +75,10 @@ export function Sidebar() {
       <div className="flex h-12 items-center justify-between border-b border-border/50 px-3">
         {!isCollapsed && (
           <Link href="/dashboard" className="flex items-center gap-2">
-            <div className="h-7 w-7 bg-primary/90 flex items-center justify-center flex-shrink-0">
+            <div className="h-7 w-7 bg-primary/90 rounded-lg flex items-center justify-center flex-shrink-0">
               <Brain className="h-4 w-4 text-white" />
             </div>
-            <span className="text-[10px] font-semibold text-primary/65">
+            <span className="text-xs font-semibold text-foreground/80">
               Thinking Partner
             </span>
           </Link>
@@ -102,7 +102,7 @@ export function Sidebar() {
         {navSections.map((section) => (
           <div key={section.label}>
             {!isCollapsed && (
-              <p className="px-3 py-1 text-[10px] font-semibold text-muted-foreground/22">
+              <p className="px-3 py-1 text-[10px] font-medium text-muted-foreground/35 uppercase tracking-wider">
                 {section.label}
               </p>
             )}

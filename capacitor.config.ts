@@ -1,8 +1,8 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'com.lockin.lifeorganizer',
-  appName: 'LockIN Life Organizer',
+  appId: 'com.thinkingpartner.app',
+  appName: 'Thinking Partner',
   webDir: 'out',
 
   server: {

@@ -54,7 +54,7 @@ export function MicroObservation() {
           exit={{ opacity: 0, y: -4 }}
           transition={{ duration: 0.6 }}
         >
-          <p className="text-[9px] font-mono text-muted-foreground/40 max-w-[220px] leading-relaxed">
+          <p className="text-[9px] text-muted-foreground/40 max-w-[220px] leading-relaxed">
             {obs}
           </p>
         </motion.div>

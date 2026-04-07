@@ -237,8 +237,8 @@ export default function TimelinePage() {
                         {EVENT_ICONS[e.eventType] || <BookOpen className="h-3 w-3 text-muted-foreground/40" />}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-xs font-mono text-foreground/80 leading-relaxed">{e.description}</p>
-                        <p className="text-[9px] font-mono text-muted-foreground/40 mt-0.5">
+                        <p className="text-xs text-foreground/80 leading-relaxed">{e.description}</p>
+                        <p className="text-[9px] text-muted-foreground/40 mt-0.5">
                           {new Date(e.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                           {' · '}
                           <span className="uppercase">{e.eventType.replace(/_/g, ' ')}</span>
@@ -260,7 +260,7 @@ export default function TimelinePage() {
             <div className="flex items-center justify-between px-4 py-3 border-b border-border/30">
               <div className="flex items-center gap-2">
                 <FileText className="h-4 w-4 text-cyan-400" />
-                <span className="text-sm font-mono font-bold text-foreground">Monthly Cognitive Report</span>
+                <span className="text-sm font-semibold text-foreground">Monthly Cognitive Report</span>
               </div>
               <button onClick={() => setShowReport(false)} className="text-muted-foreground/50 hover:text-foreground transition-colors">
                 <X className="h-4 w-4" />
@@ -270,7 +270,7 @@ export default function TimelinePage() {
               <MarkdownReport content={report} />
             </div>
             <div className="px-4 py-3 border-t border-border/30 flex justify-end">
-              <Button onClick={() => setShowReport(false)} variant="outline" size="sm" className="font-mono text-xs">Close</Button>
+              <Button onClick={() => setShowReport(false)} variant="outline" size="sm" className="text-xs">Close</Button>
             </div>
           </div>
         </div>

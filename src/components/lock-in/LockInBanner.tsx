@@ -20,7 +20,7 @@ export function LockInBanner() {
   const total = progress.ideasExpanded + progress.connectionsMade + progress.notesCreated
 
   return (
-    <div className="w-full flex items-center justify-between px-4 py-1 bg-primary/5 border-b border-primary/20 text-[9px] font-mono">
+    <div className="w-full flex items-center justify-between px-4 py-1 bg-primary/5 border-b border-primary/20 text-[9px]">
       <span className="text-primary/70">
         🔒 LOCK-IN · Focus: <span className="font-bold text-primary">{focus}</span> · Day {elapsed}/{durationDays} · {total} actions
       </span>

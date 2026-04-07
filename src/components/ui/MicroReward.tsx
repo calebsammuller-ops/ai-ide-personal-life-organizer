@@ -39,7 +39,7 @@ export function MicroReward() {
             animate={{ opacity: 1, y: -20, scale: 1 }}
             exit={{ opacity: 0, y: -40 }}
             transition={{ duration: 0.4, ease: 'easeOut' }}
-            className="text-[10px] font-mono font-bold text-primary bg-primary/10 border border-primary/30 px-2 py-0.5 rounded-sm"
+            className="text-[10px] font-bold text-primary bg-primary/10 border border-primary/30 px-2 py-0.5 rounded-sm"
           >
             {item.label}
           </motion.div>

@@ -206,7 +206,7 @@ export function VoiceMode({ onClose, onAudioLevel }: VoiceModeProps) {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }}
             className={cn(
-              'text-xs font-mono font-bold tracking-widest uppercase',
+              'text-xs font-semibold uppercase tracking-wide',
               voiceState === 'listening'
                 ? 'text-primary'
                 : voiceState === 'speaking'

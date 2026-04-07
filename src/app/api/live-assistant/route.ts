@@ -102,7 +102,6 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
-  console.log('[Assistant] POST request received')
 
   const supabase = createClient()
   // db is a base SupabaseClient without the Database generic — used for tables
@@ -111,18 +110,14 @@ export async function POST(request: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser()
 
   if (!user) {
-    console.log('[Assistant] No session - unauthorized')
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
-  console.log('[Assistant] Session valid for user:', user.id)
 
   // Validate request body
   const validation = await validateBody(request, assistantMessageSchema)
   if (!validation.success) {
-    console.log('[Assistant] Validation failed:', validation.error)
     return NextResponse.json({ error: validation.error }, { status: 400 })
   }
-  console.log('[Assistant] Request body validated')
 
   const body = validation.data
   const conversationId = body.conversationId || crypto.randomUUID()
@@ -141,7 +136,6 @@ export async function POST(request: NextRequest) {
   await incrementUsage(user.id, 'ai_message')
 
   // Create user message
-  console.log('[Assistant] Creating user message in database')
   const { data: userMessage, error: userError } = await db
     .from('assistant_messages')
     .insert({
@@ -157,14 +151,12 @@ export async function POST(request: NextRequest) {
     console.error('[Assistant] Database error creating message:', userError.message)
     return NextResponse.json({ error: userError.message }, { status: 500 })
   }
-  console.log('[Assistant] User message created successfully')
 
   // ── Vault Command Detection ───────────────────────────────────────────────
   // If the message is a slash command, run a deep data-fetch + specialized
   // Claude prompt and return early — bypassing the normal intent pipeline.
   const vaultCmd = detectCommand(body.content)
   if (vaultCmd) {
-    console.log(`[Assistant] Vault command detected: ${vaultCmd.command.trigger}`)
     try {
       let cmdCtx
       switch (vaultCmd.command.trigger) {
@@ -306,7 +298,6 @@ Respond in a structured, tactical way. Use markdown with headers and bullet poin
     const messageWithContext = agentInsights
       ? `${body.content}\n\n---\nSYSTEM NOTE (from sub-agent, use to inform your response but do not repeat verbatim):\n${agentInsights}`
       : body.content
-    console.log('[Assistant] Generating AI response for:', body.content.substring(0, 50))
     aiResponse = await generateAIResponse(
       messageWithContext,
       (history || []) as AssistantMessage[],
@@ -318,7 +309,6 @@ Respond in a structured, tactical way. Use markdown with headers and bullet poin
       latestReflection,
       body.attachment
     )
-    console.log('[Assistant] AI response generated successfully')
   } catch (error) {
     const errMsg = error instanceof Error ? error.message : String(error)
     console.error('[Assistant] AI response error:', errMsg)
@@ -382,7 +372,6 @@ Respond in a structured, tactical way. Use markdown with headers and bullet poin
   }
 
   // Save assistant message (only use columns that exist in the database)
-  console.log('[Assistant] Saving assistant message to database')
   const { data: assistantMessage, error: assistantError } = await db
     .from('assistant_messages')
     .insert({
@@ -398,7 +387,6 @@ Respond in a structured, tactical way. Use markdown with headers and bullet poin
     console.error('[Assistant] Failed to save assistant message:', assistantError.message)
     return NextResponse.json({ error: assistantError.message }, { status: 500 })
   }
-  console.log('[Assistant] Assistant message saved successfully')
 
   // Save conversation exchange to ai_decisions for transparency log
   ;db.from('ai_decisions')
@@ -989,7 +977,6 @@ SUCCESS METRIC: The user should trust this system to challenge their thinking, s
 
     if (toolUseBlock.name === 'web_search') {
       const searchInput = toolUseBlock.input as { query: string; reason: string }
-      console.log('[Assistant] AI requested web search:', searchInput.query)
       await incrementUsage(userId, 'web_search')
 
       let searchResults = ''
@@ -997,7 +984,6 @@ SUCCESS METRIC: The user should trust this system to challenge their thinking, s
         const { searchWeb, formatSearchResultsForAI } = await import('@/lib/ai/webSearch')
         const results = await searchWeb(searchInput.query, { count: 5, validateSources: true })
         searchResults = formatSearchResultsForAI(results)
-        console.log('[Assistant] Web search completed, found', results.results.length, 'results')
       } catch (searchError) {
         console.error('[Assistant] Web search failed:', searchError)
         searchResults = 'Web search failed. Please answer based on your knowledge.'
@@ -1021,7 +1007,6 @@ SUCCESS METRIC: The user should trust this system to challenge their thinking, s
 
     } else if (toolUseBlock.name === 'generate_image') {
       const { prompt } = toolUseBlock.input as { prompt: string }
-      console.log('[Assistant] AI requested image generation:', prompt.substring(0, 80))
 
       let toolResultContent = 'Image generation failed. Please try again.'
       try {
@@ -1036,7 +1021,6 @@ SUCCESS METRIC: The user should trust this system to challenge their thinking, s
         toolResultContent = generatedImageUrl
           ? 'Image generated successfully and is now displayed to the user.'
           : toolResultContent
-        console.log('[Assistant] Image generated successfully')
       } catch (imgError) {
         console.error('[Assistant] DALL-E error:', imgError)
       }

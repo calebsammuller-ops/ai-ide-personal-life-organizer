@@ -22,6 +22,8 @@ export function SubscriptionStatus({
 }: SubscriptionStatusProps) {
   const [loading, setLoading] = useState(false)
   const { subscription, features, usage, isTrial, trialDaysRemaining } = subscriptionData
+  const isPaidMember =
+    features.tier !== 'free' && ['active', 'trialing'].includes(subscription?.status ?? '')
 
   const tierColors = {
     free: 'bg-gray-100 text-gray-800',
@@ -91,40 +93,25 @@ export function SubscriptionStatus({
       </CardHeader>
 
       <CardContent className="space-y-6">
-        {/* Usage Stats */}
-        <div className="space-y-4">
-          <div>
-            <div className="flex justify-between text-sm mb-2">
-              <span>AI Messages</span>
-              <span className="text-muted-foreground">
-                {usage.aiMessagesUsed} / {usage.aiMessagesLimit === -1 ? 'Unlimited' : usage.aiMessagesLimit}
-              </span>
-            </div>
-            {usage.aiMessagesLimit !== -1 && (
-              <Progress
-                value={aiUsagePercent}
-                className={cn(aiUsagePercent > 80 && 'bg-red-100')}
-              />
-            )}
-          </div>
-
-          {features.webSearchEnabled && (
+        {/* Usage Stats — only shown for free tier */}
+        {!isPaidMember && (
+          <div className="space-y-4">
             <div>
               <div className="flex justify-between text-sm mb-2">
-                <span>Web Searches</span>
+                <span>AI Messages</span>
                 <span className="text-muted-foreground">
-                  {usage.webSearchesUsed} / {usage.webSearchesLimit === -1 ? 'Unlimited' : usage.webSearchesLimit}
+                  {usage.aiMessagesUsed} / {usage.aiMessagesLimit === -1 ? 'Unlimited' : usage.aiMessagesLimit}
                 </span>
               </div>
-              {usage.webSearchesLimit !== -1 && (
+              {usage.aiMessagesLimit !== -1 && (
                 <Progress
-                  value={searchUsagePercent}
-                  className={cn(searchUsagePercent > 80 && 'bg-red-100')}
+                  value={aiUsagePercent}
+                  className={cn(aiUsagePercent > 80 && 'bg-red-100')}
                 />
               )}
             </div>
-          )}
-        </div>
+          </div>
+        )}
 
         {/* Features Summary */}
         <div className="grid grid-cols-2 gap-4 text-sm">

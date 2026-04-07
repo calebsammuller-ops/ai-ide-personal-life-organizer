@@ -172,6 +172,20 @@ export const assistantSlice = createSlice({
     setSelectedVoice: (state, action: PayloadAction<VoiceId>) => {
       state.selectedVoice = action.payload
     },
+    addStreamedAssistantMessage: (
+      state,
+      action: PayloadAction<{ content: string; conversationId: string }>
+    ) => {
+      state.currentConversationId = action.payload.conversationId
+      state.messages.push({
+        id: `streamed-${Date.now()}`,
+        role: 'assistant',
+        content: action.payload.content,
+        createdAt: new Date().toISOString(),
+        conversationId: action.payload.conversationId,
+        feedback: null,
+      } as AssistantMessage)
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -236,6 +250,7 @@ export const {
   startNewConversation,
   setVoiceEnabled,
   setSelectedVoice,
+  addStreamedAssistantMessage,
 } = assistantSlice.actions
 
 export const selectConversations = (state: RootState) => state.assistant.conversations
