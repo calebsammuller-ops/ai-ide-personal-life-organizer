@@ -102,7 +102,7 @@ export function InsightsDashboard() {
 
       {/* Knowledge Briefing */}
       {briefing && (
-        <Card className="rounded-xl border-amber-500/15 bg-amber-500/[0.03]">
+        <Card className="rounded-xl card-gradient-amber border-l-[3px] border-l-amber-500">
           <CardHeader className="flex flex-row items-center justify-between py-3 px-4 border-b border-amber-500/15">
             <CardTitle className="flex items-center gap-2">
               <div className="p-1 rounded-lg bg-primary/10">
@@ -138,7 +138,7 @@ export function InsightsDashboard() {
 
       {/* AI Predictions */}
       {predictions.length > 0 && (
-        <Card className="rounded-xl border-purple-500/15 bg-purple-500/[0.03]">
+        <Card className="rounded-xl card-gradient-purple border-l-[3px] border-l-purple-500">
           <CardHeader className="flex flex-row items-center justify-between py-3 px-4 border-b border-purple-500/15">
             <CardTitle className="flex items-center gap-2">
               <div className="p-1 rounded-lg bg-purple-500/10">

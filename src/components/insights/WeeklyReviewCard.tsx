@@ -46,7 +46,7 @@ export function WeeklyReviewCard() {
     : null
 
   return (
-    <Card>
+    <Card className="rounded-xl card-gradient-green border-l-[3px] border-l-green-500">
       <CardHeader className="pb-3">
         <CardTitle className="flex items-center gap-2 text-base">
           <CalendarDays className="h-4 w-4 text-indigo-500" />

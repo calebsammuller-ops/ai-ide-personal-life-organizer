@@ -33,7 +33,7 @@ export function LifeTrajectoryCard() {
   const maxMomentum = Math.max(...data.trends.map(t => Math.abs(t.momentum)), 1)
 
   return (
-    <Card>
+    <Card className="rounded-xl card-gradient-rose border-l-[3px] border-l-rose-500">
       <CardHeader className="pb-3">
         <CardTitle className="flex items-center gap-2 text-base">
           <TrendingUp className="h-4 w-4 text-green-500" />

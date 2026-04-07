@@ -17,7 +17,7 @@ export function CognitiveHeatmap({ notes }: Props) {
   const neglected = all.slice(-2)
 
   return (
-    <div className="rounded-lg border border-border/40 bg-card">
+    <div className="rounded-xl card-gradient-green border-l-[3px] border-l-emerald-500">
       <div className="flex items-center gap-2 px-3 py-2 border-b border-border/30">
         <div className="w-0.5 h-3 bg-primary" />
         <p className="text-[10px] font-semibold text-primary/70">Cognitive Heatmap</p>

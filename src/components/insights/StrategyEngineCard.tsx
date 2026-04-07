@@ -32,7 +32,7 @@ export function StrategyEngineCard() {
     : null
 
   return (
-    <Card>
+    <Card className="rounded-xl card-gradient-amber border-l-[3px] border-l-amber-500">
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center gap-2 text-base">

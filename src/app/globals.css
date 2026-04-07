@@ -60,34 +60,34 @@
     --glow-blue: 220 100% 60%;
   }
 
-  /* Dark Mode - Deep Violet Cognitive Space */
+  /* Dark Mode - Deep Navy Cognitive Space */
   .dark {
-    /* Deep blue-black backgrounds */
-    --background: 240 18% 4%;
-    --foreground: 220 15% 88%;
+    /* Rich navy backgrounds */
+    --background: 228 25% 6%;
+    --foreground: 210 20% 92%;
 
-    /* Slightly elevated blue-black card */
-    --card: 240 15% 7%;
-    --card-foreground: 220 15% 88%;
+    /* Elevated navy card with subtle blue tint */
+    --card: 225 22% 9%;
+    --card-foreground: 210 20% 92%;
 
     /* Popover */
-    --popover: 240 14% 9%;
-    --popover-foreground: 220 15% 88%;
+    --popover: 225 20% 11%;
+    --popover-foreground: 210 20% 92%;
 
-    /* Primary - Vibrant Violet #8B5CF6 */
-    --primary: 258 89% 66%;
+    /* Primary - Vibrant Blue #6366F1 (Indigo) */
+    --primary: 239 84% 67%;
     --primary-foreground: 0 0% 100%;
 
-    /* Secondary - dark blue surface */
-    --secondary: 240 12% 11%;
-    --secondary-foreground: 220 12% 65%;
+    /* Secondary - slightly lighter navy */
+    --secondary: 225 18% 13%;
+    --secondary-foreground: 210 15% 70%;
 
     /* Muted */
-    --muted: 240 11% 10%;
-    --muted-foreground: 240 8% 40%;
+    --muted: 225 16% 12%;
+    --muted-foreground: 220 12% 45%;
 
-    /* Accent - electric indigo */
-    --accent: 270 75% 60%;
+    /* Accent - Cyan */
+    --accent: 190 90% 50%;
     --accent-foreground: 0 0% 100%;
 
     /* Destructive - stays red */
@@ -103,9 +103,9 @@
     --warning-foreground: 0 0% 100%;
 
     /* Borders and inputs */
-    --border: 240 12% 15%;
-    --input: 240 11% 12%;
-    --ring: 258 89% 66%;
+    --border: 225 18% 16%;
+    --input: 225 16% 13%;
+    --ring: 239 84% 67%;
 
     /* Radius: modern rounded */
     --radius: 0.75rem;
@@ -609,6 +609,41 @@ body.focus-mode .primary-content {
 .card-glow:hover {
   box-shadow: 0 0 0 1px hsl(var(--primary) / 0.2), 0 4px 24px hsl(var(--primary) / 0.09);
   border-color: hsl(var(--primary) / 0.25);
+}
+
+/* Hover lift — subtle translateY effect */
+.hover-lift {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.hover-lift:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Colored gradient cards — reference design style */
+.card-gradient-blue {
+  background: linear-gradient(135deg, hsl(225 30% 10%) 0%, hsl(230 25% 14%) 100%);
+  border: 1px solid hsl(220 50% 25% / 0.3);
+}
+.card-gradient-purple {
+  background: linear-gradient(135deg, hsl(260 25% 10%) 0%, hsl(265 20% 14%) 100%);
+  border: 1px solid hsl(260 50% 35% / 0.3);
+}
+.card-gradient-green {
+  background: linear-gradient(135deg, hsl(150 20% 8%) 0%, hsl(155 18% 12%) 100%);
+  border: 1px solid hsl(150 50% 30% / 0.3);
+}
+.card-gradient-amber {
+  background: linear-gradient(135deg, hsl(35 20% 8%) 0%, hsl(40 18% 12%) 100%);
+  border: 1px solid hsl(35 50% 30% / 0.3);
+}
+.card-gradient-cyan {
+  background: linear-gradient(135deg, hsl(190 20% 8%) 0%, hsl(195 18% 12%) 100%);
+  border: 1px solid hsl(190 50% 30% / 0.3);
+}
+.card-gradient-rose {
+  background: linear-gradient(135deg, hsl(340 20% 8%) 0%, hsl(345 18% 12%) 100%);
+  border: 1px solid hsl(340 50% 30% / 0.3);
 }
 
 /* Glowing animated progress bar fill */

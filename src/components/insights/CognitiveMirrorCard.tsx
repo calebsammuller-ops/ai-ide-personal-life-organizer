@@ -44,7 +44,7 @@ export function CognitiveMirrorCard() {
     : null
 
   return (
-    <Card className="rounded-lg border-primary/20">
+    <Card className="rounded-xl card-gradient-cyan border-l-[3px] border-l-cyan-500">
       <CardHeader className="flex flex-row items-center justify-between py-2 px-3 border-b border-primary/20">
         <CardTitle className="flex items-center gap-2">
           <Brain className="h-3.5 w-3.5 text-primary" />

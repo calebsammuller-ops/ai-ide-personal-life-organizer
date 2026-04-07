@@ -40,7 +40,7 @@ export function WhatIfSimulator() {
   }
 
   return (
-    <Card>
+    <Card className="rounded-xl card-gradient-purple border-l-[3px] border-l-violet-500">
       <CardHeader className="pb-3">
         <CardTitle className="flex items-center gap-2 text-base">
           <Sparkles className="h-4 w-4 text-purple-500" />

@@ -50,13 +50,12 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-40 safe-top">
-      <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/50 to-transparent" />
+      <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-border/60 to-transparent" />
 
-      <div className="bg-background/90 backdrop-blur-xl">
+      <div className="bg-card/60 backdrop-blur-xl border-b border-border/30">
         <div className="flex h-12 items-center justify-between px-4">
           <div className="flex items-center gap-2.5">
-            <div className="w-1 h-4 bg-primary rounded-full" />
-            <h1 className="text-sm font-semibold text-foreground">
+            <h1 className="text-base font-bold text-foreground tracking-tight">
               {getTitle()}
             </h1>
           </div>

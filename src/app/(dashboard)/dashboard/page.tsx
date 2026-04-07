@@ -240,23 +240,23 @@ export default function DashboardPage() {
       {/* Stats strip */}
       <div className="flex-shrink-0 grid grid-cols-2 md:grid-cols-4 gap-3 secondary-content">
         {stats.map((stat, i) => {
-          const icons = [
-            <Lightbulb key="i" className="h-4 w-4 text-violet-400" />,
-            <Link2 key="l" className="h-4 w-4 text-sky-400" />,
-            <Sparkles key="s" className="h-4 w-4 text-emerald-400" />,
-            <Brain key="b" className="h-4 w-4 text-pink-400" />,
+          const configs = [
+            { icon: <Lightbulb key="i" className="h-4 w-4 text-violet-400" />, gradient: 'card-gradient-purple', accent: 'border-l-violet-500' },
+            { icon: <Link2 key="l" className="h-4 w-4 text-sky-400" />, gradient: 'card-gradient-blue', accent: 'border-l-sky-500' },
+            { icon: <Sparkles key="s" className="h-4 w-4 text-emerald-400" />, gradient: 'card-gradient-green', accent: 'border-l-emerald-500' },
+            { icon: <Brain key="b" className="h-4 w-4 text-pink-400" />, gradient: 'card-gradient-rose', accent: 'border-l-pink-500' },
           ]
           return (
             <Link key={stat.label} href={stat.href}>
-              <div className="group card-glow border border-border/40 bg-card/80 rounded-xl p-3.5 hover:border-primary/30 hover:bg-primary/5 transition-all hover-lift">
-                <div className="flex items-center justify-between mb-2">
-                  <div className="p-1.5 rounded-lg bg-muted/50">{icons[i]}</div>
+              <div className={cn('group rounded-xl p-4 hover-lift border-l-[3px] transition-all', configs[i].gradient, configs[i].accent)}>
+                <div className="flex items-center justify-between mb-3">
+                  <div className="p-2 rounded-lg bg-white/5">{configs[i].icon}</div>
                   <ArrowRight className="h-3 w-3 text-muted-foreground/30 group-hover:text-primary/50 transition-colors" />
                 </div>
-                <p className="text-2xl font-semibold text-foreground leading-none mb-1">
+                <p className="text-3xl font-bold text-foreground leading-none mb-1">
                   <AnimatedStat value={stat.value} />
                 </p>
-                <p className="text-[11px] text-muted-foreground/60">{stat.label}</p>
+                <p className="text-xs text-muted-foreground/60">{stat.label}</p>
               </div>
             </Link>
           )
@@ -266,19 +266,19 @@ export default function DashboardPage() {
       {/* Quick actions */}
       <div className="flex-shrink-0 grid grid-cols-3 gap-3 secondary-content">
         <Link href="/knowledge">
-          <Button variant="outline" size="sm" className="w-full h-10 text-xs font-medium justify-center gap-2 rounded-lg hover-lift">
+          <div className="w-full h-12 flex items-center justify-center gap-2 text-sm font-medium rounded-xl border border-primary/30 bg-primary/10 text-primary hover:bg-primary/20 transition-all hover-lift">
             <Brain className="h-4 w-4" /> New Idea
-          </Button>
+          </div>
         </Link>
         <Link href="/knowledge/graph">
-          <Button variant="outline" size="sm" className="w-full h-10 text-xs font-medium justify-center gap-2 rounded-lg hover-lift">
+          <div className="w-full h-12 flex items-center justify-center gap-2 text-sm font-medium rounded-xl border border-sky-500/30 bg-sky-500/10 text-sky-400 hover:bg-sky-500/20 transition-all hover-lift">
             <Network className="h-4 w-4" /> Graph
-          </Button>
+          </div>
         </Link>
         <Link href="/live-assistant">
-          <Button variant="outline" size="sm" className="w-full h-10 text-xs font-medium justify-center gap-2 rounded-lg hover-lift">
+          <div className="w-full h-12 flex items-center justify-center gap-2 text-sm font-medium rounded-xl border border-emerald-500/30 bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20 transition-all hover-lift">
             <MessageCircle className="h-4 w-4" /> Think
-          </Button>
+          </div>
         </Link>
       </div>
 
@@ -310,7 +310,7 @@ export default function DashboardPage() {
 
       {/* Identity + Momentum Card */}
       {knowledgeNotes.length > 0 && (
-        <Card className="card-glow border-border/30 bg-gradient-to-br from-card to-card/50 primary-content overflow-hidden">
+        <Card className="card-glow card-gradient-purple border-l-[3px] border-l-violet-500 primary-content overflow-hidden rounded-xl">
           <CardContent className="pt-5 pb-4 px-5 flex items-center justify-between">
             <div className="flex-1 min-w-0">
               <p className="text-xs text-muted-foreground/50 mb-1">You are becoming</p>
@@ -457,7 +457,7 @@ export default function DashboardPage() {
       <FutureSelfCard />
 
       {/* AI OBSERVATIONS */}
-      <Card className="border-primary/15 bg-primary/[0.03]">
+      <Card className="card-gradient-blue border-l-[3px] border-l-sky-500 rounded-xl">
         <CardHeader className="flex flex-row items-center justify-between py-3 px-4 border-b border-primary/10">
           <div className="flex items-center gap-2">
             <div className="p-1.5 rounded-lg bg-primary/10">
@@ -570,7 +570,7 @@ export default function DashboardPage() {
 
       {/* COGNITIVE PROFILE */}
       {cognitiveData && (
-        <Card className="rounded-xl border-border/30 secondary-content">
+        <Card className="rounded-xl card-gradient-cyan border-l-[3px] border-l-cyan-500 secondary-content">
           <CardHeader className="flex flex-row items-center justify-between py-3 px-4 border-b border-border/30">
             <div className="flex items-center gap-2">
               <div className="p-1 rounded-lg bg-primary/10">
@@ -659,7 +659,7 @@ export default function DashboardPage() {
 
       {/* AI Predictions */}
       {(predictions.length > 0 || knowledgeNotes.length >= 3) && (
-        <Card className="rounded-xl border-purple-500/15 bg-purple-500/[0.03] secondary-content">
+        <Card className="rounded-xl card-gradient-purple border-l-[3px] border-l-purple-500 secondary-content">
           <CardHeader className="flex flex-row items-center justify-between py-3 px-4 border-b border-purple-500/15">
             <div className="flex items-center gap-2">
               <div className="p-1 rounded-lg bg-purple-500/10">

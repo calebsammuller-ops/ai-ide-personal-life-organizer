@@ -44,7 +44,7 @@ export function DecisionEngineCard() {
   }
 
   return (
-    <Card>
+    <Card className="rounded-xl card-gradient-blue border-l-[3px] border-l-blue-500">
       <CardHeader className="pb-3">
         <CardTitle className="flex items-center gap-2 text-base">
           <Scale className="h-4 w-4 text-blue-500" />

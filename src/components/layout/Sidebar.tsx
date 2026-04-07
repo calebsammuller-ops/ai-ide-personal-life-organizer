@@ -66,9 +66,9 @@ export function Sidebar() {
   return (
     <aside
       className={cn(
-        'hidden md:flex flex-col h-screen sticky top-0 transition-all duration-300 border-r border-border/50',
-        'bg-background/95',
-        isCollapsed ? 'w-14' : 'w-60'
+        'hidden md:flex flex-col h-screen sticky top-0 transition-all duration-300 border-r border-border/40',
+        'bg-card/50 backdrop-blur-sm',
+        isCollapsed ? 'w-14' : 'w-56'
       )}
     >
       {/* Logo / Header */}
@@ -115,12 +115,11 @@ export function Sidebar() {
                     key={item.href}
                     href={item.href}
                     className={cn(
-                      'fade-in-up flex items-center gap-2.5 px-3 py-1.5 transition-colors',
-                      !isCollapsed && 'border-l-2',
+                      'fade-in-up flex items-center gap-2.5 px-3 py-2 rounded-lg mx-1 transition-all duration-200',
                       isActive
-                        ? 'nav-active-glow border-primary bg-primary/[0.06] text-primary'
-                        : 'border-transparent text-muted-foreground hover:bg-primary/[0.04] hover:text-foreground hover:border-primary/35',
-                      isCollapsed && 'justify-center px-2'
+                        ? 'bg-primary/15 text-primary shadow-sm shadow-primary/10'
+                        : 'text-muted-foreground/70 hover:bg-white/5 hover:text-foreground',
+                      isCollapsed && 'justify-center px-2 mx-0'
                     )}
                     style={{ animationDelay: `${index * 30}ms` }}
                     title={isCollapsed ? item.label : undefined}
@@ -142,12 +141,11 @@ export function Sidebar() {
         <Link
           href="/settings"
           className={cn(
-            'flex items-center gap-2.5 px-3 py-1.5 transition-colors',
-            !isCollapsed && 'border-l-2',
+            'flex items-center gap-2.5 px-3 py-2 rounded-lg mx-1 transition-all duration-200',
             pathname.startsWith('/settings')
-              ? 'nav-active-glow border-primary bg-primary/[0.06] text-primary'
-              : 'border-transparent text-muted-foreground hover:bg-primary/[0.04] hover:text-foreground hover:border-primary/35',
-            isCollapsed && 'justify-center px-2'
+              ? 'bg-primary/15 text-primary shadow-sm shadow-primary/10'
+              : 'text-muted-foreground/70 hover:bg-white/5 hover:text-foreground',
+            isCollapsed && 'justify-center px-2 mx-0'
           )}
           title={isCollapsed ? 'Settings' : undefined}
         >

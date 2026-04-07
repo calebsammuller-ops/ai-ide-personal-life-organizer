@@ -13,7 +13,7 @@ export function CognitiveSignature() {
     : null
 
   return (
-    <div className="rounded-lg border border-primary/20 bg-primary/5">
+    <div className="rounded-xl card-gradient-blue border-l-[3px] border-l-indigo-500">
       <div className="flex items-center gap-2 px-3 py-2 border-b border-primary/20">
         <div className="w-0.5 h-3 bg-primary" />
         <p className="text-[10px] font-semibold text-primary/70">Cognitive Signature</p>
