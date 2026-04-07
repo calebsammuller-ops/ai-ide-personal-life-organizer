@@ -228,13 +228,18 @@ export default function DashboardPage() {
       )}
 
       {/* Header — greeting + status */}
-      <div className="flex-shrink-0">
-        <h1 className="text-xl font-semibold text-foreground">Dashboard</h1>
-        <p className="text-sm text-muted-foreground mt-0.5">
-          {knowledgeNotes.length > 0
-            ? `${knowledgeNotes.length} ideas captured · ${knowledgeLinks.length} connections`
-            : 'Start capturing ideas to build your knowledge graph'}
-        </p>
+      <div className="flex-shrink-0 flex items-center justify-between">
+        <div>
+          <h1 className="text-xl font-bold text-foreground">Dashboard</h1>
+          <p className="text-sm text-muted-foreground mt-0.5">
+            {knowledgeNotes.length > 0
+              ? `${knowledgeNotes.length} ideas captured · ${knowledgeLinks.length} connections`
+              : 'Start capturing ideas to build your knowledge graph'}
+          </p>
+        </div>
+        <span className="text-[10px] font-semibold px-3 py-1 rounded-full bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
+          {identityTitle}
+        </span>
       </div>
 
       {/* Stats strip */}
@@ -308,61 +313,196 @@ export default function DashboardPage() {
         </Card>
       )}
 
-      {/* Identity + Momentum Card */}
+      {/* Main 2-column grid — Briefing + Momentum */}
       {knowledgeNotes.length > 0 && (
-        <Card className="card-glow card-gradient-purple border-l-[3px] border-l-violet-500 primary-content overflow-hidden rounded-xl">
-          <CardContent className="pt-5 pb-4 px-5 flex items-center justify-between">
-            <div className="flex-1 min-w-0">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* Cognitive Briefing */}
+          <Card className="card-gradient-blue border-l-[3px] border-l-sky-500 rounded-xl">
+            <CardHeader className="py-3 px-4 border-b border-white/5">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <div className="p-1.5 rounded-lg bg-sky-500/15">
+                    <Brain className="h-4 w-4 text-sky-400" />
+                  </div>
+                  <span className="text-sm font-semibold text-foreground/90">Cognitive Briefing</span>
+                  <span className="text-[10px] text-muted-foreground/40">AI overview</span>
+                </div>
+                <Button variant="ghost" size="sm" onClick={() => dispatch(generateBriefing() as any)} disabled={isBriefingGenerating} className="h-7 px-2 text-xs text-sky-400 hover:bg-sky-500/10 rounded-lg">
+                  <RefreshCw className={cn('h-3 w-3 mr-1', isBriefingGenerating && 'animate-spin')} />
+                  {isBriefingGenerating ? '...' : 'Refresh'}
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent className="p-4">
+              {briefing ? (
+                <div className="space-y-2">
+                  {briefing.briefing && <p className="text-sm text-muted-foreground/80 leading-relaxed">{briefing.briefing}</p>}
+                  {briefing.insights?.slice(0, 2).map((insight: { title: string; content: string }, i: number) => (
+                    <div key={i} className="flex items-start gap-2 p-2.5 bg-white/[0.03] border border-white/5 rounded-lg">
+                      <Sparkles className="h-3.5 w-3.5 text-sky-400/70 mt-0.5 shrink-0" />
+                      <div>
+                        <p className="text-xs font-semibold text-foreground/80">{insight.title}</p>
+                        <p className="text-xs text-muted-foreground/60 mt-0.5 leading-relaxed">{insight.content?.slice(0, 120)}</p>
+                      </div>
+                    </div>
+                  ))}
+                  {briefingAge && <p className="text-[10px] text-muted-foreground/30">Updated {new Date(briefingAge).toLocaleTimeString()}</p>}
+                </div>
+              ) : (
+                <div className="text-center py-6">
+                  <p className="text-xs text-muted-foreground/40 mb-2">No briefing yet</p>
+                  <Button onClick={() => dispatch(generateBriefing() as any)} disabled={isBriefingGenerating} size="sm" className="text-xs">
+                    <Sparkles className="h-3 w-3 mr-1" /> Generate Briefing
+                  </Button>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Momentum Score */}
+          <Card className="card-gradient-purple border-l-[3px] border-l-violet-500 rounded-xl">
+            <CardHeader className="py-3 px-4 border-b border-white/5">
+              <div className="flex items-center gap-2">
+                <div className="p-1.5 rounded-lg bg-violet-500/15">
+                  <Zap className="h-4 w-4 text-violet-400" />
+                </div>
+                <span className="text-sm font-semibold text-foreground/90">Momentum Score</span>
+              </div>
+            </CardHeader>
+            <CardContent className="p-4">
+              <div className="flex items-center gap-6">
+                {/* Circular gauge */}
+                <div className="relative flex-shrink-0">
+                  <svg width="100" height="100" viewBox="0 0 100 100">
+                    <circle cx="50" cy="50" r="40" fill="none" stroke="hsl(225 18% 16%)" strokeWidth="6" strokeDasharray="188 251.2" strokeLinecap="round" transform="rotate(135 50 50)" />
+                    <circle cx="50" cy="50" r="40" fill="none" stroke="hsl(239 84% 67%)" strokeWidth="6" strokeDasharray={`${Math.max(0, (momentumScore / 100) * 188)} 251.2`} strokeLinecap="round" transform="rotate(135 50 50)" style={{ filter: 'drop-shadow(0 0 8px hsl(239 84% 67% / 0.5))', transition: 'stroke-dasharray 1s ease' }} />
+                  </svg>
+                  <div className="absolute inset-0 flex flex-col items-center justify-center">
+                    <p className="text-2xl font-bold text-foreground leading-none">{momentumScore}</p>
+                    <p className="text-[10px] text-muted-foreground/40 mt-0.5">
+                      {momentumTrend === 'up' ? 'Rising' : momentumTrend === 'down' ? 'Falling' : 'Stable'}
+                    </p>
+                  </div>
+                </div>
+                {/* Progress bars */}
+                <div className="flex-1 space-y-3">
+                  {[
+                    { label: 'Cognitive Drive', value: Math.min(100, knowledgeNotes.length * 2), color: 'bg-violet-500' },
+                    { label: 'Connections', value: Math.min(100, knowledgeLinks.length * 5), color: 'bg-sky-500' },
+                    { label: 'Execution', value: Math.round(executionRate * 500), color: 'bg-emerald-500' },
+                  ].map(bar => (
+                    <div key={bar.label}>
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-[10px] text-muted-foreground/60">{bar.label}</span>
+                        <span className="text-[10px] text-foreground/60">{bar.value}</span>
+                      </div>
+                      <div className="h-1.5 bg-white/5 rounded-full overflow-hidden">
+                        <div className={cn('h-full rounded-full transition-all duration-700', bar.color)} style={{ width: `${Math.min(100, bar.value)}%` }} />
+                      </div>
+                    </div>
+                  ))}
+                  {momentumStreak > 0 && (
+                    <p className="text-[10px] text-muted-foreground/30">{momentumStreak} day{momentumStreak > 1 ? 's' : ''} streak</p>
+                  )}
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      {/* Row 2: Identity + Behavioral Patterns */}
+      {knowledgeNotes.length > 0 && (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* Behavioral Patterns */}
+          {cognitiveData && (
+            <Card className="card-gradient-cyan border-l-[3px] border-l-cyan-500 rounded-xl">
+              <CardHeader className="py-3 px-4 border-b border-white/5">
+                <div className="flex items-center gap-2">
+                  <div className="p-1.5 rounded-lg bg-cyan-500/15">
+                    <Brain className="h-4 w-4 text-cyan-400" />
+                  </div>
+                  <span className="text-sm font-semibold text-foreground/90">Behavioral Patterns</span>
+                </div>
+              </CardHeader>
+              <CardContent className="p-4 space-y-3">
+                <div className="flex items-center gap-2">
+                  <span className="px-2.5 py-1 rounded-full text-[10px] font-semibold bg-cyan-500/15 text-cyan-400 border border-cyan-500/20">
+                    {cognitiveData.dominantStyle}
+                  </span>
+                  <span className="text-xs text-muted-foreground/50">{cognitiveData.learningStyle} Learner</span>
+                </div>
+                <div className="space-y-2">
+                  {cognitiveData.patterns.slice(0, 3).map((p, i) => (
+                    <div key={i} className="flex items-center gap-2">
+                      <span className="text-xs text-foreground/60 flex-1 truncate">{p.label}</span>
+                      <div className="w-20 h-1.5 bg-white/5 rounded-full overflow-hidden">
+                        <div className={cn('h-full rounded-full', p.valence === 'strength' ? 'bg-cyan-500/70' : p.valence === 'weakness' ? 'bg-destructive/60' : 'bg-muted-foreground/40')} style={{ width: `${p.score * 100}%` }} />
+                      </div>
+                      <span className="text-[10px] text-muted-foreground/40 w-7 text-right">{Math.round(p.score * 100)}%</span>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Identity Evolution */}
+          <Card className="card-gradient-amber border-l-[3px] border-l-amber-500 rounded-xl">
+            <CardHeader className="py-3 px-4 border-b border-white/5">
+              <div className="flex items-center gap-2">
+                <div className="p-1.5 rounded-lg bg-amber-500/15">
+                  <Sparkles className="h-4 w-4 text-amber-400" />
+                </div>
+                <span className="text-sm font-semibold text-foreground/90">Identity Evolution</span>
+              </div>
+            </CardHeader>
+            <CardContent className="p-4">
               <p className="text-xs text-muted-foreground/50 mb-1">You are becoming</p>
               <p className="text-2xl font-bold text-primary tracking-tight">{identityTitle}</p>
-              <div className="flex gap-1.5 mt-2 flex-wrap">
+              <div className="flex gap-1.5 mt-3 flex-wrap">
                 {identityTraits.slice(0, 3).map(t => (
-                  <span key={t} className="text-[10px] text-primary/50 bg-primary/8 rounded-full px-2 py-0.5">{t}</span>
+                  <span key={t} className="text-[10px] text-amber-400/70 bg-amber-500/10 rounded-full px-2.5 py-0.5 border border-amber-500/15">{t}</span>
                 ))}
               </div>
-              {identityTitle === 'Operator' && (
-                <p className="text-xs text-muted-foreground/40 mt-2">Acting with precision today.</p>
-              )}
-              {identityTitle === 'Builder' && executionRate >= 0.15 && (
-                <p className="text-xs text-muted-foreground/40 mt-2">Building, not just thinking.</p>
-              )}
-              {identityTitle === 'Explorer' && (
-                <p className="text-xs text-muted-foreground/40 mt-2">Your curiosity is active.</p>
-              )}
-              {momentumStreak > 0 && (
-                <p className="text-[11px] text-muted-foreground/30 mt-1.5">
-                  {momentumStreak} day{momentumStreak > 1 ? 's' : ''} streak
-                </p>
-              )}
+              {identityTitle === 'Operator' && <p className="text-xs text-muted-foreground/40 mt-3">Acting with precision today.</p>}
+              {identityTitle === 'Builder' && executionRate >= 0.15 && <p className="text-xs text-muted-foreground/40 mt-3">Building, not just thinking.</p>}
+              {identityTitle === 'Explorer' && <p className="text-xs text-muted-foreground/40 mt-3">Your curiosity is active.</p>}
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      {/* AI Suggestions — full width card */}
+      {knowledgeNotes.length > 0 && (
+        <Card className="card-gradient-green border-l-[3px] border-l-emerald-500 rounded-xl">
+          <CardHeader className="py-3 px-4 border-b border-white/5">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <div className="p-1.5 rounded-lg bg-emerald-500/15">
+                  <Lightbulb className="h-4 w-4 text-emerald-400" />
+                </div>
+                <span className="text-sm font-semibold text-foreground/90">AI Suggestions</span>
+              </div>
             </div>
-            {/* Circular momentum gauge */}
-            <div className="relative flex-shrink-0 ml-4">
-              <svg width="88" height="88" viewBox="0 0 88 88">
-                <circle
-                  cx="44" cy="44" r="34"
-                  fill="none"
-                  stroke="hsl(240 12% 12%)"
-                  strokeWidth="5"
-                  strokeDasharray="160.2 213.6"
-                  strokeLinecap="round"
-                  transform="rotate(135 44 44)"
-                />
-                <circle
-                  cx="44" cy="44" r="34"
-                  fill="none"
-                  stroke="hsl(258 89% 66%)"
-                  strokeWidth="5"
-                  strokeDasharray={`${Math.max(0, (momentumScore / 100) * 160.2)} 213.6`}
-                  strokeLinecap="round"
-                  transform="rotate(135 44 44)"
-                  style={{ filter: 'drop-shadow(0 0 8px hsl(258 89% 66% / 0.5))', transition: 'stroke-dasharray 1s ease' }}
-                />
-              </svg>
-              <div className="absolute inset-0 flex flex-col items-center justify-center">
-                <p className="text-xl font-bold text-foreground leading-none">{momentumScore}</p>
-                <p className="text-[10px] text-muted-foreground/40 mt-0.5">
-                  {momentumTrend === 'up' ? 'Rising' : momentumTrend === 'down' ? 'Falling' : 'Stable'}
-                </p>
+          </CardHeader>
+          <CardContent className="p-4">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div>
+                <p className="text-xs text-muted-foreground/50 mb-1">Cognitive Briefing</p>
+                <p className="text-lg font-bold text-foreground">{briefing ? '100%' : '—'}</p>
+              </div>
+              <div>
+                <p className="text-xs text-muted-foreground/50 mb-1">Momentum</p>
+                <p className="text-lg font-bold text-foreground">{momentumTrend === 'up' ? '+' : ''}{momentumScore}%</p>
+              </div>
+              <div>
+                <p className="text-xs text-muted-foreground/50 mb-1">Strategy Evolution</p>
+                <p className="text-lg font-bold text-foreground">{Math.round(executionRate * 100)}%</p>
+              </div>
+              <div>
+                <p className="text-xs text-muted-foreground/50 mb-1">Exclusives</p>
+                <p className="text-lg font-bold text-foreground">{knowledgeNotes.filter(n => n.tags?.includes('ai-insight')).length}</p>
               </div>
             </div>
           </CardContent>
@@ -456,92 +596,6 @@ export default function DashboardPage() {
       {/* Future Self */}
       <FutureSelfCard />
 
-      {/* AI OBSERVATIONS */}
-      <Card className="card-gradient-blue border-l-[3px] border-l-sky-500 rounded-xl">
-        <CardHeader className="flex flex-row items-center justify-between py-3 px-4 border-b border-primary/10">
-          <div className="flex items-center gap-2">
-            <div className="p-1.5 rounded-lg bg-primary/10">
-              <Brain className="h-4 w-4 text-primary" />
-            </div>
-            <div>
-              <p className="text-sm font-semibold text-foreground/90">AI Observations</p>
-              <p className="text-[11px] text-muted-foreground/40">{knowledgeNotes.length} ideas · {knowledgeLinks.length} links</p>
-            </div>
-          </div>
-          <div className="flex gap-1.5">
-            <Button
-              variant="ghost" size="sm"
-              onClick={() => dispatch(generateBriefing() as any)}
-              disabled={isBriefingGenerating}
-              className="h-8 px-2.5 text-xs text-primary/70 hover:bg-primary/10 rounded-lg"
-            >
-              <RefreshCw className={cn('h-3.5 w-3.5 mr-1', isBriefingGenerating && 'animate-spin')} />
-              {isBriefingGenerating ? '...' : 'Refresh'}
-            </Button>
-            <Link href="/knowledge">
-              <Button variant="ghost" size="sm" className="h-8 px-2.5 text-xs text-muted-foreground hover:text-primary rounded-lg">
-                Open <ArrowRight className="h-3.5 w-3.5 ml-0.5" />
-              </Button>
-            </Link>
-          </div>
-        </CardHeader>
-        <CardContent className="p-3">
-          {briefing ? (
-            <div className="space-y-2.5">
-              {briefing.briefing && (
-                <p className="text-sm text-muted-foreground/80 leading-relaxed">{briefing.briefing}</p>
-              )}
-              {briefing.insights?.slice(0, 2).map((insight: { title: string; content: string }, i: number) => (
-                <div key={i} className="flex items-start gap-2.5 p-2.5 bg-primary/5 border border-primary/15 rounded-lg">
-                  <div className="p-1 rounded-md bg-primary/10 mt-0.5">
-                    <Sparkles className="h-3 w-3 text-primary/70" />
-                  </div>
-                  <div>
-                    <p className="text-xs font-semibold text-foreground/80">{insight.title}</p>
-                    <p className="text-xs text-muted-foreground/60 mt-0.5 leading-relaxed">{insight.content?.slice(0, 120)}</p>
-                  </div>
-                </div>
-              ))}
-              {briefingAge && (
-                <p className="text-[10px] text-muted-foreground/30">
-                  Updated {new Date(briefingAge).toLocaleTimeString()}
-                </p>
-              )}
-            </div>
-          ) : (
-            <div className="flex items-center gap-3">
-              <div className="grid grid-cols-3 gap-4 flex-1">
-                <div className="text-center">
-                  <p className="text-xl font-bold text-primary">{knowledgeNotes.length}</p>
-                  <p className="text-[10px] text-muted-foreground/50">Ideas</p>
-                </div>
-                <div className="text-center">
-                  <p className="text-xl font-bold text-primary">{knowledgeLinks.length}</p>
-                  <p className="text-[10px] text-muted-foreground/50">Links</p>
-                </div>
-                <div className="text-center">
-                  <Link href="/knowledge/graph">
-                    <div className="flex flex-col items-center hover:text-primary transition-colors text-muted-foreground/50">
-                      <Network className="h-5 w-5" />
-                      <p className="text-[10px]">Graph</p>
-                    </div>
-                  </Link>
-                </div>
-              </div>
-              <Button
-                onClick={() => dispatch(generateBriefing() as any)}
-                disabled={isBriefingGenerating}
-                size="sm"
-                className="text-xs shrink-0"
-              >
-                <Sparkles className="h-3 w-3 mr-1" />
-                Brief Me
-              </Button>
-            </div>
-          )}
-        </CardContent>
-      </Card>
-
       {/* Daily Mirror (once per day) */}
       {showDailyMirror && cognitiveData && (
         <Card className="rounded-xl border-border/30">
@@ -568,54 +622,14 @@ export default function DashboardPage() {
         </Card>
       )}
 
-      {/* COGNITIVE PROFILE */}
-      {cognitiveData && (
-        <Card className="rounded-xl card-gradient-cyan border-l-[3px] border-l-cyan-500 secondary-content">
-          <CardHeader className="flex flex-row items-center justify-between py-3 px-4 border-b border-border/30">
-            <div className="flex items-center gap-2">
-              <div className="p-1 rounded-lg bg-primary/10">
-                <Brain className="h-3.5 w-3.5 text-primary" />
-              </div>
-              <p className="text-xs font-semibold text-foreground/80">Cognitive Profile</p>
-            </div>
-            <Link href="/insights">
-              <span className="text-xs text-muted-foreground/40 hover:text-primary transition-colors">Full analysis →</span>
-            </Link>
-          </CardHeader>
-          <CardContent className="p-4 space-y-3">
-            <div className="flex items-center gap-2">
-              <span className="px-2.5 py-1 rounded-full text-[10px] font-semibold bg-primary/10 text-primary border border-primary/20">
-                {cognitiveData.dominantStyle}
-              </span>
-              <span className="text-xs text-muted-foreground/50">{cognitiveData.learningStyle} Learner</span>
-              <span className="ml-auto text-xs text-muted-foreground/40">
-                {Math.round(cognitiveData.focusScore * 100)}% Focus
-              </span>
-            </div>
-            <div className="h-1.5 bg-muted rounded-full overflow-hidden">
-              <div className="h-full bg-primary rounded-full transition-all" style={{ width: `${cognitiveData.focusScore * 100}%` }} />
-            </div>
-            <div className="space-y-1.5">
-              {cognitiveData.patterns.slice(0, 2).map((p, i) => (
-                <div key={i} className="flex items-center gap-2">
-                  <span className="text-xs text-foreground/60 flex-1 truncate">{p.label}</span>
-                  <div className="w-16 h-1.5 bg-muted rounded-full overflow-hidden">
-                    <div
-                      className={cn('h-full rounded-full transition-all', p.valence === 'strength' ? 'bg-primary/70' : p.valence === 'weakness' ? 'bg-destructive/60' : 'bg-muted-foreground/40')}
-                      style={{ width: `${p.score * 100}%` }}
-                    />
-                  </div>
-                  <span className="text-[10px] text-muted-foreground/40 w-7 text-right">{Math.round(p.score * 100)}%</span>
-                </div>
-              ))}
-            </div>
-            {trajectoryData?.narrative?.headline && (
-              <p className="text-xs text-muted-foreground/50 italic border-t border-border/20 pt-2">
-                {trajectoryData.narrative.headline}
-              </p>
-            )}
-          </CardContent>
-        </Card>
+      {/* Cognitive Profile link */}
+      {cognitiveData && trajectoryData?.narrative?.headline && (
+        <Link href="/insights">
+          <div className="p-3 border border-border/30 rounded-xl bg-white/[0.02] hover:bg-white/[0.04] transition-colors">
+            <p className="text-xs text-muted-foreground/50 italic">{trajectoryData.narrative.headline}</p>
+            <span className="text-[10px] text-primary/60 mt-1 inline-block">Full cognitive analysis →</span>
+          </div>
+        </Link>
       )}
 
       {/* CURIOSITY TRIGGER */}

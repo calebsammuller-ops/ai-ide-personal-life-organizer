@@ -10,6 +10,7 @@ import { selectUser } from '@/state/slices/authSlice'
 import { setSearchOpen, openModal, selectIsFocusModeActive, toggleFocusMode } from '@/state/slices/uiSlice'
 import { selectCognitiveState } from '@/state/slices/cognitiveStateSlice'
 import { selectMomentumScore, selectMomentumTrend, selectMomentumStreak } from '@/state/slices/momentumSlice'
+import { selectIdentityTitle } from '@/state/slices/identitySlice'
 import { selectCurrentNextMove } from '@/state/slices/nextMoveSlice'
 import { cn } from '@/lib/utils'
 
@@ -35,6 +36,7 @@ export function Header() {
   const streak = useAppSelector(selectMomentumStreak)
   const currentNextMove = useAppSelector(selectCurrentNextMove)
   const isFocusMode = useAppSelector(selectIsFocusModeActive)
+  const identityTitle = useAppSelector(selectIdentityTitle)
 
   const getTitle = () => {
     for (const [path, title] of Object.entries(pageTitles)) {
@@ -54,10 +56,13 @@ export function Header() {
 
       <div className="bg-card/60 backdrop-blur-xl border-b border-border/30">
         <div className="flex h-12 items-center justify-between px-4">
-          <div className="flex items-center gap-2.5">
+          <div className="flex items-center gap-3">
             <h1 className="text-base font-bold text-foreground tracking-tight">
               {getTitle()}
             </h1>
+            <span className="hidden md:inline-flex text-[10px] font-semibold px-2.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 border border-emerald-500/25">
+              {identityTitle}
+            </span>
           </div>
 
           {/* Cognitive status indicators — desktop only */}
